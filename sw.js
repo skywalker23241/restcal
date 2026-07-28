@@ -1,6 +1,6 @@
 /* 休历 Service Worker
  * 发布新版本时递增 CACHE_VERSION，旧缓存会在 activate 阶段清除。 */
-const CACHE_VERSION = "v1.5.1";
+const CACHE_VERSION = "v1.5.7";
 const APP_CACHE = `xiuli-app-${CACHE_VERSION}`;
 const FONT_CACHE = "xiuli-fonts-v1";
 
@@ -11,6 +11,7 @@ const PRECACHE = [
     "app-i18n-v1.4.9.js",
     "calendar-years.js",
     "onboarding.js",
+    "product-tour.js",
     "styles.css",
     "manifest.webmanifest",
     "vendor/chinese-days/index.min.js",

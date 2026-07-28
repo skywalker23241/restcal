@@ -131,7 +131,7 @@
                         <use href="#i-theme-auto" />
                     </svg></button>
                 <button class="btn icon-btn language-btn" id="languageToggle" type="button" title="Switch to English" aria-label="Switch to English">EN</button>
-                <button class="btn icon-btn" id="guideToggle" type="button" title="使用说明" aria-label="使用说明"
+                <button class="btn icon-btn" id="guideToggle" type="button" title="界面引导" aria-label="界面引导"
                     hidden><svg class="icon">
                         <use href="#i-guide" />
                     </svg></button>
@@ -385,49 +385,22 @@
         </div>
     </div>
 
-    <div class="modal-backdrop" id="guideModal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
-        <div class="modal">
-            <div class="modal-head">
-                <div>
-                    <h2 id="guideTitle">使用说明</h2>
-                    <div class="subtitle">按下面步骤完成月份查看、请假管理、工资计算和数据备份。</div>
-                </div>
-                <button class="btn ghost" id="closeGuide" type="button" aria-label="关闭">关闭</button>
-            </div>
-            <div class="modal-body">
-                <div class="guide-list">
-                    <div class="guide-step">
-                        <strong>切换月份</strong>
-                        <span>使用顶部的年份、月份、上月、下月按钮查看不同月份。日历会自动标记周末、法定节假日、调休和农历信息。</span>
-                    </div>
-                    <div class="guide-step">
-                        <strong>标记单日状态</strong>
-                        <span>点击任意工作日，在弹窗中选择出勤、事假、病假、年假或调休。填写理由和备注后保存。</span>
-                    </div>
-                    <div class="guide-step">
-                        <strong>批量请假或清除</strong>
-                        <span>在日期弹窗中设置开始日期和结束日期，再选择状态并保存。系统只会应用到工作日，自动跳过周末和法定节假日。</span>
-                    </div>
-                    <div class="guide-step">
-                        <strong>查看统计</strong>
-                        <span>左侧月度统计展示本月热力图和请假天数。右侧年度统计默认显示每月请假天数柱状图，也可以切换到全年每日热力图。</span>
-                    </div>
-                    <div class="guide-step">
-                        <strong>设置额度和工资</strong>
-                        <span>点击右上角设置按钮，统一填写年假、调休额度、月薪、固定扣除和各类请假扣款比例，即可得到请假扣款和实际收入。</span>
-                    </div>
-                    <div class="guide-step">
-                        <strong>生成请假条</strong>
-                        <span>在设置里维护申请人、称呼、默认理由和工作安排说明。点击日期后选择事假或病假，即可在弹窗里生成请假条。</span>
-                    </div>
-                    <div class="guide-step">
-                        <strong>备份和恢复</strong>
-                        <span>在「设置 → 数据管理」中导出 CSV 备份（桌面端也可点击右上角的双向箭头图标）。更换浏览器或设备前建议先导出，之后可通过导入 CSV 恢复数据。</span>
-                    </div>
+    <div class="modal-backdrop tour-intro-backdrop" id="guideModal" role="dialog" aria-modal="true" aria-labelledby="guideTitle" aria-describedby="guideDescription">
+        <div class="modal tour-intro-modal">
+            <div class="tour-intro-mark" aria-hidden="true"><svg class="icon"><use href="#i-guide" /></svg></div>
+            <div class="modal-body tour-intro-body">
+                <span class="tour-intro-eyebrow">快速上手</span>
+                <h2 id="guideTitle">用 2 分钟认识 RestCal</h2>
+                <p id="guideDescription">跟随高亮提示认识日历记录、批量标记、统计、实用工具、外观设置和数据备份。</p>
+                <div class="tour-intro-points" aria-hidden="true">
+                    <span>真实界面操作</span>
+                    <span>不会保存演示记录</span>
+                    <span>随时可以退出</span>
                 </div>
             </div>
             <div class="modal-foot">
-                <button class="btn primary" id="guideDone" type="button">知道了</button>
+                <button class="btn" id="closeGuide" type="button">暂不体验</button>
+                <button class="btn primary" id="guideDone" type="button">开始引导</button>
             </div>
         </div>
     </div>
@@ -837,6 +810,7 @@
     <script src="calendar-years.js"></script>
     <script src="app-i18n-v1.4.9.js"></script>
     <script src="onboarding.js"></script>
+    <script src="product-tour.js"></script>
     <script>
         const STORAGE_KEY = "xiuli-state-v1";
         const WEBDAV_KEY = "xiuli-webdav-v1";
@@ -845,6 +819,7 @@
         const WEBDAV_PROXY_URL = "/__webdav";
         const THEME_KEY = "xiuli-theme";
         const THEME_SEQUENCE = ["auto", "light", "dark"];
+        const PRODUCT_TOUR_VERSION = 2;
         const THEME_META = {
             auto: {icon: "i-theme-auto", label: "主题：跟随系统"},
             light: {icon: "i-theme-light", label: "主题：浅色"},
@@ -944,6 +919,7 @@
         let searchRenderTimer = 0;
         let onboardingStep = 0;
         let onboardingDraft = null;
+        let productTour = null;
 
         const els = {
             app: document.querySelector("main.app"),
@@ -1105,6 +1081,7 @@
             initEnhancedSelects();
             initNavigation();
             initCalendarSwipe();
+            initProductTour();
             bindEvents();
             fillSettingsInputs();
             renderRestDaysPicker();
@@ -1196,7 +1173,9 @@
             els.themeToggle.title = meta.label;
             document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#171411" : "#f6f3ed");
             document.querySelectorAll("[data-theme-choice]").forEach(button => {
-                button.classList.toggle("active", button.dataset.themeChoice === pref);
+                const active = button.dataset.themeChoice === pref;
+                button.classList.toggle("active", active);
+                button.setAttribute("aria-pressed", String(active));
             });
         }
 
@@ -1256,7 +1235,7 @@
             enhancedSelectEventsBound = true;
             document.addEventListener("click", event => {
                 const clickedInside = [...enhancedSelects.values(), ...enhancedDateInputs.values()]
-                    .some(view => view.box.contains(event.target));
+                    .some(view => view.box.contains(event.target) || view.menu?.contains(event.target));
                 if (!clickedInside) {
                     closeAllEnhancedSelects();
                     closeAllDateMenus();
@@ -1264,10 +1243,17 @@
             });
             document.addEventListener("keydown", event => {
                 if (event.key === "Escape") {
+                    const hasOpenPicker = [...enhancedSelects.values(), ...enhancedDateInputs.values()]
+                        .some(view => view.box.classList.contains("open"));
+                    if (!hasOpenPicker) return;
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
                     closeAllEnhancedSelects();
                     closeAllDateMenus();
                 }
             });
+            window.addEventListener("resize", repositionOpenDateMenus);
+            document.addEventListener("scroll", repositionOpenDateMenus, true);
         }
 
         // 旧版设置分组名 → 新分类
@@ -1377,11 +1363,15 @@
         function syncAppearanceControls() {
             const theme = getThemePreference();
             document.querySelectorAll("[data-theme-choice]").forEach(button => {
-                button.classList.toggle("active", button.dataset.themeChoice === theme);
+                const active = button.dataset.themeChoice === theme;
+                button.classList.toggle("active", active);
+                button.setAttribute("aria-pressed", String(active));
             });
             const language = window.RestCalI18n?.getLanguage() || "zh";
             document.querySelectorAll("[data-language-choice]").forEach(button => {
-                button.classList.toggle("active", button.dataset.languageChoice === language);
+                const active = button.dataset.languageChoice === language;
+                button.classList.toggle("active", active);
+                button.setAttribute("aria-pressed", String(active));
             });
         }
 
@@ -1634,6 +1624,7 @@
                 }
             });
             menu.addEventListener("click", event => handleDateMenuClick(event, input));
+            menu.addEventListener("pointerdown", event => event.stopPropagation());
             menu.addEventListener("keydown", event => handleDateMenuKeydown(event, input));
         }
 
@@ -1645,11 +1636,34 @@
             if (view.box.classList.contains("open")) renderDateMenu(input);
         }
 
+        const DATE_RANGE_PAIRS = {
+            searchFrom: ["searchFrom", "searchTo"],
+            searchTo: ["searchFrom", "searchTo"],
+            leaveStart: ["leaveStart", "leaveEnd"],
+            leaveEnd: ["leaveStart", "leaveEnd"],
+            modalStartDate: ["modalStartDate", "modalEndDate"],
+            modalEndDate: ["modalStartDate", "modalEndDate"]
+        };
+
+        function dateRangeForInput(input) {
+            const pair = DATE_RANGE_PAIRS[input.id];
+            if (!pair) return null;
+            const startValue = document.getElementById(pair[0])?.value || "";
+            const endValue = document.getElementById(pair[1])?.value || "";
+            return {
+                start: isValidISODate(startValue) ? startValue : "",
+                end: isValidISODate(endValue) ? endValue : ""
+            };
+        }
+
         function renderDateMenu(input) {
             const view = enhancedDateInputs.get(input);
             if (!view) return;
             const selected = isValidISODate(input.value) ? input.value : "";
             const todayISO = toISO(today);
+            const range = dateRangeForInput(input);
+            const rangeFrom = range?.start && range?.end ? [range.start, range.end].sort()[0] : "";
+            const rangeTo = range?.start && range?.end ? [range.start, range.end].sort()[1] : "";
             const first = new Date(view.viewYear, view.viewMonth - 1, 1);
             const start = new Date(view.viewYear, view.viewMonth - 1, 1 - (first.getDay() + 6) % 7); // 周一起始
             const weekdays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
@@ -1662,21 +1676,28 @@
                 const classes = [
                     "date-day",
                     date.getMonth() + 1 === view.viewMonth ? "" : "outside",
+                    date.getDay() === 0 || date.getDay() === 6 ? "is-weekend" : "",
                     iso === todayISO ? "is-today" : "",
-                    iso === selected ? "is-selected" : ""
+                    iso === selected ? "is-selected" : "",
+                    iso === range?.start ? "is-range-start" : "",
+                    iso === range?.end ? "is-range-end" : "",
+                    rangeFrom && iso > rangeFrom && iso < rangeTo ? "is-in-range" : ""
                 ].filter(Boolean).join(" ");
-                cells.push(`<button type="button" class="${classes}" data-date-pick="${iso}">${date.getDate()}</button>`);
+                const ariaCurrent = iso === todayISO ? ` aria-current="date"` : "";
+                const ariaPressed = iso === selected ? ` aria-pressed="true"` : "";
+                cells.push(`<button type="button" class="${classes}" data-date-pick="${iso}" aria-label="${iso}"${ariaCurrent}${ariaPressed}><span>${date.getDate()}</span></button>`);
             }
 
             // 标题拆成两个文本节点：“7月”命中词典（→ Jul），“2026 年”走 i18n 正则
             view.menu.innerHTML = `
           <div class="date-menu-head">
-            <button type="button" class="date-nav" data-date-nav="-12" aria-label="上一年">«</button>
+            <button type="button" class="date-nav date-nav-year" data-date-nav="-12" aria-label="上一年">«</button>
             <button type="button" class="date-nav" data-date-nav="-1" aria-label="上月">‹</button>
             <span class="date-menu-title"><span>${view.viewYear} 年</span> <span>${view.viewMonth}月</span></span>
             <button type="button" class="date-nav" data-date-nav="1" aria-label="下月">›</button>
-            <button type="button" class="date-nav" data-date-nav="12" aria-label="下一年">»</button>
+            <button type="button" class="date-nav date-nav-year" data-date-nav="12" aria-label="下一年">»</button>
           </div>
+          ${range?.start || range?.end ? `<div class="date-range-summary"><span>范围</span><strong>${escapeHtml(range.start || "…")} → ${escapeHtml(range.end || "…")}</strong></div>` : ""}
           <div class="date-menu-week">${weekdays.map(day => `<span>${day}</span>`).join("")}</div>
           <div class="date-menu-grid">${cells.join("")}</div>
           <div class="date-menu-foot">
@@ -1684,6 +1705,9 @@
             <button type="button" class="date-action date-action-primary" data-date-today>今天</button>
           </div>
         `;
+            if (view.box.classList.contains("open") && view.menu.classList.contains("is-portal")) {
+                window.requestAnimationFrame(() => positionDateMenu(input));
+            }
         }
 
         function toggleDateMenu(input) {
@@ -1704,15 +1728,52 @@
             renderDateMenu(input);
             view.box.classList.add("open");
             view.trigger.setAttribute("aria-expanded", "true");
-            // 弹层可能贴住视口右缘或在可滚动弹窗底部被裁切：右缘翻转 + 滚入视野
-            view.menu.classList.remove("align-right");
-            if (view.menu.getBoundingClientRect().right > window.innerWidth - 8) {
-                view.menu.classList.add("align-right");
-            }
-            view.menu.scrollIntoView({block: "nearest"});
+            // 月历挂到 body，避开 details/modal 的 overflow 裁切，再按可用空间上下翻转。
+            view.menu.classList.add("is-portal");
+            view.menu.style.visibility = "hidden";
+            document.body.appendChild(view.menu);
+            positionDateMenu(input);
+            view.menu.style.visibility = "";
             (view.menu.querySelector(".date-day.is-selected")
                 || view.menu.querySelector(".date-day.is-today")
                 || view.menu.querySelector(".date-day"))?.focus();
+        }
+
+        function positionDateMenu(input) {
+            const view = enhancedDateInputs.get(input);
+            if (!view?.box.classList.contains("open") || !view.menu.classList.contains("is-portal")) return;
+            const margin = 10;
+            const gap = 8;
+            const triggerRect = view.trigger.getBoundingClientRect();
+            const menuRect = view.menu.getBoundingClientRect();
+            const menuWidth = Math.min(menuRect.width, window.innerWidth - margin * 2);
+            const left = Math.min(
+                Math.max(margin, triggerRect.left),
+                Math.max(margin, window.innerWidth - menuWidth - margin)
+            );
+            const spaceBelow = window.innerHeight - triggerRect.bottom - gap - margin;
+            const spaceAbove = triggerRect.top - gap - margin;
+            const placeAbove = menuRect.height > spaceBelow && spaceAbove > spaceBelow;
+            const idealTop = placeAbove
+                ? Math.max(margin, triggerRect.top - menuRect.height - gap)
+                : Math.min(triggerRect.bottom + gap, window.innerHeight - menuRect.height - margin);
+            const top = Math.min(
+                Math.max(margin, idealTop),
+                Math.max(margin, window.innerHeight - menuRect.height - margin)
+            );
+            view.menu.style.left = `${left}px`;
+            view.menu.style.top = `${top}px`;
+            view.menu.style.setProperty(
+                "--date-anchor-x",
+                `${Math.min(Math.max(20, triggerRect.left + triggerRect.width / 2 - left), menuWidth - 20)}px`
+            );
+            view.menu.dataset.placement = placeAbove ? "top" : "bottom";
+        }
+
+        function repositionOpenDateMenus() {
+            enhancedDateInputs.forEach((view, input) => {
+                if (view.box.classList.contains("open")) positionDateMenu(input);
+            });
         }
 
         function closeDateMenu(input, returnFocus = false) {
@@ -1720,6 +1781,10 @@
             if (!view) return;
             view.box.classList.remove("open");
             view.trigger.setAttribute("aria-expanded", "false");
+            view.menu.classList.remove("is-portal");
+            view.menu.removeAttribute("data-placement");
+            view.menu.removeAttribute("style");
+            view.box.appendChild(view.menu);
             if (returnFocus) view.trigger.focus();
         }
 
@@ -1730,16 +1795,30 @@
         }
 
         function commitDateValue(input, iso) {
+            const pair = DATE_RANGE_PAIRS[input.id];
+            if (pair && isValidISODate(iso)) {
+                const isStart = input.id === pair[0];
+                const peer = document.getElementById(isStart ? pair[1] : pair[0]);
+                const peerValue = peer?.value || "";
+                const crossesPeer = isValidISODate(peerValue) && (isStart ? peerValue < iso : peerValue > iso);
+                if (peer && crossesPeer) {
+                    peer.value = iso;
+                    peer.dispatchEvent(new Event("input", {bubbles: true}));
+                    peer.dispatchEvent(new Event("change", {bubbles: true}));
+                }
+            }
             input.value = iso;
             input.dispatchEvent(new Event("input", {bubbles: true}));
             input.dispatchEvent(new Event("change", {bubbles: true}));
         }
 
         function handleDateMenuClick(event, input) {
+            event.stopPropagation();
             const view = enhancedDateInputs.get(input);
             if (!view) return;
             const nav = event.target.closest("[data-date-nav]");
             if (nav) {
+                event.preventDefault();
                 const next = new Date(view.viewYear, view.viewMonth - 1 + Number(nav.dataset.dateNav), 1);
                 view.viewYear = next.getFullYear();
                 view.viewMonth = next.getMonth() + 1;
@@ -1766,6 +1845,7 @@
         function handleDateMenuKeydown(event, input) {
             if (event.key === "Escape") {
                 event.preventDefault();
+                event.stopPropagation();
                 closeDateMenu(input, true);
                 return;
             }
@@ -1900,7 +1980,7 @@
                 if (button) exportCsv();
             });
 
-            els.guideToggle.addEventListener("click", () => openGuide());
+            els.guideToggle.addEventListener("click", openGuide);
             els.closeReceipt.addEventListener("click", closeReceiptModal);
             els.receiptDone.addEventListener("click", closeReceiptModal);
             els.downloadReceipt.addEventListener("click", downloadCurrentReceiptImage);
@@ -1913,10 +1993,10 @@
             els.leaveGeneratorModal.addEventListener("click", event => {
                 if (event.target === els.leaveGeneratorModal) closeLeaveGenerator();
             });
-            els.closeGuide.addEventListener("click", closeGuide);
-            els.guideDone.addEventListener("click", closeGuide);
+            els.closeGuide.addEventListener("click", dismissProductTourIntro);
+            els.guideDone.addEventListener("click", startProductTour);
             els.guideModal.addEventListener("click", event => {
-                if (event.target === els.guideModal) closeGuide();
+                if (event.target === els.guideModal) dismissProductTourIntro();
             });
 
             els.exportCsv.addEventListener("click", exportCsv);
@@ -1985,13 +2065,14 @@
             });
             document.addEventListener("keydown", event => {
                 if (event.key !== "Escape") return;
+                if (productTour?.active) return skipProductTour();
                 if (els.confirmModal.classList.contains("open")) return resolveConfirm(false);
                 if (els.searchModal.classList.contains("open")) return closeSearch();
                 if (els.dayModal.classList.contains("open")) return closeModal();
                 if (els.receiptModal.classList.contains("open")) return closeReceiptModal();
                 if (els.leaveGeneratorModal.classList.contains("open")) return closeLeaveGenerator();
                 if (els.settingsModal.classList.contains("open")) return closeSettings();
-                if (els.guideModal.classList.contains("open")) return closeGuide();
+                if (els.guideModal.classList.contains("open")) return dismissProductTourIntro();
             });
             document.addEventListener("keydown", event => {
                 // 轻量焦点圈定：Tab 只在最上层弹窗内循环（Set 保留插入顺序，最后打开的在最上层）
@@ -2970,12 +3051,290 @@
             els.settingsPage?.classList.remove("subpage-open");
         }
 
+        function firstVisible(selector) {
+            return [...document.querySelectorAll(selector)].find(element => {
+                const rect = element.getBoundingClientRect();
+                return rect.width > 0 && rect.height > 0;
+            }) || null;
+        }
+
+        function tourWorkdayCard() {
+            return [...els.calendarGrid.querySelectorAll(".day-card.clickable:not(.outside)")].find(card => {
+                const date = card.dataset.date ? fromISO(card.dataset.date) : null;
+                return date && getDayInfo(date).isWorkday;
+            }) || els.calendarGrid.querySelector(".day-card.clickable:not(.outside)");
+        }
+
+        function waitForTourTransition(ms = 220) {
+            return new Promise(resolve => window.setTimeout(resolve, ms));
+        }
+
+        function initProductTour() {
+            if (!window.RestCalProductTour) return;
+            const {ProductTour} = window.RestCalProductTour;
+            productTour = new ProductTour({
+                steps: [
+                    {
+                        target: "#nextMonth",
+                        title: "切换日期范围",
+                        text: "点击右箭头查看下一个月。旁边的年份、月份和“今天”也可以快速定位日期。",
+                        advanceOn: "target-click",
+                        beforeEnter: async () => {
+                            if (els.settingsModal.classList.contains("open")) closeSettings();
+                            closeAllDateMenus();
+                            if (els.dayModal.classList.contains("open")) closeModal();
+                            switchView("calendar");
+                            if (calendarMode !== "month") setCalendarMode("month");
+                            await waitForTourTransition(80);
+                        }
+                    },
+                    {
+                        target: tourWorkdayCard,
+                        title: "打开一天",
+                        text: "点击高亮的工作日，打开当天的出勤和请假记录。",
+                        advanceOn: "target-click",
+                        beforeEnter: async () => {
+                            if (els.settingsModal.classList.contains("open")) closeSettings();
+                            closeAllDateMenus();
+                            if (els.dayModal.classList.contains("open")) {
+                                closeModal();
+                                await waitForTourTransition();
+                            }
+                            switchView("calendar");
+                            await render();
+                        }
+                    },
+                    {
+                        target: '[data-action="annual"]',
+                        title: "选择当天状态",
+                        text: "点击“年假”看看状态如何选择。引导不会替你保存这条演示记录。",
+                        advanceOn: "target-click",
+                        beforeEnter: async () => {
+                            if (!els.dayModal.classList.contains("open")) {
+                                const card = tourWorkdayCard();
+                                if (card?.dataset.date) openModal(card.dataset.date);
+                            }
+                            els.modalAdvanced.open = false;
+                            await waitForTourTransition(60);
+                        }
+                    },
+                    {
+                        target: "#modalAdvanced > summary",
+                        title: "展开批量设置",
+                        text: "点击“更多选项”，设置需要批量标记的日期范围。",
+                        advanceOn: "target-click",
+                        beforeEnter: async () => {
+                            closeAllDateMenus();
+                            if (!els.dayModal.classList.contains("open")) {
+                                switchView("calendar");
+                                const card = tourWorkdayCard();
+                                if (card?.dataset.date) openModal(card.dataset.date);
+                            }
+                            els.modalAdvanced.open = false;
+                            await waitForTourTransition(60);
+                        }
+                    },
+                    {
+                        target: "#modalAdvanced .range-grid",
+                        title: "选择多个日期",
+                        text: "分别设置开始日期和结束日期。保存后，当前状态会应用到范围内所有工作日，并自动跳过周末和节假日。",
+                        beforeEnter: async () => {
+                            if (!els.dayModal.classList.contains("open")) {
+                                switchView("calendar");
+                                const card = tourWorkdayCard();
+                                if (card?.dataset.date) openModal(card.dataset.date);
+                            }
+                            els.modalAdvanced.open = true;
+                            await waitForTourTransition(80);
+                        }
+                    },
+                    {
+                        target: () => firstVisible('.app-nav-btn[data-nav="stats"], .bottom-nav-btn[data-nav="stats"]'),
+                        title: "查看统计",
+                        text: "点击“统计”，查看月度出勤、请假天数和年度趋势。",
+                        advanceOn: "target-click",
+                        beforeEnter: async () => {
+                            if (els.settingsModal.classList.contains("open")) {
+                                closeSettings();
+                                await waitForTourTransition();
+                            }
+                            closeAllDateMenus();
+                            if (els.dayModal.classList.contains("open")) {
+                                closeModal();
+                                await waitForTourTransition();
+                            }
+                        }
+                    },
+                    {
+                        target: () => firstVisible('.app-nav-btn[data-nav="tools"], .bottom-nav-btn[data-nav="tools"]'),
+                        title: "打开实用工具",
+                        text: "点击“工具”，这里可以生成工资条、请假条并查看购票提醒。",
+                        advanceOn: "target-click",
+                        beforeEnter: async () => {
+                            if (els.settingsModal.classList.contains("open")) {
+                                closeSettings();
+                                await waitForTourTransition();
+                            }
+                            closeAllDateMenus();
+                            if (els.dayModal.classList.contains("open")) {
+                                closeModal();
+                                await waitForTourTransition();
+                            }
+                        }
+                    },
+                    {
+                        target: '[data-open-receipt="salary"]',
+                        title: "工资核算与工资条",
+                        text: "根据本月出勤和请假记录估算扣款、实发工资，并生成可下载的工资条。",
+                        beforeEnter: async () => {
+                            if (els.settingsModal.classList.contains("open")) closeSettings();
+                            switchView("tools");
+                            await waitForTourTransition(80);
+                        }
+                    },
+                    {
+                        target: "[data-generate-leave-receipt]",
+                        title: "生成请假条",
+                        text: "填写日期、请假类型和理由，预览并下载规范的请假条。",
+                        beforeEnter: async () => {
+                            if (els.settingsModal.classList.contains("open")) closeSettings();
+                            switchView("tools");
+                            await waitForTourTransition(60);
+                        }
+                    },
+                    {
+                        target: "#ticketToolToggle",
+                        title: "购票提醒",
+                        text: "查看法定节假日火车票开售日期，提前安排假期出行。",
+                        beforeEnter: async () => {
+                            if (els.settingsModal.classList.contains("open")) closeSettings();
+                            switchView("tools");
+                            await waitForTourTransition(60);
+                        }
+                    },
+                    {
+                        target: "#languageToggle",
+                        title: "快速切换语言",
+                        text: "右上角语言按钮可以在中文和 English 之间快速切换。",
+                        beforeEnter: async () => {
+                            if (els.settingsModal.classList.contains("open")) closeSettings();
+                            switchView("tools");
+                            await waitForTourTransition(60);
+                        }
+                    },
+                    {
+                        target: () => firstVisible("#settingsToggle, #bottomNavSettings"),
+                        title: "进入设置",
+                        text: "点击设置入口，管理工作制度、工资、假期额度和个人资料。",
+                        advanceOn: "target-click",
+                        beforeEnter: async () => {
+                            if (els.settingsModal.classList.contains("open")) {
+                                closeSettings();
+                                await waitForTourTransition();
+                            }
+                            switchView("tools");
+                        }
+                    },
+                    {
+                        target: '[data-settings-nav="appearance"]',
+                        title: "打开外观设置",
+                        text: "点击“外观”，设置主题和界面语言。",
+                        advanceOn: "target-click",
+                        beforeEnter: async () => {
+                            if (!els.settingsModal.classList.contains("open")) openSettings();
+                            els.settingsPage?.classList.remove("subpage-open");
+                            await waitForTourTransition(240);
+                        }
+                    },
+                    {
+                        target: "#themeChoice",
+                        title: "选择显示主题",
+                        text: "可以跟随系统，也可以固定使用浅色或深色主题。",
+                        beforeEnter: async () => {
+                            if (!els.settingsModal.classList.contains("open")) openSettings("appearance");
+                            else setSettingsPanel("appearance");
+                            els.settingsPage?.classList.add("subpage-open");
+                            await waitForTourTransition(180);
+                        }
+                    },
+                    {
+                        target: "#languageChoice",
+                        title: "设置界面语言",
+                        text: "语言也可以在这里选择，设置会保存在当前设备。",
+                        beforeEnter: async () => {
+                            if (!els.settingsModal.classList.contains("open")) openSettings("appearance");
+                            else setSettingsPanel("appearance");
+                            els.settingsPage?.classList.add("subpage-open");
+                            await waitForTourTransition(120);
+                        }
+                    },
+                    {
+                        target: '[data-settings-nav="data"]',
+                        title: "找到数据与同步",
+                        text: "点击“数据与同步”，进入备份、恢复和 WebDAV 配置。",
+                        advanceOn: "target-click",
+                        beforeEnter: async () => {
+                            if (!els.settingsModal.classList.contains("open")) {
+                                openSettings();
+                            }
+                            els.settingsPage?.classList.remove("subpage-open");
+                            await waitForTourTransition(240);
+                        }
+                    },
+                    {
+                        target: '[data-settings-panel="data"] .settings-card',
+                        title: "记得备份数据",
+                        text: "RestCal 数据保存在当前设备。更换设备前，可以在这里导出 CSV 或配置 WebDAV。你已经完成界面引导。",
+                        beforeEnter: async () => {
+                            if (!els.settingsModal.classList.contains("open")) openSettings("data");
+                            else setSettingsPanel("data");
+                            els.settingsPage?.classList.add("subpage-open");
+                            await waitForTourTransition(240);
+                        }
+                    }
+                ],
+                onFinish: () => completeProductTour(false),
+                onSkip: () => completeProductTour(true)
+            });
+        }
+
         function openGuide() {
+            if (productTour?.active) return;
             openBackdrop(els.guideModal);
         }
 
         function closeGuide() {
             closeBackdrop(els.guideModal);
+        }
+
+        function dismissProductTourIntro() {
+            state.productTourSeenVersion = PRODUCT_TOUR_VERSION;
+            saveState();
+            closeGuide();
+        }
+
+        async function startProductTour() {
+            closeGuide();
+            await waitForTourTransition();
+            if (!productTour) {
+                showToast("界面引导模块暂不可用，请刷新后重试", "error");
+                return;
+            }
+            productTour.start();
+        }
+
+        function skipProductTour() {
+            productTour?.skip();
+        }
+
+        function completeProductTour(skipped) {
+            state.productTourSeenVersion = PRODUCT_TOUR_VERSION;
+            saveState();
+            closeAllDateMenus();
+            if (els.dayModal.classList.contains("open")) closeModal();
+            if (els.settingsModal.classList.contains("open")) closeSettings();
+            switchView("calendar");
+            showToast(skipped ? "已退出界面引导，可从右上角重新打开" : "界面引导已完成");
         }
 
         function openSearch() {
@@ -3977,7 +4336,8 @@
                     language: window.RestCalI18n?.getLanguage() || "zh"
                 },
                 onboardingCompleted: state.onboardingCompleted,
-                onboardingSkipped: state.onboardingSkipped
+                onboardingSkipped: state.onboardingSkipped,
+                productTourSeenVersion: state.productTourSeenVersion
             }));
         }
 
@@ -4018,6 +4378,10 @@
             }
             if (typeof data.onboardingSkipped === "boolean") {
                 state.onboardingSkipped = data.onboardingSkipped;
+                restored = true;
+            }
+            if (Number.isFinite(Number(data.productTourSeenVersion))) {
+                state.productTourSeenVersion = Math.max(0, Number(data.productTourSeenVersion));
                 restored = true;
             }
             return restored;
@@ -4061,7 +4425,25 @@
         }
         function renderOnboardingRestDays() { const host = document.getElementById("obRestDays"); if (!host) return; host.innerHTML = RestCalOnboardingView.restDayOptions(onboardingDraft.workSchedule.restDays); }
         function renderOnboardingSummary() { const host = document.getElementById("onboardingSummary"); if (!host) return; const d = onboardingDraft; host.innerHTML = `<div class="onboarding-summary-row"><span>个人</span><strong>${escapeHtml(d.profile.name || "未填写")}</strong></div><div class="onboarding-summary-row"><span>工作制度</span><strong>每周 ${d.workSchedule.workdaysPerWeek} 天 · 每天 ${d.workSchedule.dailyWorkHours} 小时</strong></div><div class="onboarding-summary-row"><span>工资</span><strong>${d.salary.monthlySalary ? formatMoney(d.salary.monthlySalary) + " / 月" : "未填写"}</strong></div>`; }
-        function nextOnboardingStep() { syncOnboardingDraft(); if (!validateOnboardingStep()) return; if (onboardingStep < RestCalOnboardingView.steps.length - 1) { onboardingStep += 1; renderOnboardingStep(); return; } applyUserData(onboardingDraft); state.onboardingCompleted = true; state.onboardingSkipped = false; saveState(); closeOnboarding(); render(); showToast("设置已保存，欢迎来到 RestCal"); }
+        async function nextOnboardingStep() {
+            syncOnboardingDraft();
+            if (!validateOnboardingStep()) return;
+            if (onboardingStep < RestCalOnboardingView.steps.length - 1) {
+                onboardingStep += 1;
+                renderOnboardingStep();
+                return;
+            }
+            applyUserData(onboardingDraft);
+            state.onboardingCompleted = true;
+            state.onboardingSkipped = false;
+            saveState();
+            closeOnboarding();
+            await render();
+            showToast("设置已保存，欢迎来到 RestCal");
+            if (state.productTourSeenVersion < PRODUCT_TOUR_VERSION) {
+                window.setTimeout(openGuide, 260);
+            }
+        }
         function validateOnboardingStep() {
             const kind = RestCalOnboardingView.steps[onboardingStep].kind;
             if (kind === "welcome" || kind === "profile" || kind === "summary") return true;
@@ -4768,6 +5150,7 @@
                 workSchedule: {...DEFAULT_USER_DATA.workSchedule, ...(source.workSchedule || {}), restDays: Array.isArray(source.workSchedule?.restDays) ? source.workSchedule.restDays : [0, 6]},
                 salary: {...DEFAULT_USER_DATA.salary, ...(source.salary || {}), monthlySalary: source.salary?.monthlySalary ?? settings.salary ?? 0, fixedDeductions: source.salary?.fixedDeductions ?? settings.deduction ?? 0, estimatedTax: source.salary?.estimatedTax ?? settings.estimatedTax ?? 0, payday: source.salary?.payday ?? settings.payday ?? null},
                 onboardingCompleted: Boolean(source.onboardingCompleted), onboardingSkipped: Boolean(source.onboardingSkipped),
+                productTourSeenVersion: Math.max(0, Number(source.productTourSeenVersion) || 0),
                 setupBannerDismissed: Boolean(source.setupBannerDismissed)
             };
             return result;

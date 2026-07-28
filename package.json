@@ -27,6 +27,7 @@
             "app-i18n-v1.4.9.js",
             "calendar-years.js",
             "onboarding.js",
+            "product-tour.js",
             "styles.css",
             "manifest.webmanifest",
             "sw.js",
