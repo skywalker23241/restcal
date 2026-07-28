@@ -1,6 +1,13 @@
 [build]
   publish = "."
 
+# /app 无后缀路径显式重写到 app.html（此前依赖 Netlify Pretty URLs 的隐式行为）。
+# 200 重写不产生浏览器可见的重定向，Service Worker 才能按导航路径稳定识别应用页。
+[[redirects]]
+  from = "/app"
+  to = "/app.html"
+  status = 200
+
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"

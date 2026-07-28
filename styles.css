@@ -168,6 +168,8 @@ body {
     font-size: 14px;
     line-height: 1.5;
     font-variant-numeric: tabular-nums;
+    /* 复选框、单选等原生控件跟随主题印章红 */
+    accent-color: var(--primary);
 }
 
 body.modal-open {
@@ -984,6 +986,275 @@ h1 {
     }
 }
 
+/* selectbox 的 field 变体：用于弹窗/设置里的字段下拉，
+   触发器外观对齐 .field input，菜单铺满字段宽度 */
+.selectbox-field {
+    width: 100%;
+    min-width: 0;
+}
+
+.selectbox-field .select-trigger {
+    min-height: 36px;
+    padding: 8px 12px 8px 10px;
+    border: 1px solid var(--input);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--text);
+    font-weight: 400;
+    box-shadow: none;
+}
+
+@media (hover: hover) {
+    .selectbox-field .select-trigger:hover {
+        border-color: color-mix(in srgb, var(--ring) 36%, var(--input));
+        background: var(--accent);
+    }
+}
+
+.selectbox-field .select-trigger:focus-visible {
+    outline: 0;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px var(--ring-soft);
+}
+
+.selectbox-field .select-menu {
+    width: 100%;
+}
+
+/* 设置页字段更高、边框微混主题色，触发器随之对齐 */
+.settings-panel > .settings-grid .field .select-trigger {
+    min-height: 42px;
+    border-color: color-mix(in srgb, var(--border) 88%, var(--ring));
+}
+
+/* ===== 自定义日期选择器 datebox：触发器同 field 下拉，弹层为主题月历面板 ===== */
+.datebox {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+}
+
+.date-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 8px;
+    min-height: 36px;
+    padding: 8px 12px 8px 10px;
+    border: 1px solid var(--input);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--text);
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+}
+
+.date-trigger::after {
+    content: "";
+    width: 15px;
+    height: 15px;
+    flex: 0 0 auto;
+    background: currentColor;
+    opacity: 0.55;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M3 11h18'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M3 11h18'/%3E%3C/svg%3E") center / contain no-repeat;
+    transition: opacity var(--transition-fast) ease;
+}
+
+@media (hover: hover) {
+    .date-trigger:hover {
+        border-color: color-mix(in srgb, var(--ring) 36%, var(--input));
+        background: var(--accent);
+    }
+
+    .date-trigger:hover::after {
+        opacity: 0.9;
+    }
+}
+
+.date-trigger:focus-visible {
+    outline: 0;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px var(--ring-soft);
+}
+
+.datebox.open .date-trigger {
+    border-color: var(--ring);
+    background: color-mix(in srgb, var(--primary) 7%, var(--card));
+    box-shadow: 0 0 0 3px var(--ring-soft);
+}
+
+.date-trigger-label.is-placeholder {
+    color: var(--muted);
+}
+
+.date-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 1002;
+    display: none;
+    width: 276px;
+    max-width: min(276px, calc(100vw - 24px));
+    padding: 10px;
+    border: 1px solid color-mix(in srgb, var(--border) 86%, var(--ring));
+    border-radius: var(--radius);
+    background: var(--popover);
+    color: var(--popover-foreground);
+    box-shadow: var(--shadow-lg);
+}
+
+.datebox.open .date-menu {
+    display: block;
+}
+
+.date-menu.align-right {
+    left: auto;
+    right: 0;
+}
+
+.date-menu-head {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-bottom: 8px;
+}
+
+.date-menu-title {
+    flex: 1;
+    text-align: center;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.date-nav {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1;
+}
+
+@media (hover: hover) {
+    .date-nav:hover {
+        background: var(--accent);
+        color: var(--accent-foreground);
+    }
+}
+
+.date-nav:focus-visible {
+    outline: 0;
+    background: var(--accent);
+    box-shadow: 0 0 0 2px var(--ring-soft);
+}
+
+.date-menu-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 2px;
+    color: var(--muted);
+    font-size: 10.5px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.date-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.date-day {
+    display: grid;
+    place-items: center;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--popover-foreground);
+    font-variant-numeric: tabular-nums;
+}
+
+@media (hover: hover) {
+    .date-day:hover {
+        background: var(--accent);
+    }
+}
+
+.date-day:focus-visible {
+    outline: 0;
+    box-shadow: inset 0 0 0 2px var(--ring);
+}
+
+.date-day.outside {
+    color: color-mix(in srgb, var(--muted) 55%, transparent);
+}
+
+.date-day.is-today {
+    box-shadow: inset 0 0 0 1.5px var(--primary);
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.date-day.is-selected {
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-weight: 700;
+}
+
+.date-day.is-selected.is-today {
+    box-shadow: none;
+    color: var(--primary-foreground);
+}
+
+.date-menu-foot {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+}
+
+.date-action {
+    min-height: 28px;
+    padding: 4px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+@media (hover: hover) {
+    .date-action:hover {
+        background: var(--accent);
+        color: var(--accent-foreground);
+    }
+}
+
+.date-action:focus-visible {
+    outline: 0;
+    background: var(--accent);
+    box-shadow: 0 0 0 2px var(--ring-soft);
+}
+
+.date-action-primary {
+    color: var(--primary);
+}
+
+/* 设置页字段更高时对齐（同 select-trigger） */
+.settings-panel > .settings-grid .field .date-trigger {
+    min-height: 42px;
+    border-color: color-mix(in srgb, var(--border) 88%, var(--ring));
+}
+
 .select-menu::-webkit-scrollbar {
     width: 10px;
 }
@@ -1256,8 +1527,9 @@ h1 {
 }
 
 .weekday-row {
-    border-bottom: 1px solid var(--border);
-    background: var(--muted-surface);
+    gap: 6px;
+    padding: 6px 12px 0;
+    background: transparent;
 }
 
 .weekday {
@@ -1269,8 +1541,9 @@ h1 {
 }
 
 .calendar-grid {
-    gap: 1px;
-    background: var(--border);
+    gap: 6px;
+    padding: 12px;
+    background: transparent;
     flex: 1;
     align-content: stretch;
 }
@@ -1289,115 +1562,121 @@ h1 {
 
 .day-card {
     position: relative;
-    min-height: 96px;
-    padding: 8px 8px 8px 11px;
-    border: 0;
+    min-height: 84px;
+    padding: 12px 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
     background: var(--card);
-    text-align: left;
+    text-align: center;
     color: var(--text);
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 4px;
     outline: none;
-    transition: background var(--transition-fast) ease, box-shadow var(--transition-fast) ease, transform 0.12s ease;
-}
-
-/* 状态用左侧细色条表达，避免整格高饱和填充 */
-.day-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 3px;
-    background: transparent;
+    transition: background var(--transition-fast) ease, border-color var(--transition-fast) ease, box-shadow var(--transition-fast) ease, transform 0.12s ease;
 }
 
 .day-card.clickable:focus-visible {
     z-index: 2;
-    filter: brightness(0.985);
-    box-shadow: inset 0 0 0 1px var(--ring);
+    box-shadow: 0 0 0 2px var(--ring);
 }
 
 @media (hover: hover) {
     .day-card.clickable:hover {
         z-index: 2;
         filter: brightness(0.985);
-        box-shadow: inset 0 0 0 1px var(--ring);
+        transform: translateY(-1px);
     }
 }
 
+.day-card .solar {
+    font-size: 20px;
+}
+
+/* 单行副标签：状态 / 补班 / 节假日 / 节气 / 农历，一格只说一件事 */
+.day-sub {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--muted);
+}
+
+.day-sub.kind-lunar {
+    font-weight: 500;
+}
+
+.day-sub.kind-term { color: var(--st-comp); }
+.day-sub.kind-work { color: var(--st-work); }
+.day-sub.kind-personal { color: var(--st-personal); }
+.day-sub.kind-sick { color: var(--st-sick); }
+.day-sub.kind-annual { color: var(--st-annual); }
+.day-sub.kind-comp { color: var(--st-comp); }
+.day-sub.kind-makeup { color: var(--st-makeup); }
+.day-sub.kind-holiday { color: var(--st-holiday); }
+
+/* 连休非首日的“休”走伪元素：进词典会误翻品牌 logo 等同字节点 */
+.day-sub.rest-day::before {
+    content: "休";
+}
+
+:lang(en) .day-sub.rest-day::before {
+    content: "Off";
+}
+
 .day-card.outside {
-    color: var(--muted);
-    background: var(--surface-dim);
+    opacity: 0.45;
 }
 
-.day-card.outside .solar {
-    opacity: 0.6;
+/* 周末中性灰底；节假日红底红字（周末假日重叠时，靠后的节假日规则胜出）。
+   以下状态表达月/周视图共用：整卡淡色底 + 状态色描边（出勤最常见，只上底色不描边） */
+:is(.day-card, .week-row).is-weekend {
+    background: var(--tint-weekend);
+    border-color: transparent;
 }
 
-/* 周末保持中性，仅日期数字弱化 */
-.day-card.is-weekend {
-    background: var(--card);
-}
-
-.day-card.is-weekend .solar {
+:is(.day-card, .week-row).is-weekend .solar {
     color: var(--muted);
 }
 
-.day-card.is-holiday {
-    background: color-mix(in srgb, var(--st-holiday) 4%, var(--card));
+:is(.day-card, .week-row).is-holiday {
+    background: var(--tint-holiday);
+    border-color: var(--line-holiday);
 }
 
-.day-card.is-holiday .solar {
+:is(.day-card, .week-row).is-holiday .solar,
+:is(.day-card, .week-row).is-holiday .day-sub {
     color: var(--st-holiday);
 }
 
 :is(.day-card, .week-row).status-work {
-    background: color-mix(in srgb, var(--st-work) 4%, var(--card));
-}
-
-:is(.day-card, .week-row).status-work::before {
-    background: var(--st-work);
+    background: var(--tint-work);
+    border-color: transparent;
 }
 
 :is(.day-card, .week-row).status-personal {
-    background: color-mix(in srgb, var(--st-personal) 4%, var(--card));
-}
-
-:is(.day-card, .week-row).status-personal::before {
-    background: var(--st-personal);
+    background: var(--tint-personal);
+    border-color: var(--line-personal);
 }
 
 :is(.day-card, .week-row).status-sick {
-    background: color-mix(in srgb, var(--st-sick) 4%, var(--card));
-}
-
-:is(.day-card, .week-row).status-sick::before {
-    background: var(--st-sick);
+    background: var(--tint-sick);
+    border-color: var(--line-sick);
 }
 
 :is(.day-card, .week-row).status-annual {
-    background: color-mix(in srgb, var(--st-annual) 4%, var(--card));
-}
-
-:is(.day-card, .week-row).status-annual::before {
-    background: var(--st-annual);
+    background: var(--tint-annual);
+    border-color: var(--line-annual);
 }
 
 :is(.day-card, .week-row).status-comp {
-    background: color-mix(in srgb, var(--st-comp) 4%, var(--card));
-}
-
-:is(.day-card, .week-row).status-comp::before {
-    background: var(--st-comp);
-}
-
-.date-line {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 8px;
+    background: var(--tint-comp);
+    border-color: var(--line-comp);
 }
 
 .solar {
@@ -1407,33 +1686,14 @@ h1 {
     line-height: 1;
 }
 
-.today-dot {
-    display: none;
-    min-height: 18px;
-    padding: 1px 5px;
-    border-radius: 999px;
-    border: 1px solid transparent;
-    background: var(--primary);
-    color: var(--primary-foreground);
-    font-size: 11px;
-    font-weight: 800;
-    flex: 0 0 auto;
+:is(.day-card, .week-row).today {
+    border-color: transparent;
+    box-shadow: 0 0 0 2px var(--primary);
 }
 
-.today-dot::before {
-    content: "今天";
-}
-
-.day-card.today .today-dot {
-    display: block;
-}
-
-.day-card.today {
-    box-shadow: inset 0 0 0 1.5px var(--primary);
-}
-
-.day-card.selected {
-    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--foreground) 55%, transparent);
+:is(.day-card, .week-row).selected {
+    border-color: transparent;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--foreground) 55%, transparent);
 }
 
 /* ===== 日历多视图（日/周/年） ===== */
@@ -1452,7 +1712,7 @@ h1 {
     display: none;
 }
 
-/* ===== 周视图：议程式 7 行 ===== */
+/* ===== 周视图：议程式 7 行卡片，与月视图同一套状态语言 ===== */
 .calendar-grid.week-mode {
     grid-template-columns: 1fr;
 }
@@ -1460,57 +1720,42 @@ h1 {
 .week-row {
     position: relative;
     display: grid;
-    grid-template-columns: 64px 88px auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(84px, auto) 44px minmax(96px, auto) minmax(0, 1fr) auto;
     align-items: center;
     gap: 12px;
     min-height: 62px;
-    padding: 10px 16px 10px 19px;
-    border: 0;
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
     background: var(--card);
     color: var(--text);
     text-align: left;
-    transition: background var(--transition-fast) ease, box-shadow var(--transition-fast) ease;
-}
-
-.week-row::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 3px;
-    background: transparent;
+    outline: none;
+    transition: background var(--transition-fast) ease, border-color var(--transition-fast) ease, box-shadow var(--transition-fast) ease, transform 0.12s ease;
 }
 
 @media (hover: hover) {
     .week-row:hover {
-        background: var(--accent);
+        z-index: 2;
+        filter: brightness(0.985);
+        transform: translateY(-1px);
     }
 }
 
 .week-row:focus-visible {
-    outline: 0;
-    box-shadow: inset 0 0 0 2px var(--ring-soft);
+    z-index: 2;
+    box-shadow: 0 0 0 2px var(--ring);
 }
 
-.week-row.today {
-    box-shadow: inset 0 0 0 1.5px var(--primary);
-}
-
-.week-row.selected {
-    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--foreground) 55%, transparent);
-}
-
-.week-row.today .today-dot {
-    display: block;
-    justify-self: end;
-}
-
-.week-row .week-date {
-    display: flex;
-    align-items: baseline;
-    gap: 7px;
-    min-width: 0;
+/* 农历放在日期左侧：主题色 + 撕页日历同款衬线，像老黄历的批注 */
+.week-row .week-lunar {
+    color: var(--primary);
+    font-family: var(--font-display);
+    font-size: 15px;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .week-row .solar {
@@ -1520,22 +1765,18 @@ h1 {
     line-height: 1;
 }
 
+/* 周几缀在行尾：字号放大、对比度压低，作低调的行尾水印 */
 .week-row .week-dow {
-    color: var(--muted);
-    font-size: 12px;
+    justify-self: end;
+    color: color-mix(in srgb, var(--muted) 55%, transparent);
+    font-size: 17px;
     font-weight: 600;
-}
-
-.week-row .week-lunar {
-    color: var(--muted);
-    font-size: 12px;
+    letter-spacing: 0.14em;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-.week-row .tags {
-    margin: 0;
+.week-row .day-sub {
+    font-size: 13px;
 }
 
 .week-row .week-detail {
@@ -1549,18 +1790,6 @@ h1 {
 .week-row .week-detail em {
     font-style: normal;
     opacity: 0.55;
-}
-
-.week-row.is-weekend .solar {
-    color: var(--muted);
-}
-
-.week-row.is-holiday .solar {
-    color: var(--st-holiday);
-}
-
-.week-row.is-holiday {
-    background: color-mix(in srgb, var(--st-holiday) 4%, var(--card));
 }
 
 /* ===== 日视图：传统撕页日历 ===== */
@@ -1880,15 +2109,6 @@ h1 {
     font-weight: 700;
 }
 
-.lunar {
-    color: var(--muted);
-    font-size: 11px;
-    min-height: 15px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .tags {
     display: flex;
     flex-wrap: wrap;
@@ -1974,17 +2194,6 @@ h1 {
     color: var(--st-comp);
     font-family: var(--font-display);
     letter-spacing: 0.06em;
-}
-
-.reason {
-    margin-top: auto;
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.35;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
 
 .section h2,
@@ -2755,6 +2964,18 @@ h1 {
     color: var(--popover-foreground);
 }
 
+/* 原生日期输入：字段外观已随 .field input 主题化；弹出面板由浏览器渲染，
+   仅跟随明暗（color-scheme），这里把日历图标压淡、悬停提亮以贴近墨色层级 */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity var(--transition-fast) ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
 .field textarea {
     min-height: 82px;
     resize: vertical;
@@ -2961,10 +3182,6 @@ h1 {
 
 .calendar-grid.animate .week-row {
     animation-delay: calc(var(--i, 0) * 24ms);
-}
-
-.calendar-grid.animate .day-card.today .today-dot {
-    animation: stamp-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
 }
 
 @keyframes loading-pulse {
@@ -3588,7 +3805,6 @@ html.theme-anim #themeToggle .icon {
 .search-result {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
-    gap: 3px 10px;
     min-height: 58px;
     padding: 10px 12px;
     border: 1px solid var(--border);
@@ -4040,14 +4256,23 @@ html.theme-anim #themeToggle .icon {
 
     /* 周视图议程行：小屏压缩列距 */
     .week-row {
-        grid-template-columns: 46px 70px auto minmax(0, 1fr) auto;
+        grid-template-columns: minmax(70px, auto) 34px minmax(56px, auto) minmax(0, 1fr) auto;
         gap: 8px;
         min-height: 56px;
-        padding: 10px 12px 10px 15px;
+        padding: 10px 12px;
+        border-radius: 10px;
     }
 
     .week-row .solar {
         font-size: 18px;
+    }
+
+    .week-row .week-lunar {
+        font-size: 13px;
+    }
+
+    .week-row .week-dow {
+        font-size: 14px;
     }
 
     .calendar-grid.year-mode {
@@ -4243,34 +4468,33 @@ html.theme-anim #themeToggle .icon {
         font-size: 11px;
     }
 
-    .day-card {
-        min-height: 62px;
-        padding: 6px 4px 5px;
-        gap: 2px;
+    .weekday-row {
+        gap: 4px;
+        padding: 4px 10px 0;
     }
 
-    .date-line {
+    .calendar-grid {
         gap: 4px;
+        padding: 10px;
+    }
+
+    .day-card {
+        min-height: 60px;
+        padding: 7px 3px 6px;
+        gap: 2px;
+        border-radius: 10px;
+    }
+
+    .day-card .solar {
+        font-size: 15px;
+    }
+
+    .day-sub {
+        font-size: 10px;
     }
 
     .solar {
         font-size: 15px;
-    }
-
-    /* “今天”文字徽标缩成圆点，今天卡片本身保留描边 */
-    .today-dot {
-        width: 7px;
-        height: 7px;
-        min-height: 0;
-        padding: 0;
-        font-size: 0;
-        line-height: 0;
-        overflow: hidden;
-    }
-
-    .lunar {
-        font-size: 10px;
-        min-height: 13px;
     }
 
     .tags {
@@ -4278,26 +4502,6 @@ html.theme-anim #themeToggle .icon {
         min-height: 14px;
         flex-wrap: nowrap;
         overflow: hidden;
-    }
-
-    /* 标签退化为无边框迷你文字，颜色沿用各状态文字色 */
-    .day-card .tag {
-        min-height: 0;
-        max-width: 100%;
-        padding: 0;
-        border: 0;
-        border-radius: 0;
-        background: transparent;
-        font-size: 10px;
-        line-height: 1.3;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .day-card .tag.aux-state,
-    .reason {
-        display: none;
     }
 
     .summary-row {
@@ -4474,24 +4678,30 @@ html.theme-anim #themeToggle .icon {
     }
 
     .calendar-grid {
-        gap: 1px;
+        gap: 4px;
+        padding: 8px;
+    }
+
+    .weekday-row {
+        gap: 4px;
+        padding: 2px 8px 0;
     }
 
     .day-card {
-        min-height: 56px;
-        padding: 5px 3px 4px;
+        min-height: 54px;
+        padding: 5px 2px 4px;
+        border-radius: 9px;
+    }
+
+    .day-card .solar {
+        font-size: 14px;
     }
 
     .solar {
         font-size: 14px;
     }
 
-    .lunar {
-        font-size: 9px;
-        min-height: 12px;
-    }
-
-    .day-card .tag {
+    .day-sub {
         font-size: 9px;
     }
 

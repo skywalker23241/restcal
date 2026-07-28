@@ -937,6 +937,7 @@
         let currentSalaryReceipt = null;
         let currentLeaveReceipt = null;
         const enhancedSelects = new Map();
+        const enhancedDateInputs = new Map();
         let enhancedSelectEventsBound = false;
         const narrowScreenQuery = window.matchMedia("(max-width: 760px)");
         const openBackdrops = new Set();
@@ -1243,15 +1244,29 @@
         }
 
         function initEnhancedSelects() {
-            [els.yearSelect, els.monthSelect].forEach(enhanceSelect);
+            // forEach 会把索引传入第二参，必须显式包装避免污染 variant
+            [els.yearSelect, els.monthSelect].forEach(select => enhanceSelect(select));
+            // 弹窗与设置里的原生下拉弹层无法主题化，统一替换为自定义 selectbox（field 变体铺满字段宽度）
+            ["searchStatus", "scheduleTypeInput", "leaveTypeForDoc"]
+                .forEach(id => enhanceSelect(document.getElementById(id), "field"));
+            // 原生日期输入的弹出面板同样无法主题化，替换为自定义日期选择器
+            ["searchFrom", "searchTo", "hireDateInput", "leaveStart", "leaveEnd", "modalStartDate", "modalEndDate"]
+                .forEach(id => enhanceDateInput(document.getElementById(id)));
             if (enhancedSelectEventsBound) return;
             enhancedSelectEventsBound = true;
             document.addEventListener("click", event => {
-                const clickedInside = [...enhancedSelects.values()].some(view => view.box.contains(event.target));
-                if (!clickedInside) closeAllEnhancedSelects();
+                const clickedInside = [...enhancedSelects.values(), ...enhancedDateInputs.values()]
+                    .some(view => view.box.contains(event.target));
+                if (!clickedInside) {
+                    closeAllEnhancedSelects();
+                    closeAllDateMenus();
+                }
             });
             document.addEventListener("keydown", event => {
-                if (event.key === "Escape") closeAllEnhancedSelects();
+                if (event.key === "Escape") {
+                    closeAllEnhancedSelects();
+                    closeAllDateMenus();
+                }
             });
         }
 
@@ -1399,15 +1414,16 @@
             }, {passive: true});
         }
 
-        function enhanceSelect(select) {
+        function enhanceSelect(select, variant) {
             if (!select || enhancedSelects.has(select)) return;
 
             const box = document.createElement("div");
-            box.className = `selectbox ${select.id === "monthSelect" ? "selectbox-month" : "selectbox-year"}`;
+            const kind = variant || (select.id === "monthSelect" ? "month" : "year");
+            box.className = `selectbox selectbox-${kind}`;
 
             const trigger = document.createElement("button");
             trigger.type = "button";
-            trigger.className = "select-trigger control";
+            trigger.className = kind === "field" ? "select-trigger" : "select-trigger control";
             trigger.setAttribute("aria-haspopup", "listbox");
             trigger.setAttribute("aria-expanded", "false");
             trigger.setAttribute("aria-label", select.getAttribute("aria-label") || "选择");
@@ -1432,6 +1448,17 @@
             enhancedSelects.set(select, view);
             rebuildEnhancedSelect(select, view);
             syncEnhancedSelect(select);
+
+            // 代码里多处直接给 select.value 赋值（载入设置、清空筛选、预填请假单），
+            // 拦截该实例的 value setter 让触发器文案始终同步，免去逐个赋值点手动刷新
+            const valueDescriptor = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
+            Object.defineProperty(select, "value", {
+                get() { return valueDescriptor.get.call(this); },
+                set(next) {
+                    valueDescriptor.set.call(this, next);
+                    syncEnhancedSelect(this);
+                }
+            });
 
             select.addEventListener("change", () => syncEnhancedSelect(select));
             trigger.addEventListener("click", () => toggleEnhancedSelect(select));
@@ -1494,7 +1521,9 @@
         function openEnhancedSelect(select, focusSelected = false) {
             const view = enhancedSelects.get(select);
             if (!view) return;
+            syncEnhancedSelect(select);
             closeAllEnhancedSelects(select);
+            closeAllDateMenus();
             view.box.classList.add("open");
             view.trigger.setAttribute("aria-expanded", "true");
             if (focusSelected) {
@@ -1550,6 +1579,212 @@
                 event.preventDefault();
                 closeEnhancedSelect(select, true);
             }
+        }
+
+        // ===== 自定义日期选择器：datebox（原生 date 弹出面板无法主题化，这里
+        // 与 selectbox 同构——原生 input 隐藏持值，触发器 + 月历弹层完全走主题） =====
+        function enhanceDateInput(input) {
+            if (!input || enhancedDateInputs.has(input)) return;
+
+            const box = document.createElement("div");
+            box.className = "datebox";
+
+            const trigger = document.createElement("button");
+            trigger.type = "button";
+            trigger.className = "date-trigger";
+            trigger.setAttribute("aria-haspopup", "dialog");
+            trigger.setAttribute("aria-expanded", "false");
+            trigger.setAttribute("aria-label", input.labels?.[0]?.textContent.trim() || "选择日期");
+
+            const label = document.createElement("span");
+            label.className = "date-trigger-label";
+            trigger.appendChild(label);
+
+            const menu = document.createElement("div");
+            menu.className = "date-menu";
+            menu.setAttribute("role", "dialog");
+            menu.setAttribute("aria-label", "选择日期");
+
+            box.append(trigger, menu);
+            input.after(box);
+            input.classList.add("select-native");
+            input.tabIndex = -1;
+            input.setAttribute("aria-hidden", "true");
+
+            const view = {box, trigger, label, menu, viewYear: today.getFullYear(), viewMonth: today.getMonth() + 1};
+            enhancedDateInputs.set(input, view);
+            syncDateInput(input);
+
+            // 与 selectbox 相同：拦截实例 value setter，程序赋值时自动同步触发器文案
+            const valueDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
+            Object.defineProperty(input, "value", {
+                get() { return valueDescriptor.get.call(this); },
+                set(next) {
+                    valueDescriptor.set.call(this, next);
+                    syncDateInput(this);
+                }
+            });
+
+            input.addEventListener("change", () => syncDateInput(input));
+            trigger.addEventListener("click", () => toggleDateMenu(input));
+            trigger.addEventListener("keydown", event => {
+                if (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openDateMenu(input);
+                }
+            });
+            menu.addEventListener("click", event => handleDateMenuClick(event, input));
+            menu.addEventListener("keydown", event => handleDateMenuKeydown(event, input));
+        }
+
+        function syncDateInput(input) {
+            const view = enhancedDateInputs.get(input);
+            if (!view) return;
+            view.label.textContent = input.value || "选择日期";
+            view.label.classList.toggle("is-placeholder", !input.value);
+            if (view.box.classList.contains("open")) renderDateMenu(input);
+        }
+
+        function renderDateMenu(input) {
+            const view = enhancedDateInputs.get(input);
+            if (!view) return;
+            const selected = isValidISODate(input.value) ? input.value : "";
+            const todayISO = toISO(today);
+            const first = new Date(view.viewYear, view.viewMonth - 1, 1);
+            const start = new Date(view.viewYear, view.viewMonth - 1, 1 - (first.getDay() + 6) % 7); // 周一起始
+            const weekdays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+
+            const cells = [];
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(start);
+                date.setDate(start.getDate() + i);
+                const iso = toISO(date);
+                const classes = [
+                    "date-day",
+                    date.getMonth() + 1 === view.viewMonth ? "" : "outside",
+                    iso === todayISO ? "is-today" : "",
+                    iso === selected ? "is-selected" : ""
+                ].filter(Boolean).join(" ");
+                cells.push(`<button type="button" class="${classes}" data-date-pick="${iso}">${date.getDate()}</button>`);
+            }
+
+            // 标题拆成两个文本节点：“7月”命中词典（→ Jul），“2026 年”走 i18n 正则
+            view.menu.innerHTML = `
+          <div class="date-menu-head">
+            <button type="button" class="date-nav" data-date-nav="-12" aria-label="上一年">«</button>
+            <button type="button" class="date-nav" data-date-nav="-1" aria-label="上月">‹</button>
+            <span class="date-menu-title"><span>${view.viewYear} 年</span> <span>${view.viewMonth}月</span></span>
+            <button type="button" class="date-nav" data-date-nav="1" aria-label="下月">›</button>
+            <button type="button" class="date-nav" data-date-nav="12" aria-label="下一年">»</button>
+          </div>
+          <div class="date-menu-week">${weekdays.map(day => `<span>${day}</span>`).join("")}</div>
+          <div class="date-menu-grid">${cells.join("")}</div>
+          <div class="date-menu-foot">
+            <button type="button" class="date-action" data-date-clear>清空</button>
+            <button type="button" class="date-action date-action-primary" data-date-today>今天</button>
+          </div>
+        `;
+        }
+
+        function toggleDateMenu(input) {
+            const view = enhancedDateInputs.get(input);
+            if (!view) return;
+            if (view.box.classList.contains("open")) closeDateMenu(input);
+            else openDateMenu(input);
+        }
+
+        function openDateMenu(input) {
+            const view = enhancedDateInputs.get(input);
+            if (!view) return;
+            closeAllEnhancedSelects();
+            closeAllDateMenus(input);
+            const base = isValidISODate(input.value) ? fromISO(input.value) : today;
+            view.viewYear = base.getFullYear();
+            view.viewMonth = base.getMonth() + 1;
+            renderDateMenu(input);
+            view.box.classList.add("open");
+            view.trigger.setAttribute("aria-expanded", "true");
+            // 弹层可能贴住视口右缘或在可滚动弹窗底部被裁切：右缘翻转 + 滚入视野
+            view.menu.classList.remove("align-right");
+            if (view.menu.getBoundingClientRect().right > window.innerWidth - 8) {
+                view.menu.classList.add("align-right");
+            }
+            view.menu.scrollIntoView({block: "nearest"});
+            (view.menu.querySelector(".date-day.is-selected")
+                || view.menu.querySelector(".date-day.is-today")
+                || view.menu.querySelector(".date-day"))?.focus();
+        }
+
+        function closeDateMenu(input, returnFocus = false) {
+            const view = enhancedDateInputs.get(input);
+            if (!view) return;
+            view.box.classList.remove("open");
+            view.trigger.setAttribute("aria-expanded", "false");
+            if (returnFocus) view.trigger.focus();
+        }
+
+        function closeAllDateMenus(exceptInput = null) {
+            enhancedDateInputs.forEach((_, input) => {
+                if (input !== exceptInput) closeDateMenu(input);
+            });
+        }
+
+        function commitDateValue(input, iso) {
+            input.value = iso;
+            input.dispatchEvent(new Event("input", {bubbles: true}));
+            input.dispatchEvent(new Event("change", {bubbles: true}));
+        }
+
+        function handleDateMenuClick(event, input) {
+            const view = enhancedDateInputs.get(input);
+            if (!view) return;
+            const nav = event.target.closest("[data-date-nav]");
+            if (nav) {
+                const next = new Date(view.viewYear, view.viewMonth - 1 + Number(nav.dataset.dateNav), 1);
+                view.viewYear = next.getFullYear();
+                view.viewMonth = next.getMonth() + 1;
+                renderDateMenu(input);
+                return;
+            }
+            const day = event.target.closest("[data-date-pick]");
+            if (day) {
+                commitDateValue(input, day.dataset.datePick);
+                closeDateMenu(input, true);
+                return;
+            }
+            if (event.target.closest("[data-date-clear]")) {
+                commitDateValue(input, "");
+                closeDateMenu(input, true);
+                return;
+            }
+            if (event.target.closest("[data-date-today]")) {
+                commitDateValue(input, toISO(today));
+                closeDateMenu(input, true);
+            }
+        }
+
+        function handleDateMenuKeydown(event, input) {
+            if (event.key === "Escape") {
+                event.preventDefault();
+                closeDateMenu(input, true);
+                return;
+            }
+            const steps = {ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7};
+            const day = event.target.closest("[data-date-pick]");
+            if (!day || !(event.key in steps)) return;
+            event.preventDefault();
+            const view = enhancedDateInputs.get(input);
+            const target = fromISO(day.dataset.datePick);
+            target.setDate(target.getDate() + steps[event.key]);
+            const iso = toISO(target);
+            let cell = view.menu.querySelector(`[data-date-pick="${iso}"]`);
+            if (!cell) {
+                view.viewYear = target.getFullYear();
+                view.viewMonth = target.getMonth() + 1;
+                renderDateMenu(input);
+                cell = view.menu.querySelector(`[data-date-pick="${iso}"]`);
+            }
+            cell?.focus();
         }
 
         function bindEvents() {
@@ -1843,6 +2078,35 @@
             else renderCalendar();
         }
 
+        // 单行副标签（月/周视图共用）。优先级：记录状态 > 补班 > 节假日 > 节气；
+        // 都未命中返回 null（月视图回退农历，周视图留空）。节假日只有连休首日
+        // 显示假名，后续日子显示节气或“休”——“休”不能进 i18n 词典（会误翻
+        // 品牌 logo 等同字文本节点），用 rest 标记走 CSS 伪元素按 :lang 输出。
+        function daySubInfo(date, info, record) {
+            if (record?.status) {
+                return record.status === "work"
+                    ? {text: "✓", kind: "work"}
+                    : {text: STATUS_LABELS[record.status] || record.status, kind: record.status};
+            }
+            if (info.makeupName) return {text: "班", kind: "makeup"};
+            const solarTerm = getSolarTermText(date);
+            if (info.isHoliday) {
+                const prev = new Date(date);
+                prev.setDate(prev.getDate() - 1);
+                const prevInfo = getDayInfo(prev);
+                const firstOfRun = !prevInfo.isHoliday || prevInfo.holidayName !== info.holidayName;
+                const text = (firstOfRun && info.holidayName) || solarTerm || "";
+                return {text, kind: "holiday", rest: !text};
+            }
+            if (solarTerm) return {text: solarTerm, kind: "term"};
+            return null;
+        }
+
+        function daySubHtml(sub) {
+            if (!sub) return `<span class="day-sub"></span>`;
+            return `<span class="day-sub kind-${sub.kind}${sub.rest ? " rest-day" : ""}">${escapeHtml(sub.text)}</span>`;
+        }
+
         function createDayCard(date, {outside = false, index = 0} = {}) {
             const iso = toISO(date);
             const info = getDayInfo(date);
@@ -1863,23 +2127,10 @@
             card.type = "button";
             card.setAttribute("aria-label", dayAriaLabel(date, info, record));
 
-            const primaryTags = [];
-            const auxTags = [];
-            if (record?.status) primaryTags.push(tag(STATUS_LABELS[record.status], `${record.status} primary-state`));
-            else if (info.isHoliday) primaryTags.push(tag(info.holidayName || "节假日", "holiday primary-state"));
-            else if (info.isWeekend) primaryTags.push(tag("周末", "aux-state"));
-            if (info.makeupName) primaryTags.push(tag("调休上班", "makeup primary-state"));
-            const solarTerm = getSolarTermText(date);
-            if (solarTerm) auxTags.push(tag(solarTerm, "term aux-state"));
-
+            const sub = daySubInfo(date, info, record) || {text: getLunarText(date), kind: "lunar"};
             card.innerHTML = `
-          <div class="date-line">
-            <div class="solar">${date.getDate()}</div>
-            <span class="today-dot" aria-label="今天"></span>
-          </div>
-          <div class="lunar">${getLunarText(date)}</div>
-          <div class="tags">${primaryTags.concat(auxTags).join("")}</div>
-          ${record?.reason ? `<div class="reason">${escapeHtml(record.reason)}</div>` : ""}
+          <span class="solar">${date.getDate()}</span>
+          ${daySubHtml(sub)}
         `;
             return card;
         }
@@ -1911,7 +2162,6 @@
                 const iso = toISO(date);
                 const info = getDayInfo(date);
                 const record = state.records[iso];
-                const solarTerm = getSolarTermText(date);
 
                 const row = document.createElement("button");
                 row.type = "button";
@@ -1928,35 +2178,27 @@
                 row.dataset.date = iso;
                 row.setAttribute("aria-label", dayAriaLabel(date, info, record));
 
-                const tags = [];
-                if (record?.status) tags.push(tag(STATUS_LABELS[record.status], `${record.status} primary-state`));
-                else if (info.isHoliday) tags.push(tag(info.holidayName || "节假日", "holiday primary-state"));
-                else if (info.isWeekend) tags.push(tag("周末", "aux-state"));
-                if (info.makeupName) tags.push(tag("调休上班", "makeup primary-state"));
-                if (solarTerm) tags.push(tag(solarTerm, "term aux-state"));
-
                 const detail = [record?.reason, record?.note].filter(Boolean).join(" · ");
                 const detailHtml = detail
                     ? escapeHtml(detail)
                     : (!record?.status && !info.isHoliday && !info.isWeekend && !info.makeupName ? `<em>未标记</em>` : "");
                 row.innerHTML = `
-          <span class="week-date">
-            <strong class="solar">${date.getDate()}</strong>
-            <span class="week-dow">${weekdayName(date)}</span>
-          </span>
           <span class="week-lunar">${getLunarText(date)}</span>
-          <span class="tags">${tags.join("")}</span>
+          <strong class="solar">${date.getDate()}</strong>
+          ${daySubHtml(daySubInfo(date, info, record))}
           <span class="week-detail">${detailHtml}</span>
-          <span class="today-dot" aria-label="今天"></span>
+          <span class="week-dow">${weekdayName(date)}</span>
         `;
                 fragment.appendChild(row);
             }
             els.calendarGrid.replaceChildren(fragment);
         }
 
-        // ===== 日视图·每日一言（Quotable API + 本地兜底） =====
+        // ===== 日视图·每日一言（中文一言 Hitokoto / 英文 Quotable + 本地兜底） =====
         const QUOTE_CACHE_KEY = "xiuli-day-quotes-v1";
         const QUOTE_CACHE_LIMIT = 90;
+        // c=d 文学 / c=i 诗词 / c=k 哲学，贴合本地名句的调性；中文按字算宽，限 60 字
+        const HITOKOTO_URL = "https://v1.hitokoto.cn/?c=d&c=i&c=k&max_length=60";
         const FALLBACK_QUOTES_ZH = [
             {content: "不积跬步，无以至千里。", author: "《荀子》"},
             {content: "逝者如斯夫，不舍昼夜。", author: "《论语》"},
@@ -2035,24 +2277,33 @@
             if (!res.ok) throw new Error(String(res.status));
             const data = await res.json();
             const quote = Array.isArray(data) ? data[0] : data;
+            // 一言返回 {hitokoto, from_who, from}，Quotable 返回 {content, author}
+            if (quote?.hitokoto) {
+                const who = String(quote.from_who || "").trim();
+                const work = String(quote.from || "").trim();
+                const author = who && work && who !== work ? `${who}《${work}》`
+                    : who || (work ? `《${work}》` : "佚名");
+                return {content: String(quote.hitokoto), author};
+            }
             if (!quote?.content) throw new Error("empty");
             return {content: String(quote.content), author: String(quote.author || "Unknown")};
         }
 
         async function requestQuote(iso) {
             if (getCachedQuote(iso) || quoteInflight.has(iso)) return;
-            // 中文版本只使用本地格言，不从 API 请求
             const language = getLanguage();
-            if (language === "zh") return;
-
             quoteInflight.add(iso);
             const controller = new AbortController();
             const timer = window.setTimeout(() => controller.abort(), 6000);
-            // api.quotable.io 的 HTTPS 证书长期过期：优先走本站 /__quote 代理
-            // （本地 server.js 与 Netlify Function 均已实现）；非 https 页面
-            // （本地调试、桌面版）还可以直连明文 HTTP；全部失败则保留本地名句。
-            const sources = ["/__quote"];
-            if (location.protocol !== "https:") {
+            // 优先走本站 /__quote 代理（本地 server.js 与 Netlify Function 均已实现）。
+            // 代理不可用时降级直连：中文源一言证书正常，可随时直连；英文源
+            // api.quotable.io 的 HTTPS 证书长期过期，仅非 https 页面（本地调试、
+            // 桌面版）可直连明文 HTTP。全部失败则保留本地名句。
+            const sources = [`/__quote?lang=${language}`];
+            if (language === "zh") {
+                // 时间戳参数绕过一言的 Cloudflare 边缘缓存（相同 URL 短时间内返回同一条）
+                sources.push(`${HITOKOTO_URL}&_=${Date.now()}`);
+            } else if (location.protocol !== "https:") {
                 sources.push("http://api.quotable.io/quotes/random?maxLength=120");
             }
             try {
@@ -3785,10 +4036,12 @@
                 setInputValue("obName", onboardingDraft.profile.name);
                 setInputValue("obCompany", onboardingDraft.profile.company);
                 setInputValue("obHireDate", onboardingDraft.profile.hireDate);
+                enhanceDateInput(document.getElementById("obHireDate"));
             } else if (step.kind === "schedule") {
                 setInputValue("obWorkdays", onboardingDraft.workSchedule.workdaysPerWeek);
                 setInputValue("obDailyHours", onboardingDraft.workSchedule.dailyWorkHours);
                 setInputValue("obScheduleType", onboardingDraft.workSchedule.scheduleType);
+                enhanceSelect(document.getElementById("obScheduleType"), "field");
                 renderOnboardingRestDays();
             } else if (step.kind === "salary") {
                 setInputValue("obSalary", onboardingDraft.salary.monthlySalary || "");

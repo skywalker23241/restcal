@@ -481,14 +481,6 @@
         /* ============================================================
            Preview mockup
            ============================================================ */
-        .preview-frame {
-            background: var(--card);
-            border: 1px solid var(--line);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-        }
-
         .product-gallery { position: relative; }
 
         .product-carousel-stage {
@@ -822,39 +814,36 @@
         .demo-editor-tip { padding: 18px; border: 1px dashed var(--line); border-radius: 14px; color: var(--muted); font-size: 11px; line-height: 1.7; }
         .demo-editor-tip b { display: block; margin-bottom: 6px; color: var(--ink); font-family: var(--serif); font-size: 1rem; }
 
-        .frame-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 18px;
-            border-bottom: 1px solid var(--line-soft);
-            background: color-mix(in srgb, var(--paper) 55%, var(--card));
-        }
+        .demo-day-quote { margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line-soft); font-family: var(--serif); font-size: 11.5px; line-height: 1.6; color: var(--muted); }
+        .demo-day-quote-author { display: block; margin-top: 2px; font-size: 9.5px; letter-spacing: 0.04em; }
 
-        .frame-bar .mark { width: 26px; height: 26px; font-size: 14px; border-radius: 7px; }
+        .demo-month { display: flex; flex-direction: column; min-height: 0; }
+        .demo-month .cal-head { margin-bottom: 10px; }
+        .demo-month .day { min-height: clamp(30px, 4.4vw, 48px); }
+        .demo-month .cal-legend { margin-top: 10px; padding-top: 9px; }
 
-        .frame-title { font-size: 0.86rem; font-weight: 600; }
-
-        .frame-title span { color: var(--muted); font-weight: 500; }
-
-        .frame-icons { display: flex; gap: 8px; margin-left: auto; color: var(--muted); }
-
-        .frame-icons svg { width: 15px; height: 15px; opacity: 0.75; }
-
-        .mock {
+        .demo-data-layout {
             display: grid;
-            grid-template-columns: 1.85fr 1fr;
-            gap: 16px;
-            padding: clamp(14px, 2.4vw, 22px);
-            background: var(--paper);
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+            gap: 18px;
+            align-content: start;
+            height: 100%;
+            min-height: 0;
         }
 
-        .cal-panel {
-            background: var(--card);
-            border: 1px solid var(--line-soft);
-            border-radius: var(--radius);
-            padding: clamp(12px, 1.8vw, 18px);
-        }
+        .demo-backup { padding: 16px; }
+        .demo-backup-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+        .demo-backup-head h4 { margin: 0; font-family: var(--serif); font-size: 1.05rem; }
+        .demo-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 99px; background: color-mix(in srgb, var(--st-work) 14%, transparent); color: var(--st-work); font-size: 9.5px; font-weight: 800; }
+        .demo-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .demo-backup-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line-soft); color: var(--muted); font-size: 10.5px; }
+        .demo-backup-row b { color: var(--ink); font-weight: 700; text-align: right; }
+        .demo-backup .demo-actions { margin-top: 13px; }
+
+        .demo-data-list { display: grid; align-content: center; gap: 10px; }
+        .demo-data-item { padding: 12px 14px; border: 1px dashed var(--line); border-radius: 12px; }
+        .demo-data-item b { display: block; color: var(--ink); font-family: var(--serif); font-size: 0.95rem; }
+        .demo-data-item span { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.55; }
 
         .cal-head {
             display: flex;
@@ -979,88 +968,6 @@
             border-radius: 3px;
             flex: none;
         }
-
-        /* stat rail */
-        .rail { display: grid; gap: 10px; align-content: start; }
-
-        .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-        .tile {
-            background: var(--card);
-            border: 1px solid var(--line-soft);
-            border-radius: var(--radius);
-            padding: 13px 14px 12px;
-        }
-
-        .tile .t-l {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-
-        .tile .t-l i { width: 7px; height: 7px; border-radius: 50%; flex: none; }
-
-        .tile .t-n {
-            font-family: var(--font-display);
-            font-weight: 700;
-            font-size: 1.42rem;
-            line-height: 1.2;
-            margin-top: 5px;
-            font-variant-numeric: tabular-nums;
-            letter-spacing: -0.01em;
-        }
-
-        .tile .t-s { font-size: 10.5px; color: var(--muted); line-height: 1.45; margin-top: 2px; }
-
-        .quota {
-            background: var(--card);
-            border: 1px solid var(--line-soft);
-            border-radius: var(--radius);
-            padding: 14px;
-            display: grid;
-            gap: 12px;
-        }
-
-        .quota .q-row { display: grid; gap: 6px; }
-
-        .quota .q-t {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11.5px;
-            font-weight: 600;
-        }
-
-        .quota .q-t span { color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
-
-        .quota .q-bar {
-            height: 6px;
-            border-radius: 999px;
-            background: var(--line-soft);
-            overflow: hidden;
-        }
-
-        .quota .q-bar i { display: block; height: 100%; border-radius: 999px; }
-
-        .ticket {
-            display: flex;
-            gap: 11px;
-            align-items: flex-start;
-            background: var(--card);
-            border: 1px dashed color-mix(in srgb, var(--seal) 38%, var(--line));
-            border-radius: var(--radius);
-            padding: 13px 14px;
-        }
-
-        .ticket svg { width: 18px; height: 18px; color: var(--seal); flex: none; margin-top: 2px; }
-
-        .ticket .tk-t { font-size: 12.5px; font-weight: 600; line-height: 1.4; }
-
-        .ticket .tk-s { font-size: 11px; color: var(--muted); line-height: 1.45; margin-top: 2px; }
 
         .preview-cap {
             text-align: center;
@@ -1399,8 +1306,6 @@
         @media (max-width: 1000px) {
             .features-grid { grid-template-columns: repeat(2, 1fr); }
             .cases-grid { grid-template-columns: repeat(2, 1fr); }
-            .mock { grid-template-columns: 1fr; }
-            .tiles { grid-template-columns: repeat(2, 1fr); }
             .oss { grid-template-columns: 1fr; }
             .footer-grid { grid-template-columns: 1.5fr repeat(3, 1fr); gap-inline: 28px; }
         }
@@ -1426,6 +1331,14 @@
             .demo-settings-layout { grid-template-columns: 1fr; }
             .demo-settings-nav { display: flex; overflow: hidden; }
             .demo-settings-nav span:not(.on) { display: none; }
+            .demo-data-layout { grid-template-columns: 1fr; }
+            .demo-data-list { display: none; }
+            .demo-month .cal-lunar { display: none; }
+            /* 16:9 舞台在此宽度带高度有限：先收紧月历与格言，@560 改固定高舞台后再恢复 */
+            .demo-month .cal-legend { display: none; }
+            .demo-month .cal-head { margin-bottom: 6px; }
+            .demo-month .day { min-height: 28px; }
+            .demo-day-quote { display: none; }
         }
 
         @media (max-width: 560px) {
@@ -1469,6 +1382,9 @@
             .day .d-n { font-size: 0.82rem; }
             .day .d-s { font-size: 8.5px; }
             .cal-legend { gap: 5px 10px; }
+            .demo-month .day { min-height: 40px; }
+            .demo-month .cal-legend { display: flex; }
+            .demo-day-quote { display: block; }
             .footer-grid { grid-template-columns: 1fr 1fr; }
             .footer-column:last-child { grid-column: 1 / -1; }
             .footer-bottom { flex-direction: column; }
@@ -1658,6 +1574,10 @@
                                             <div class="demo-day-lunar" data-i18n="demo.lunarDate">Sixth lunar month · day 10</div>
                                             <div class="demo-day-term" data-i18n="demo.greatHeat">Great Heat</div>
                                             <div class="demo-day-note" data-i18n="demo.noRecord">No record yet — click to add one</div>
+                                            <div class="demo-day-quote">
+                                                <span data-i18n="demo.quoteText">"Take rest; a field that has rested gives a bountiful crop."</span>
+                                                <span class="demo-day-quote-author" data-i18n="demo.quoteAuthor">— Ovid · daily quote</span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="demo-metrics">
@@ -1669,6 +1589,82 @@
                                 </div>
                             </div>
                             <figcaption><span data-i18n="preview.dayShot">Day view and daily summary</span><span>01</span></figcaption>
+                        </figure>
+                        <figure class="product-shot" data-carousel-slide aria-hidden="true">
+                            <div class="feature-demo">
+                                <div class="demo-head">
+                                    <div>
+                                        <span class="demo-kicker" data-i18n="demo.calendar">Calendar</span>
+                                        <h3 data-i18n="demo.monthTitle">Holidays, makeup days and leave, colour-coded</h3>
+                                    </div>
+                                    <div class="demo-segment">
+                                        <span data-i18n="demo.day">Day</span><span data-i18n="demo.week">Week</span>
+                                        <span class="on" data-i18n="demo.month">Month</span><span data-i18n="demo.year">Year</span>
+                                    </div>
+                                </div>
+                                <div class="demo-month">
+                                    <div class="cal-head">
+                                        <span class="cal-month" data-i18n="preview.calendarMonth">October 2025</span>
+                                        <span class="cal-lunar">乙巳年 · 蛇年</span>
+                                        <span class="cal-nav" aria-hidden="true"><span>‹</span><span>›</span></span>
+                                    </div>
+                                    <div class="cal-grid" role="img"
+                                        aria-label="October 2025 calendar. October 1 to 8 are the National Day and Mid-Autumn holiday. Saturday October 11 is a makeup workday. October 16 and 17 are annual leave, October 20 is personal leave, October 24 is sick leave. Attended workdays are checked; October 28 is today.">
+                                        <span class="wd" data-i18n="week.mon">MON</span><span class="wd" data-i18n="week.tue">TUE</span><span class="wd" data-i18n="week.wed">WED</span><span class="wd" data-i18n="week.thu">THU</span><span class="wd" data-i18n="week.fri">FRI</span><span class="wd" data-i18n="week.sat">SAT</span><span class="wd" data-i18n="week.sun">SUN</span>
+
+                                        <div class="day is-out is-att"><span class="d-n">29</span><span class="d-s">✓</span></div>
+                                        <div class="day is-out is-att"><span class="d-n">30</span><span class="d-s">✓</span></div>
+                                        <div class="day is-hol"><span class="d-n">1</span><span class="d-s">国庆</span></div>
+                                        <div class="day is-hol"><span class="d-n">2</span><span class="d-s">休</span></div>
+                                        <div class="day is-hol"><span class="d-n">3</span><span class="d-s">休</span></div>
+                                        <div class="day is-hol"><span class="d-n">4</span><span class="d-s">休</span></div>
+                                        <div class="day is-hol"><span class="d-n">5</span><span class="d-s">休</span></div>
+
+                                        <div class="day is-hol"><span class="d-n">6</span><span class="d-s">中秋</span></div>
+                                        <div class="day is-hol"><span class="d-n">7</span><span class="d-s">休</span></div>
+                                        <div class="day is-hol"><span class="d-n">8</span><span class="d-s">寒露</span></div>
+                                        <div class="day is-att"><span class="d-n">9</span><span class="d-s">✓</span></div>
+                                        <div class="day is-att"><span class="d-n">10</span><span class="d-s">✓</span></div>
+                                        <div class="day is-makeup"><span class="d-n">11</span><span class="d-s">班</span></div>
+                                        <div class="day is-wknd"><span class="d-n">12</span><span class="d-s">廿一</span></div>
+
+                                        <div class="day is-att"><span class="d-n">13</span><span class="d-s">✓</span></div>
+                                        <div class="day is-att"><span class="d-n">14</span><span class="d-s">✓</span></div>
+                                        <div class="day is-att"><span class="d-n">15</span><span class="d-s">✓</span></div>
+                                        <div class="day is-annual"><span class="d-n">16</span><span class="d-s">年假</span></div>
+                                        <div class="day is-annual"><span class="d-n">17</span><span class="d-s">年假</span></div>
+                                        <div class="day is-wknd"><span class="d-n">18</span><span class="d-s">廿七</span></div>
+                                        <div class="day is-wknd"><span class="d-n">19</span><span class="d-s">廿八</span></div>
+
+                                        <div class="day is-personal"><span class="d-n">20</span><span class="d-s">事假</span></div>
+                                        <div class="day is-att"><span class="d-n">21</span><span class="d-s">✓</span></div>
+                                        <div class="day is-att"><span class="d-n">22</span><span class="d-s">✓</span></div>
+                                        <div class="day is-att"><span class="d-n">23</span><span class="d-s">霜降</span></div>
+                                        <div class="day is-sick"><span class="d-n">24</span><span class="d-s">病假</span></div>
+                                        <div class="day is-wknd"><span class="d-n">25</span><span class="d-s">初五</span></div>
+                                        <div class="day is-wknd"><span class="d-n">26</span><span class="d-s">初六</span></div>
+
+                                        <div class="day is-att"><span class="d-n">27</span><span class="d-s">✓</span></div>
+                                        <div class="day is-att is-today"><span class="d-n">28</span><span class="d-s">✓</span></div>
+                                        <div class="day"><span class="d-n">29</span><span class="d-s">初九</span></div>
+                                        <div class="day"><span class="d-n">30</span><span class="d-s">初十</span></div>
+                                        <div class="day"><span class="d-n">31</span><span class="d-s">十一</span></div>
+                                        <div class="day is-out is-wknd"><span class="d-n">1</span><span class="d-s">十二</span></div>
+                                        <div class="day is-out is-wknd"><span class="d-n">2</span><span class="d-s">十三</span></div>
+                                    </div>
+
+                                    <div class="cal-legend">
+                                        <span class="lg"><i style="background:var(--st-work)"></i><span data-i18n="legend.attended">Attended</span></span>
+                                        <span class="lg"><i style="background:var(--st-holiday)"></i><span data-i18n="legend.holiday">Holiday</span></span>
+                                        <span class="lg"><i style="background:var(--st-makeup)"></i><span data-i18n="legend.makeup">Makeup workday</span></span>
+                                        <span class="lg"><i style="background:var(--st-annual)"></i><span data-i18n="legend.annual">Annual leave</span></span>
+                                        <span class="lg"><i style="background:var(--st-sick)"></i><span data-i18n="legend.sick">Sick leave</span></span>
+                                        <span class="lg"><i style="background:var(--st-personal)"></i><span data-i18n="legend.personal">Personal leave</span></span>
+                                        <span class="lg"><i style="background:var(--st-weekend)"></i><span data-i18n="legend.weekend">Weekend</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <figcaption><span data-i18n="preview.monthShot">Month view with holidays and makeup workdays</span><span>02</span></figcaption>
                         </figure>
                         <figure class="product-shot" data-carousel-slide aria-hidden="true">
                             <div class="feature-demo">
@@ -1709,7 +1705,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <figcaption><span data-i18n="preview.statsShot">Monthly and yearly statistics</span><span>02</span></figcaption>
+                            <figcaption><span data-i18n="preview.statsShot">Monthly and yearly statistics</span><span>03</span></figcaption>
                         </figure>
                         <figure class="product-shot" data-carousel-slide aria-hidden="true">
                             <div class="feature-demo">
@@ -1731,7 +1727,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <figcaption><span data-i18n="preview.toolsShot">Three focused utilities</span><span>03</span></figcaption>
+                            <figcaption><span data-i18n="preview.toolsShot">Three focused utilities</span><span>04</span></figcaption>
                         </figure>
                         <figure class="product-shot" data-carousel-slide aria-hidden="true">
                             <div class="feature-demo">
@@ -1762,7 +1758,44 @@
                                     </div>
                                 </div>
                             </div>
-                            <figcaption><span data-i18n="preview.settingsShot">Settings that match your work week</span><span>04</span></figcaption>
+                            <figcaption><span data-i18n="preview.settingsShot">Settings that match your work week</span><span>05</span></figcaption>
+                        </figure>
+                        <figure class="product-shot" data-carousel-slide aria-hidden="true">
+                            <div class="feature-demo">
+                                <div class="demo-head">
+                                    <div>
+                                        <span class="demo-kicker" data-i18n="demo.data">Data</span>
+                                        <h3 data-i18n="demo.dataTitle">Local by default, backed up when you say so</h3>
+                                    </div>
+                                </div>
+                                <div class="demo-data-layout">
+                                    <div class="demo-panel demo-backup">
+                                        <div class="demo-backup-head">
+                                            <h4 data-i18n="demo.webdavBackup">WebDAV cloud backup</h4>
+                                            <span class="demo-badge" data-i18n="demo.connected">Connected</span>
+                                        </div>
+                                        <div class="demo-backup-row"><span data-i18n="demo.server">Server</span><b>dav.jianguoyun.com</b></div>
+                                        <div class="demo-backup-row"><span data-i18n="demo.lastBackup">Last backup</span><b data-i18n="demo.backupTime">Today 09:12 · verified</b></div>
+                                        <div class="demo-backup-row"><span data-i18n="demo.scope">Includes</span><b data-i18n="demo.scopeText">Records, settings and quotas</b></div>
+                                        <div class="demo-actions"><span data-i18n="demo.restore">Restore</span><span class="primary" data-i18n="demo.backupNow">Back up now</span></div>
+                                    </div>
+                                    <div class="demo-data-list">
+                                        <div class="demo-data-item">
+                                            <b data-i18n="demo.localFirst">100% local by default</b>
+                                            <span data-i18n="demo.localFirstText">Data lives in your browser — no account, no analytics.</span>
+                                        </div>
+                                        <div class="demo-data-item">
+                                            <b data-i18n="demo.csv">CSV import &amp; export</b>
+                                            <span data-i18n="demo.csvText">Take records to Excel, or move between devices with validated imports.</span>
+                                        </div>
+                                        <div class="demo-data-item">
+                                            <b data-i18n="demo.offline">Offline-ready PWA</b>
+                                            <span data-i18n="demo.offlineText">Install once — it opens with or without a network, on desktop and phone.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <figcaption><span data-i18n="preview.dataShot">WebDAV backup and data ownership</span><span>06</span></figcaption>
                         </figure>
                         <figure class="product-shot" data-carousel-slide aria-hidden="true">
                             <div class="feature-demo">
@@ -1789,7 +1822,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <figcaption><span data-i18n="preview.editorShot">Fast daily record editor</span><span>05</span></figcaption>
+                            <figcaption><span data-i18n="preview.editorShot">Fast daily record editor</span><span>07</span></figcaption>
                         </figure>
 
                         <button class="carousel-arrow prev" type="button" data-carousel-prev
@@ -1813,136 +1846,17 @@
                         <button class="carousel-dot is-active" type="button" data-carousel-dot="0"
                             data-i18n-attr="aria-label:preview.slide1" aria-label="Show day view preview"></button>
                         <button class="carousel-dot" type="button" data-carousel-dot="1"
-                            data-i18n-attr="aria-label:preview.slide2" aria-label="Show statistics preview"></button>
+                            data-i18n-attr="aria-label:preview.slide2" aria-label="Show month calendar preview"></button>
                         <button class="carousel-dot" type="button" data-carousel-dot="2"
-                            data-i18n-attr="aria-label:preview.slide3" aria-label="Show tools preview"></button>
+                            data-i18n-attr="aria-label:preview.slide3" aria-label="Show statistics preview"></button>
                         <button class="carousel-dot" type="button" data-carousel-dot="3"
-                            data-i18n-attr="aria-label:preview.slide4" aria-label="Show settings preview"></button>
+                            data-i18n-attr="aria-label:preview.slide4" aria-label="Show tools preview"></button>
                         <button class="carousel-dot" type="button" data-carousel-dot="4"
-                            data-i18n-attr="aria-label:preview.slide5" aria-label="Show daily editor preview"></button>
-                    </div>
-                </div>
-
-                <div class="preview-frame" data-reveal hidden aria-hidden="true">
-                    <div class="frame-bar">
-                        <span class="mark" aria-hidden="true">休</span>
-                        <span class="frame-title">RestCal <span data-i18n="preview.month">· October 2025</span></span>
-                        <span class="frame-icons" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor" stroke="none"/></svg>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4M7 20V4"/><path d="m21 8-4-4-4 4M17 4v16"/></svg>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 7h-9M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
-                        </span>
-                    </div>
-
-                    <div class="mock">
-                        <!-- Calendar: October 2025, Monday-first -->
-                        <div class="cal-panel">
-                            <div class="cal-head">
-                                <span class="cal-month" data-i18n="preview.calendarMonth">October 2025</span>
-                                <span class="cal-lunar">乙巳年 · 蛇年</span>
-                                <span class="cal-nav" aria-hidden="true"><span>‹</span><span>›</span></span>
-                            </div>
-
-                            <div class="cal-grid" role="img"
-                                aria-label="October 2025 calendar. October 1 to 8 are the National Day and Mid-Autumn holiday. Saturday October 11 is a makeup workday. October 16 and 17 are annual leave, October 20 is personal leave, October 24 is sick leave. Attended workdays are checked; October 28 is today.">
-                                <span class="wd" data-i18n="week.mon">MON</span><span class="wd" data-i18n="week.tue">TUE</span><span class="wd" data-i18n="week.wed">WED</span><span class="wd" data-i18n="week.thu">THU</span><span class="wd" data-i18n="week.fri">FRI</span><span class="wd" data-i18n="week.sat">SAT</span><span class="wd" data-i18n="week.sun">SUN</span>
-
-                                <div class="day is-out is-att"><span class="d-n">29</span><span class="d-s">✓</span></div>
-                                <div class="day is-out is-att"><span class="d-n">30</span><span class="d-s">✓</span></div>
-                                <div class="day is-hol"><span class="d-n">1</span><span class="d-s">国庆</span></div>
-                                <div class="day is-hol"><span class="d-n">2</span><span class="d-s">休</span></div>
-                                <div class="day is-hol"><span class="d-n">3</span><span class="d-s">休</span></div>
-                                <div class="day is-hol"><span class="d-n">4</span><span class="d-s">休</span></div>
-                                <div class="day is-hol"><span class="d-n">5</span><span class="d-s">休</span></div>
-
-                                <div class="day is-hol"><span class="d-n">6</span><span class="d-s">中秋</span></div>
-                                <div class="day is-hol"><span class="d-n">7</span><span class="d-s">休</span></div>
-                                <div class="day is-hol"><span class="d-n">8</span><span class="d-s">寒露</span></div>
-                                <div class="day is-att"><span class="d-n">9</span><span class="d-s">✓</span></div>
-                                <div class="day is-att"><span class="d-n">10</span><span class="d-s">✓</span></div>
-                                <div class="day is-makeup"><span class="d-n">11</span><span class="d-s">班</span></div>
-                                <div class="day is-wknd"><span class="d-n">12</span><span class="d-s">廿一</span></div>
-
-                                <div class="day is-att"><span class="d-n">13</span><span class="d-s">✓</span></div>
-                                <div class="day is-att"><span class="d-n">14</span><span class="d-s">✓</span></div>
-                                <div class="day is-att"><span class="d-n">15</span><span class="d-s">✓</span></div>
-                                <div class="day is-annual"><span class="d-n">16</span><span class="d-s">年假</span></div>
-                                <div class="day is-annual"><span class="d-n">17</span><span class="d-s">年假</span></div>
-                                <div class="day is-wknd"><span class="d-n">18</span><span class="d-s">廿七</span></div>
-                                <div class="day is-wknd"><span class="d-n">19</span><span class="d-s">廿八</span></div>
-
-                                <div class="day is-personal"><span class="d-n">20</span><span class="d-s">事假</span></div>
-                                <div class="day is-att"><span class="d-n">21</span><span class="d-s">✓</span></div>
-                                <div class="day is-att"><span class="d-n">22</span><span class="d-s">✓</span></div>
-                                <div class="day is-att"><span class="d-n">23</span><span class="d-s">霜降</span></div>
-                                <div class="day is-sick"><span class="d-n">24</span><span class="d-s">病假</span></div>
-                                <div class="day is-wknd"><span class="d-n">25</span><span class="d-s">初五</span></div>
-                                <div class="day is-wknd"><span class="d-n">26</span><span class="d-s">初六</span></div>
-
-                                <div class="day is-att"><span class="d-n">27</span><span class="d-s">✓</span></div>
-                                <div class="day is-att is-today"><span class="d-n">28</span><span class="d-s">✓</span></div>
-                                <div class="day"><span class="d-n">29</span><span class="d-s">初九</span></div>
-                                <div class="day"><span class="d-n">30</span><span class="d-s">初十</span></div>
-                                <div class="day"><span class="d-n">31</span><span class="d-s">十一</span></div>
-                                <div class="day is-out is-wknd"><span class="d-n">1</span><span class="d-s">十二</span></div>
-                                <div class="day is-out is-wknd"><span class="d-n">2</span><span class="d-s">十三</span></div>
-                            </div>
-
-                            <div class="cal-legend">
-                                <span class="lg"><i style="background:var(--st-work)"></i><span data-i18n="legend.attended">Attended</span></span>
-                                <span class="lg"><i style="background:var(--st-holiday)"></i><span data-i18n="legend.holiday">Holiday</span></span>
-                                <span class="lg"><i style="background:var(--st-makeup)"></i><span data-i18n="legend.makeup">Makeup workday</span></span>
-                                <span class="lg"><i style="background:var(--st-annual)"></i><span data-i18n="legend.annual">Annual leave</span></span>
-                                <span class="lg"><i style="background:var(--st-sick)"></i><span data-i18n="legend.sick">Sick leave</span></span>
-                                <span class="lg"><i style="background:var(--st-personal)"></i><span data-i18n="legend.personal">Personal leave</span></span>
-                                <span class="lg"><i style="background:var(--st-weekend)"></i><span data-i18n="legend.weekend">Weekend</span></span>
-                            </div>
-                        </div>
-
-                        <!-- Stat rail -->
-                        <div class="rail">
-                            <div class="tiles">
-                                <div class="tile">
-                                    <span class="t-l" data-i18n="stats.workingDays">Working days</span>
-                                    <span class="t-n">18</span>
-                                    <span class="t-s" data-i18n="stats.workingDetail">17 weekdays + 1 makeup Sat, holidays excluded</span>
-                                </div>
-                                <div class="tile">
-                                    <span class="t-l"><i style="background:var(--st-annual)" aria-hidden="true"></i><span data-i18n="stats.leaveTaken">Leave taken</span></span>
-                                    <span class="t-n" data-i18n="stats.fourDays">4 days</span>
-                                    <span class="t-s" data-i18n="stats.leaveDetail">2 annual · 1 sick · 1 personal</span>
-                                </div>
-                                <div class="tile">
-                                    <span class="t-l"><i style="background:var(--st-sick)" aria-hidden="true"></i><span data-i18n="stats.deduction">Deduction</span></span>
-                                    <span class="t-n">−¥1,250</span>
-                                    <span class="t-s" data-i18n="stats.deductionDetail">daily rate ¥833 · sick at 50% · annual at 0%</span>
-                                </div>
-                                <div class="tile">
-                                    <span class="t-l"><i style="background:var(--st-work)" aria-hidden="true"></i><span data-i18n="stats.takeHome">Est. take-home</span></span>
-                                    <span class="t-n">¥13,750</span>
-                                    <span class="t-s" data-i18n="stats.takeHomeDetail">on a ¥15,000 base, after leave deductions</span>
-                                </div>
-                            </div>
-
-                            <div class="quota">
-                                <div class="q-row">
-                                    <span class="q-t"><span data-i18n="quota.annual">Annual leave</span> <span data-i18n="quota.annualUsed">5 / 10 used</span></span>
-                                    <span class="q-bar"><i style="width:50%;background:var(--st-annual)"></i></span>
-                                </div>
-                                <div class="q-row">
-                                    <span class="q-t"><span data-i18n="quota.comp">Comp days</span> <span data-i18n="quota.compUsed">1 / 3 used</span></span>
-                                    <span class="q-bar"><i style="width:33%;background:var(--st-comp)"></i></span>
-                                </div>
-                            </div>
-
-                            <div class="ticket">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v2a3 3 0 0 0 0 6v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2a3 3 0 0 0 0-6Z"/><path d="M13 5v2M13 11v2M13 17v2"/></svg>
-                                <div>
-                                    <p class="tk-t" data-i18n="ticket.next">Next holiday: New Year's Day</p>
-                                    <p class="tk-s" data-i18n="ticket.detail">Train tickets open Dec 18 — 15 days ahead, reminder configurable.</p>
-                                </div>
-                            </div>
-                        </div>
+                            data-i18n-attr="aria-label:preview.slide5" aria-label="Show settings preview"></button>
+                        <button class="carousel-dot" type="button" data-carousel-dot="5"
+                            data-i18n-attr="aria-label:preview.slide6" aria-label="Show data and backup preview"></button>
+                        <button class="carousel-dot" type="button" data-carousel-dot="6"
+                            data-i18n-attr="aria-label:preview.slide7" aria-label="Show daily editor preview"></button>
                     </div>
                 </div>
 
@@ -2150,11 +2064,13 @@
                 "features.localText": "Everything runs locally by default, works offline as a PWA or Windows app, and only uses WebDAV when you choose to configure it.",
                 "preview.label": "Preview",
                 "preview.title": "One calendar, three focused workspaces",
-                "preview.intro": "Five crisp, browser-rendered previews show the daily calendar, statistics, allowances, tools, settings and quick record editor.",
+                "preview.intro": "Seven crisp, browser-rendered previews show the daily page, month calendar, statistics, tools, settings, backup and the quick record editor.",
                 "preview.dayShot": "Day view and daily summary",
+                "preview.monthShot": "Month view with holidays and makeup workdays",
                 "preview.statsShot": "Monthly and yearly statistics",
                 "preview.toolsShot": "Three focused utilities",
                 "preview.settingsShot": "Settings that match your work week",
+                "preview.dataShot": "WebDAV backup and data ownership",
                 "preview.editorShot": "Fast daily record editor",
                 "preview.statsAlt": "RestCal yearly statistics with leave allowance usage",
                 "preview.toolsAlt": "RestCal tools for payslips, leave notes and train-ticket reminders",
@@ -2164,11 +2080,12 @@
                 "preview.next": "Next feature",
                 "preview.slidePicker": "Choose feature preview",
                 "preview.slide1": "Show day view preview",
-                "preview.slide2": "Show statistics preview",
-                "preview.slide3": "Show tools preview",
-                "preview.slide4": "Show settings preview",
-                "preview.slide5": "Show daily editor preview",
-                "preview.month": "· October 2025",
+                "preview.slide2": "Show month calendar preview",
+                "preview.slide3": "Show statistics preview",
+                "preview.slide4": "Show tools preview",
+                "preview.slide5": "Show settings preview",
+                "preview.slide6": "Show data and backup preview",
+                "preview.slide7": "Show daily editor preview",
                 "preview.calendarMonth": "October 2025",
                 "preview.caption": "Built directly in HTML for sharp detail at every size — open the <a href=\"app.html\">live demo</a> to try the real interactions.",
                 "demo.calendar": "Calendar",
@@ -2177,6 +2094,9 @@
                 "demo.july2026": "July 2026", "demo.thursdayToday": "Thursday · Today",
                 "demo.lunarDate": "Sixth lunar month · day 10", "demo.greatHeat": "Great Heat",
                 "demo.noRecord": "No record yet — click to add one",
+                "demo.quoteText": "\"Take rest; a field that has rested gives a bountiful crop.\"",
+                "demo.quoteAuthor": "— Ovid · daily quote",
+                "demo.monthTitle": "Holidays, makeup days and leave, colour-coded",
                 "demo.annualRemaining": "Annual leave left", "demo.monthLeave": "Leave this month",
                 "demo.attendance": "Attendance", "demo.takeHome": "Estimated take-home", "demo.days": "days",
                 "demo.statistics": "Statistics", "demo.statsTitle": "See the month, then zoom out to the year",
@@ -2204,20 +2124,19 @@
                 "demo.cancel": "Cancel", "demo.save": "Save",
                 "demo.mobileFriendly": "Built for quick mobile entry",
                 "demo.mobileFriendlyText": "The same editor becomes a bottom sheet on phones, with large status targets and aligned actions.",
+                "demo.data": "Data", "demo.dataTitle": "Local by default, backed up when you say so",
+                "demo.webdavBackup": "WebDAV cloud backup", "demo.connected": "Connected",
+                "demo.server": "Server", "demo.lastBackup": "Last backup", "demo.backupTime": "Today 09:12 · verified",
+                "demo.scope": "Includes", "demo.scopeText": "Records, settings and quotas",
+                "demo.restore": "Restore", "demo.backupNow": "Back up now",
+                "demo.localFirst": "100% local by default",
+                "demo.localFirstText": "Data lives in your browser — no account, no analytics.",
+                "demo.csv": "CSV import & export",
+                "demo.csvText": "Take records to Excel, or move between devices with validated imports.",
+                "demo.offline": "Offline-ready PWA",
+                "demo.offlineText": "Install once — it opens with or without a network, on desktop and phone.",
                 "week.mon": "MON", "week.tue": "TUE", "week.wed": "WED", "week.thu": "THU", "week.fri": "FRI", "week.sat": "SAT", "week.sun": "SUN",
                 "legend.attended": "Attended", "legend.holiday": "Holiday", "legend.makeup": "Makeup workday", "legend.annual": "Annual leave", "legend.sick": "Sick leave", "legend.personal": "Personal leave", "legend.weekend": "Weekend",
-                "stats.workingDays": "Working days",
-                "stats.workingDetail": "17 weekdays + 1 makeup Sat, holidays excluded",
-                "stats.leaveTaken": "Leave taken",
-                "stats.fourDays": "4 days",
-                "stats.leaveDetail": "2 annual · 1 sick · 1 personal",
-                "stats.deduction": "Deduction",
-                "stats.deductionDetail": "daily rate ¥833 · sick at 50% · annual at 0%",
-                "stats.takeHome": "Est. take-home",
-                "stats.takeHomeDetail": "on a ¥15,000 base, after leave deductions",
-                "quota.annual": "Annual leave", "quota.annualUsed": "5 / 10 used", "quota.comp": "Comp days", "quota.compUsed": "1 / 3 used",
-                "ticket.next": "Next holiday: New Year's Day",
-                "ticket.detail": "Train tickets open Dec 18 — 15 days ahead, reminder configurable.",
                 "audience.label": "Who it's for",
                 "audience.title": "For people who count their days",
                 "audience.intro": "RestCal is deliberately small. If any of these sound like you, it will probably fit.",
@@ -2285,11 +2204,13 @@
                 "features.localText": "默认完全在本地运行，支持 PWA 离线和 Windows 版本；只有主动配置时才会使用 WebDAV。",
                 "preview.label": "产品预览",
                 "preview.title": "一张日历，三个专注的工作区",
-                "preview.intro": "五个由浏览器直接绘制的清晰预览，分别展示天视图、统计额度、工具、设置和快速记录。",
+                "preview.intro": "七个由浏览器直接绘制的清晰预览：日页、月历、统计、工具、设置、云备份与快速记录。",
                 "preview.dayShot": "天视图与当日概览",
+                "preview.monthShot": "月视图：节假日与调休一目了然",
                 "preview.statsShot": "月度与年度统计",
                 "preview.toolsShot": "三个专注的小工具",
                 "preview.settingsShot": "匹配实际工作制度的设置",
+                "preview.dataShot": "WebDAV 云备份与数据自主",
                 "preview.editorShot": "快速填写每日记录",
                 "preview.statsAlt": "休历年度统计与假期额度使用情况",
                 "preview.toolsAlt": "休历的工资条、请假条与购票提醒工具",
@@ -2299,11 +2220,12 @@
                 "preview.next": "下一个功能",
                 "preview.slidePicker": "选择功能预览",
                 "preview.slide1": "显示天视图预览",
-                "preview.slide2": "显示统计功能预览",
-                "preview.slide3": "显示工具功能预览",
-                "preview.slide4": "显示设置功能预览",
-                "preview.slide5": "显示每日记录预览",
-                "preview.month": "· 2025 年 10 月",
+                "preview.slide2": "显示月视图预览",
+                "preview.slide3": "显示统计功能预览",
+                "preview.slide4": "显示工具功能预览",
+                "preview.slide5": "显示设置功能预览",
+                "preview.slide6": "显示数据与备份预览",
+                "preview.slide7": "显示每日记录预览",
                 "preview.calendarMonth": "2025 年 10 月",
                 "preview.caption": "直接使用 HTML 构建，在任何尺寸下都保持清晰——打开<a href=\"app.html\">在线体验</a>，亲自尝试真实交互。",
                 "demo.calendar": "日历",
@@ -2312,6 +2234,9 @@
                 "demo.july2026": "2026 年 7 月", "demo.thursdayToday": "周四 · 今天",
                 "demo.lunarDate": "六月初十", "demo.greatHeat": "大暑",
                 "demo.noRecord": "今天还没有记录，点击即可添加",
+                "demo.quoteText": "「一张一弛，文武之道也。」",
+                "demo.quoteAuthor": "——《礼记》 · 每日一言",
+                "demo.monthTitle": "节假日、补班与请假，颜色一目了然",
                 "demo.annualRemaining": "剩余年假", "demo.monthLeave": "本月请假",
                 "demo.attendance": "本月出勤", "demo.takeHome": "预计实发", "demo.days": "天",
                 "demo.statistics": "统计",
@@ -2340,20 +2265,19 @@
                 "demo.cancel": "取消", "demo.save": "保存",
                 "demo.mobileFriendly": "专为手机端快速填写",
                 "demo.mobileFriendlyText": "在手机上会变成底部弹层，状态按钮更大，操作按钮保持整齐对齐。",
+                "demo.data": "数据", "demo.dataTitle": "默认留在本地，备份由你决定",
+                "demo.webdavBackup": "WebDAV 云备份", "demo.connected": "已连接",
+                "demo.server": "服务器", "demo.lastBackup": "上次备份", "demo.backupTime": "今天 09:12 · 已校验",
+                "demo.scope": "备份内容", "demo.scopeText": "记录、设置与假期额度",
+                "demo.restore": "恢复数据", "demo.backupNow": "立即备份",
+                "demo.localFirst": "默认 100% 本地",
+                "demo.localFirstText": "数据保存在你的浏览器里——无账号、无统计追踪。",
+                "demo.csv": "CSV 导入导出",
+                "demo.csvText": "随时把记录带去 Excel，或经校验导入在设备间迁移。",
+                "demo.offline": "PWA 离线可用",
+                "demo.offlineText": "安装一次，有没有网络都能打开，桌面手机皆可。",
                 "week.mon": "周一", "week.tue": "周二", "week.wed": "周三", "week.thu": "周四", "week.fri": "周五", "week.sat": "周六", "week.sun": "周日",
                 "legend.attended": "已出勤", "legend.holiday": "节假日", "legend.makeup": "调休补班", "legend.annual": "年假", "legend.sick": "病假", "legend.personal": "事假", "legend.weekend": "周末",
-                "stats.workingDays": "工作日",
-                "stats.workingDetail": "17 个工作日 + 1 个补班周六，已排除节假日",
-                "stats.leaveTaken": "已请假",
-                "stats.fourDays": "4 天",
-                "stats.leaveDetail": "年假 2 天 · 病假 1 天 · 事假 1 天",
-                "stats.deduction": "预计扣薪",
-                "stats.deductionDetail": "日薪 ¥833 · 病假扣 50% · 年假不扣薪",
-                "stats.takeHome": "预计到手",
-                "stats.takeHomeDetail": "基本工资 ¥15,000，已扣除请假影响",
-                "quota.annual": "年假", "quota.annualUsed": "已用 5 / 10 天", "quota.comp": "调休", "quota.compUsed": "已用 1 / 3 天",
-                "ticket.next": "下一个假期：元旦",
-                "ticket.detail": "火车票 12 月 18 日开售——提前 15 天，可自定义提醒。",
                 "audience.label": "适合谁",
                 "audience.title": "为认真计算每一天的人而做",
                 "audience.intro": "休历刻意保持简单。如果下面任何一种描述像你，它大概正适合你。",

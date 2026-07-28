@@ -78,15 +78,23 @@ function proxyWebdav(req, res) {
   });
 }
 
-// 每日一言代理：api.quotable.io 的 HTTPS 证书长期过期，浏览器无法直连，
-// 服务端改走明文 HTTP 转发（内容为公开格言，不含敏感信息）。
-function proxyQuote(res) {
+// 每日一言代理。英文源 api.quotable.io 的 HTTPS 证书长期过期，浏览器无法直连，
+// 服务端改走明文 HTTP 转发；中文源一言（hitokoto.cn）证书正常，代理只为让前端
+// 两种语言共用同一入口（内容为公开格言，不含敏感信息）。请求时给上游 URL 追加
+// 时间戳参数：一言经 Cloudflare，相同 URL 短时间内会命中边缘缓存返回同一条。
+const quoteSources = {
+  zh: { url: "https://v1.hitokoto.cn/?c=d&c=i&c=k&max_length=60", transport: https, textField: "hitokoto" },
+  en: { url: "http://api.quotable.io/quotes/random?maxLength=120", transport: http, textField: "content" }
+};
+
+function proxyQuote(res, lang) {
+  const source = quoteSources[lang] || quoteSources.en;
   const sendJson = (code, obj) => {
     if (res.headersSent) return;
     res.writeHead(code, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
     res.end(JSON.stringify(obj));
   };
-  const request = http.get("http://api.quotable.io/quotes/random?maxLength=120", { timeout: 6000 }, upstream => {
+  const request = source.transport.get(`${source.url}&_=${Date.now()}`, { timeout: 6000 }, upstream => {
     const chunks = [];
     upstream.on("data", chunk => chunks.push(chunk));
     upstream.on("end", () => {
@@ -94,7 +102,7 @@ function proxyQuote(res) {
         const data = JSON.parse(Buffer.concat(chunks).toString("utf-8"));
         // 确保返回的是数组格式（API 既可能返回对象也可能返回数组）
         const quote = Array.isArray(data) ? data[0] : data;
-        if (quote?.content) {
+        if (quote && quote[source.textField]) {
           sendJson(200, quote);
         } else {
           sendJson(502, { error: "格言服务响应异常" });
@@ -125,11 +133,13 @@ const server = http.createServer((req, res) => {
   }
 
   if (req.method === "GET" && pathname === "/__quote") {
-    proxyQuote(res);
+    proxyQuote(res, url.searchParams.get("lang"));
     return;
   }
 
-  const requested = pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
+  // 与线上的 /app → app.html 重写保持一致，本地也能用无后缀路径访问应用
+  const routes = { "/": "index.html", "/app": "app.html" };
+  const requested = routes[pathname] || pathname.replace(/^\/+/, "");
   const file = path.resolve(root, requested);
   const relative = path.relative(root, file);
 
