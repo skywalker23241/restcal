@@ -106,6 +106,13 @@
     --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
     --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", "Courier New", monospace;
     --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+    --receipt-stage: #ebe4d8;
+    --receipt-paper: #fffaf1;
+    --receipt-ink: #2b211b;
+    --receipt-muted: #8a7c6b;
+    --receipt-line: #dfd0bd;
+    --receipt-accent: #b4382a;
+    --receipt-accent-soft: #f7e6df;
 }
 
 [data-theme="dark"] {
@@ -146,6 +153,13 @@
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.32);
     --shadow-popover: 0 6px 24px rgba(0, 0, 0, 0.34);
     --shadow-dialog: 0 18px 50px rgba(0, 0, 0, 0.5);
+    --receipt-stage: #171411;
+    --receipt-paper: #241f19;
+    --receipt-ink: #f0e6d7;
+    --receipt-muted: #aa9c89;
+    --receipt-line: #4a3e32;
+    --receipt-accent: #df6b52;
+    --receipt-accent-soft: #3b251f;
 }
 
 * {
@@ -2867,18 +2881,20 @@ h1 {
 .receipt-preview {
     position: relative;
     display: grid;
-    gap: 12px;
+    gap: 13px;
     width: min(100%, 320px);
     margin: 4px auto 0;
-    padding: 18px 16px 20px;
-    border: 1px solid #e2ddd2;
-    border-radius: 2px;
+    padding: 16px 16px 20px;
+    border: 1px solid var(--receipt-line);
+    border-radius: 4px;
     background:
-        linear-gradient(#ffffff, #ffffff) padding-box,
-        repeating-linear-gradient(90deg, transparent 0 8px, rgba(24, 24, 27, 0.04) 8px 9px) border-box;
-    color: #1c1917;
-    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
-    font-family: var(--font-mono);
+        linear-gradient(color-mix(in srgb, var(--receipt-paper) 96%, transparent), color-mix(in srgb, var(--receipt-paper) 96%, transparent)),
+        var(--grain),
+        var(--receipt-paper);
+    color: var(--receipt-ink);
+    box-shadow: 0 14px 34px color-mix(in srgb, var(--receipt-ink) 16%, transparent);
+    font-family: var(--font-display);
+    font-weight: 600;
 }
 
 .receipt-preview::before,
@@ -2889,7 +2905,7 @@ h1 {
     right: 0;
     height: 8px;
     background:
-        radial-gradient(circle at 4px 4px, transparent 4px, #ffffff 4.5px) 0 0 / 8px 8px repeat-x;
+        radial-gradient(circle at 4px 4px, transparent 4px, var(--receipt-paper) 4.5px) 0 0 / 8px 8px repeat-x;
     pointer-events: none;
 }
 
@@ -2906,7 +2922,7 @@ h1 {
 .receipt-preview.empty {
     min-height: 150px;
     place-items: center;
-    color: #8c857a;
+    color: var(--receipt-muted);
     text-align: center;
     font-family: inherit;
 }
@@ -2919,20 +2935,21 @@ h1 {
     display: grid;
     justify-items: center;
     gap: 4px;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed #d4d4d8;
+    padding: 2px 0 11px;
+    border-bottom: 1px dashed var(--receipt-line);
     text-align: center;
 }
 
 .receipt-title {
-    font-family: inherit;
-    font-size: 16px;
+    color: var(--receipt-ink);
+    font-family: var(--font-display);
+    font-size: 20px;
     font-weight: 800;
-    letter-spacing: 0;
+    letter-spacing: 0.08em;
 }
 
 .receipt-subtitle {
-    color: #8c857a;
+    color: var(--receipt-muted);
     font-size: 11px;
 }
 
@@ -2940,7 +2957,7 @@ h1 {
     display: grid;
     gap: 8px;
     padding-bottom: 10px;
-    border-bottom: 1px dashed #d4d4d8;
+    border-bottom: 1px dashed var(--receipt-line);
 }
 
 .receipt-row {
@@ -2953,7 +2970,7 @@ h1 {
 }
 
 .receipt-row span:first-child {
-    color: #8c857a;
+    color: var(--receipt-muted);
 }
 
 .receipt-row strong,
@@ -2963,19 +2980,27 @@ h1 {
 }
 
 .receipt-total {
-    padding-top: 2px;
+    margin-top: 2px;
+    padding: 8px 9px;
+    border: 1px solid color-mix(in srgb, var(--receipt-accent) 25%, transparent);
+    border-radius: 7px;
+    background: var(--receipt-accent-soft);
     font-size: 14px;
     font-weight: 800;
 }
 
 .receipt-total span:first-child,
 .receipt-total strong {
-    color: #1c1917;
+    color: var(--receipt-accent);
 }
 
 .receipt-body {
-    color: #27272a;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    padding: 10px 11px;
+    border-left: 3px solid var(--receipt-accent);
+    border-radius: 0 7px 7px 0;
+    background: var(--receipt-accent-soft);
+    color: var(--receipt-ink);
+    font-family: inherit;
     font-size: 13px;
     line-height: 1.8;
     white-space: pre-wrap;
@@ -2985,7 +3010,7 @@ h1 {
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    color: #8c857a;
+    color: var(--receipt-muted);
     font-size: 11px;
 }
 
@@ -2994,7 +3019,7 @@ h1 {
     max-height: calc(100vh - 32px);
     max-height: calc(100dvh - 32px);
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
     overflow: hidden;
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -3006,7 +3031,9 @@ h1 {
     overflow: auto;
     justify-items: center;
     padding-block: 24px;
-    background: var(--secondary);
+    background:
+        radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--receipt-accent) 8%, transparent), transparent 34%),
+        var(--receipt-stage);
 }
 
 .receipt-window .receipt-preview {
@@ -3056,7 +3083,9 @@ h1 {
 .leave-preview-panel {
     display: grid;
     place-items: start center;
-    background: var(--secondary);
+    background:
+        radial-gradient(circle at 20% 20%, color-mix(in srgb, var(--receipt-accent) 8%, transparent), transparent 34%),
+        var(--receipt-stage);
 }
 
 .leave-preview-panel .receipt-preview {
@@ -3443,6 +3472,95 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .calendar-loading {
     animation: loading-pulse 1.6s ease-in-out infinite;
+}
+
+.receipt-period {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+}
+
+.receipt-period-copy {
+    display: grid;
+    gap: 2px;
+}
+
+.receipt-period-copy label {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.receipt-period-copy span {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.receipt-signature {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
+    padding-top: 2px;
+}
+
+.receipt-signature::before,
+.receipt-signature::after {
+    content: "";
+    height: 1px;
+    background: var(--receipt-line);
+}
+
+.receipt-signature-mark {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid color-mix(in srgb, var(--receipt-accent) 55%, var(--receipt-line));
+    border-radius: 8px;
+    color: var(--receipt-accent);
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.receipt-period-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.receipt-period-controls .selectbox-year {
+    width: 104px;
+}
+
+.receipt-period-controls .selectbox-month {
+    width: 82px;
+}
+
+.receipt-period-controls .select-trigger {
+    min-height: 36px;
+}
+
+.receipt-period-nav {
+    width: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 0;
+}
+
+.receipt-loading {
+    width: 100%;
+    min-height: 260px;
+    animation: loading-pulse 1.6s ease-in-out infinite;
+}
+
+.calendar-loading.calendar-unavailable {
+    animation: none;
 }
 
 /* ===== 重渲染区块：快速淡入 ===== */
@@ -4432,6 +4550,18 @@ html.theme-anim #themeToggle .icon {
     .modal-foot .btn {
         min-height: 44px;
         flex: 1 1 auto;
+    }
+
+    .receipt-period {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .receipt-period-controls .selectbox-year,
+    .receipt-period-controls .selectbox-month {
+        width: auto;
+        flex: 1 1 0;
     }
 
     .topbar {

@@ -238,9 +238,9 @@ WEBDAV_ALLOWED_HOSTS=dav.jianguoyun.com,dav.example.com
 
 ## 📅 节假日数据源
 
-节假日、调休、农历和节气数据来自 [Chinese Days](https://chinese-days.yaavi.me/)，已打包在 `vendor/chinese-days/` 中（2004–2026 年），不依赖网络。
+节假日、调休、农历和节气数据来自 [Chinese Days](https://chinese-days.yaavi.me/)，2004–2026 年数据已打包在 `vendor/chinese-days/` 中，不依赖网络。
 
-数据加载失败或年份超出范围时，页面会自动回退到内置的备用节假日数据，避免日历空白。新一年的官方放假安排公布后，从 `https://cdn.jsdelivr.net/npm/chinese-days@latest/dist/years/<年份>.json` 下载文件放入 `vendor/chinese-days/years/`，并同步更新 `sw.js` 中 `YEAR_DATA` 的年份范围。
+对于尚未打包的新年份，页面会自动请求 Chinese Days 的 jsDelivr 年度数据，并将成功响应缓存供离线使用。如果官方数据尚未发布，页面会明确提示并暂停该年度的出勤、工资与购票提醒计算，避免把普通周末规则误当成正式放假安排。新一年的官方数据发布后，也可以下载 `https://cdn.jsdelivr.net/npm/chinese-days/dist/years/<年份>.json` 放入 `vendor/chinese-days/years/`，再运行 `node tools/build-calendar-bundle.js` 更新离线数据包。
 
 ## 🧱 项目结构
 

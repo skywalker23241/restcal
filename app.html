@@ -272,7 +272,7 @@
                             </svg></span>
                         <span class="tool-card-copy">
                             <strong id="salaryReceiptLabel">工资核算与工资条</strong>
-                            <small>核算本月扣款与实发工资，预览并下载工资条</small>
+                            <small>选择月份核算扣款与实发工资，预览并下载工资条</small>
                         </span>
                         <span class="tool-card-action">开始核算 <span aria-hidden="true">→</span></span>
                     </button>
@@ -667,6 +667,20 @@
                 </div>
                 <button class="btn ghost" id="closeReceipt" type="button" aria-label="关闭">关闭</button>
             </div>
+            <div class="receipt-period" id="salaryReceiptPeriod" hidden>
+                <div class="receipt-period-copy">
+                    <label for="salaryReceiptMonth">工资月份</label>
+                    <span>按该月出勤记录和当前工资设置估算</span>
+                </div>
+                <div class="receipt-period-controls">
+                    <button class="btn ghost receipt-period-nav" id="salaryReceiptPrev" type="button"
+                        aria-label="上一个月">‹</button>
+                    <select id="salaryReceiptYear" aria-label="工资年份"></select>
+                    <select id="salaryReceiptMonth" aria-label="工资月份"></select>
+                    <button class="btn ghost receipt-period-nav" id="salaryReceiptNext" type="button"
+                        aria-label="下一个月">›</button>
+                </div>
+            </div>
             <div class="modal-body" id="receiptModalBody"></div>
             <div class="modal-foot">
                 <button class="btn" id="downloadReceipt" type="button">打印/下载图片</button>
@@ -828,7 +842,8 @@
         const darkSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
         const CALENDAR_API = {
             sourceName: "Chinese Days",
-            yearJson: year => `vendor/chinese-days/years/${year}.json`
+            localYearJson: year => `vendor/chinese-days/years/${year}.json`,
+            remoteYearJson: year => `https://cdn.jsdelivr.net/npm/chinese-days/dist/years/${year}.json`
         };
         const CSV_HEADERS = ["日期", "状态", "请假类型", "请假理由", "是否节假日", "是否周末", "备注"];
         const CSV_USER_DATA_HEADER = "用户设置(JSON)";
@@ -910,6 +925,7 @@
         let anchorDate = new Date();
         let currentReceipt = null;
         let currentSalaryReceipt = null;
+        let salaryReceiptRenderVersion = 0;
         let currentLeaveReceipt = null;
         const enhancedSelects = new Map();
         const enhancedDateInputs = new Map();
@@ -961,6 +977,11 @@
             compRateInput: document.getElementById("compRateInput"),
             salaryResult: document.getElementById("salaryResult"),
             salaryReceiptLabel: document.getElementById("salaryReceiptLabel"),
+            salaryReceiptPeriod: document.getElementById("salaryReceiptPeriod"),
+            salaryReceiptYear: document.getElementById("salaryReceiptYear"),
+            salaryReceiptMonth: document.getElementById("salaryReceiptMonth"),
+            salaryReceiptPrev: document.getElementById("salaryReceiptPrev"),
+            salaryReceiptNext: document.getElementById("salaryReceiptNext"),
             annualQuotaInput: document.getElementById("annualQuotaInput"),
             compQuotaInput: document.getElementById("compQuotaInput"),
             profileNameInput: document.getElementById("profileNameInput"),
@@ -1219,12 +1240,24 @@
                 opt.value = String(month);
                 opt.textContent = `${month} 月`;
                 els.monthSelect.appendChild(opt);
+
+                const salaryOpt = opt.cloneNode(true);
+                els.salaryReceiptMonth.appendChild(salaryOpt);
+            }
+
+            for (let year = 2004; year <= today.getFullYear(); year++) {
+                const opt = document.createElement("option");
+                opt.value = String(year);
+                opt.textContent = `${year} 年`;
+                els.salaryReceiptYear.appendChild(opt);
             }
         }
 
         function initEnhancedSelects() {
             // forEach 会把索引传入第二参，必须显式包装避免污染 variant
             [els.yearSelect, els.monthSelect].forEach(select => enhanceSelect(select));
+            enhanceSelect(els.salaryReceiptYear, "year");
+            enhanceSelect(els.salaryReceiptMonth, "month");
             // 弹窗与设置里的原生下拉弹层无法主题化，统一替换为自定义 selectbox（field 变体铺满字段宽度）
             ["searchStatus", "scheduleTypeInput", "leaveTypeForDoc"]
                 .forEach(id => enhanceSelect(document.getElementById(id), "field"));
@@ -1984,6 +2017,13 @@
             els.closeReceipt.addEventListener("click", closeReceiptModal);
             els.receiptDone.addEventListener("click", closeReceiptModal);
             els.downloadReceipt.addEventListener("click", downloadCurrentReceiptImage);
+            els.salaryReceiptYear.addEventListener("change", () => {
+                updateSalaryReceiptMonthOptions();
+                updateSalaryReceiptPreview();
+            });
+            els.salaryReceiptMonth.addEventListener("change", updateSalaryReceiptPreview);
+            els.salaryReceiptPrev.addEventListener("click", () => shiftSalaryReceiptMonth(-1));
+            els.salaryReceiptNext.addEventListener("click", () => shiftSalaryReceiptMonth(1));
             els.receiptModal.addEventListener("click", event => {
                 if (event.target === els.receiptModal) closeReceiptModal();
             });
@@ -2119,6 +2159,12 @@
                 renderCalendarLoading("正在获取节假日、调休和农历数据...");
                 await ensureCalendarDataForView();
                 if (version !== renderVersion) return;
+            }
+            if (!calendarApi.years.has(currentYear)) {
+                renderCalendarUnavailable(currentYear);
+                renderHomeExtras();
+                updateCalendarSource();
+                return;
             }
             renderCalendarView();
             renderCalendarFooter();
@@ -2521,6 +2567,35 @@
             els.calendarGrid.innerHTML = `<div class="calendar-loading">${escapeHtml(text)}<br>如果网络不可用，将自动使用本地备用数据。</div>`;
         }
 
+        function renderCalendarUnavailable(year) {
+            const message = `${year} 年官方节假日数据尚未发布`;
+            els.calendarGrid.innerHTML = `
+        <div class="calendar-loading calendar-unavailable">
+          <strong>${escapeHtml(message)}</strong><br>
+          Chinese Days 发布该年度数据后，联网刷新页面即可自动获取。为避免误导，当前不计算该年度的出勤、工资和购票提醒。
+        </div>
+      `;
+            els.calendarFooter.innerHTML = `<span class="calendar-tip">${escapeHtml(message)}</span>`;
+            els.monthSummary.innerHTML = [
+                ["剩余年假", "待发布"],
+                ["本月请假", "待发布"],
+                ["本月出勤", "待发布"],
+                ["预计实发", "待发布"]
+            ].map(([label, value]) => `
+        <div class="overview-item">
+          <span class="overview-label">${label}</span>
+          <strong class="overview-value">${value}</strong>
+        </div>
+      `).join("");
+            const unavailable = `<div class="empty-state">${escapeHtml(message)}，暂不计算统计。</div>`;
+            els.monthStats.innerHTML = unavailable;
+            els.yearStats.innerHTML = unavailable;
+            if (els.homeTrend) els.homeTrend.innerHTML = unavailable;
+            els.salaryResult.innerHTML = `<div class="empty-state">${escapeHtml(message)}，暂不估算工资。</div>`;
+            currentSalaryReceipt = null;
+            els.ticketReminders.innerHTML = `<div class="empty-state">${escapeHtml(message)}，暂不生成购票提醒。</div>`;
+        }
+
         function dayAriaLabel(date, info, record) {
             const iso = toISO(date);
             const labels = [iso, weekdayName(date), getLunarText(date)];
@@ -2715,7 +2790,7 @@
         function renderSalary() {
             const stats = calculateStats(currentYear, currentMonth);
             const salary = calculateSalarySnapshot(stats);
-            currentSalaryReceipt = buildSalaryReceipt({stats, ...salary});
+            currentSalaryReceipt = buildSalaryReceipt({stats, ...salary}, currentYear, currentMonth);
             els.salaryResult.innerHTML = receiptHtml(currentSalaryReceipt);
         }
 
@@ -2732,8 +2807,8 @@
             return {salary, deduction, estimatedTax, daily, leaveDeduction, actual};
         }
 
-        function buildSalaryReceipt({stats, salary, deduction, estimatedTax, daily, leaveDeduction, actual}) {
-            const monthText = `${currentYear}-${String(currentMonth).padStart(2, "0")}`;
+        function buildSalaryReceipt({stats, salary, deduction, estimatedTax, daily, leaveDeduction, actual}, year, month) {
+            const monthText = `${year}-${String(month).padStart(2, "0")}`;
             return {
                 kind: "salary",
                 title: "工资条",
@@ -3185,7 +3260,7 @@
                     {
                         target: '[data-open-receipt="salary"]',
                         title: "工资核算与工资条",
-                        text: "根据本月出勤和请假记录估算扣款、实发工资，并生成可下载的工资条。",
+                        text: "根据所选月份的出勤和请假记录估算扣款、实发工资，并生成可下载的工资条。",
                         beforeEnter: async () => {
                             if (els.settingsModal.classList.contains("open")) closeSettings();
                             switchView("tools");
@@ -3893,25 +3968,121 @@
           <span>${escapeHtml(data.footer[0])}</span>
           <span>${escapeHtml(data.footer[1])}</span>
         </div>
+        <div class="receipt-signature" aria-hidden="true"><span class="receipt-signature-mark">休</span></div>
       `;
         }
 
-        function openReceiptModal(type) {
-            const data = type === "leave" ? currentLeaveReceipt : currentSalaryReceipt;
-            if (!data) return;
+        async function openReceiptModal(type) {
+            const isSalary = type === "salary";
+            els.salaryReceiptPeriod.hidden = !isSalary;
+            els.downloadReceipt.disabled = false;
+            openBackdrop(els.receiptModal);
+            if (isSalary) {
+                const latest = salaryReceiptLatestPeriod();
+                const initial = periodKey(currentYear, currentMonth) > latest
+                    ? latest
+                    : periodKey(currentYear, currentMonth);
+                const initialPeriod = parsePeriod(initial);
+                els.salaryReceiptYear.value = String(initialPeriod.year);
+                els.salaryReceiptMonth.value = String(initialPeriod.month);
+                updateSalaryReceiptMonthOptions();
+                els.receiptModalTitle.textContent = "工资条";
+                els.receiptModalSubtitle.textContent = "选择工资月份，预览并下载 PNG 图片";
+                await updateSalaryReceiptPreview();
+                return;
+            }
+            const data = currentLeaveReceipt;
+            if (!data) {
+                closeReceiptModal();
+                return;
+            }
             currentReceipt = data;
             els.receiptModalTitle.textContent = data.title;
             els.receiptModalSubtitle.textContent = "热敏小票预览，可下载为 PNG 图片";
             els.receiptModalBody.innerHTML = receiptHtml(data);
-            openBackdrop(els.receiptModal);
+        }
+
+        function salaryReceiptLatestPeriod() {
+            return periodKey(today.getFullYear(), today.getMonth() + 1);
+        }
+
+        function periodKey(year, month) {
+            return `${year}-${String(month).padStart(2, "0")}`;
+        }
+
+        function parsePeriod(value) {
+            const match = /^(\d{4})-(\d{2})$/.exec(value || "");
+            if (!match) return null;
+            const year = Number(match[1]);
+            const month = Number(match[2]);
+            return year >= 2004 && month >= 1 && month <= 12 ? {year, month} : null;
+        }
+
+        async function updateSalaryReceiptPreview() {
+            const period = selectedSalaryReceiptPeriod();
+            if (!period) return;
+            const version = ++salaryReceiptRenderVersion;
+            const selectedKey = periodKey(period.year, period.month);
+            els.salaryReceiptPrev.disabled = selectedKey <= "2004-01";
+            els.salaryReceiptNext.disabled = selectedKey >= salaryReceiptLatestPeriod();
+            els.downloadReceipt.disabled = true;
+            els.receiptModalBody.innerHTML = `<div class="calendar-loading receipt-loading">正在核算 ${period.year} 年 ${period.month} 月工资…</div>`;
+            await loadRemoteCalendarYear(period.year);
+            const currentPeriod = selectedSalaryReceiptPeriod();
+            if (version !== salaryReceiptRenderVersion
+                || !currentPeriod
+                || periodKey(currentPeriod.year, currentPeriod.month) !== selectedKey) return;
+            if (!calendarApi.years.has(period.year)) {
+                currentReceipt = null;
+                els.receiptModalBody.innerHTML = `<div class="empty-state">${period.year} 年官方节假日数据尚未发布，暂不估算工资。</div>`;
+                return;
+            }
+            const stats = calculateStats(period.year, period.month);
+            const salary = calculateSalarySnapshot(stats);
+            currentSalaryReceipt = buildSalaryReceipt({stats, ...salary}, period.year, period.month);
+            currentReceipt = currentSalaryReceipt;
+            els.receiptModalBody.innerHTML = receiptHtml(currentSalaryReceipt);
+            els.downloadReceipt.disabled = false;
+        }
+
+        function shiftSalaryReceiptMonth(delta) {
+            const period = selectedSalaryReceiptPeriod();
+            if (!period) return;
+            const shifted = new Date(period.year, period.month - 1 + delta, 1);
+            const next = periodKey(shifted.getFullYear(), shifted.getMonth() + 1);
+            if (next < "2004-01" || next > salaryReceiptLatestPeriod()) return;
+            els.salaryReceiptYear.value = String(shifted.getFullYear());
+            els.salaryReceiptMonth.value = String(shifted.getMonth() + 1);
+            updateSalaryReceiptMonthOptions();
+            return updateSalaryReceiptPreview();
+        }
+
+        function selectedSalaryReceiptPeriod() {
+            return parsePeriod(periodKey(Number(els.salaryReceiptYear.value), Number(els.salaryReceiptMonth.value)));
+        }
+
+        function updateSalaryReceiptMonthOptions() {
+            const selectedYear = Number(els.salaryReceiptYear.value);
+            const latestMonth = selectedYear === today.getFullYear() ? today.getMonth() + 1 : 12;
+            if (Number(els.salaryReceiptMonth.value) > latestMonth) {
+                els.salaryReceiptMonth.value = String(latestMonth);
+            }
+            [...els.salaryReceiptMonth.options].forEach(option => {
+                option.disabled = Number(option.value) > latestMonth;
+            });
+            syncEnhancedSelect(els.salaryReceiptMonth, true);
         }
 
         function closeReceiptModal() {
+            salaryReceiptRenderVersion += 1;
             closeBackdrop(els.receiptModal);
         }
 
-        function downloadCurrentReceiptImage() {
+        async function downloadCurrentReceiptImage() {
             if (!currentReceipt) return;
+            if (document.fonts?.ready) {
+                await document.fonts.ready.catch(() => {});
+            }
             const canvas = receiptCanvas(currentReceipt);
             const a = document.createElement("a");
             a.href = canvas.toDataURL("image/png");
@@ -3925,86 +4096,126 @@
             const width = 720;
             const padding = 54;
             const contentWidth = width - padding * 2;
+            const styles = getComputedStyle(document.documentElement);
+            const displayFont = styles.getPropertyValue("--font-display").trim()
+                || '"Bodoni Moda", "Noto Serif SC", "Songti SC", "STSong", "SimSun", Georgia, serif';
+            const palette = {
+                stage: styles.getPropertyValue("--receipt-stage").trim() || "#ebe4d8",
+                paper: styles.getPropertyValue("--receipt-paper").trim() || "#fffaf1",
+                ink: styles.getPropertyValue("--receipt-ink").trim() || "#2b211b",
+                muted: styles.getPropertyValue("--receipt-muted").trim() || "#8a7c6b",
+                line: styles.getPropertyValue("--receipt-line").trim() || "#dfd0bd",
+                accent: styles.getPropertyValue("--receipt-accent").trim() || "#b4382a",
+                accentSoft: styles.getPropertyValue("--receipt-accent-soft").trim() || "#f7e6df"
+            };
             const probe = document.createElement("canvas");
             const ctx = probe.getContext("2d");
-            ctx.font = "24px sans-serif";
+            ctx.font = `600 24px ${displayFont}`;
             const bodyLines = data.body ? wrapCanvasText(ctx, data.body, contentWidth) : [];
             const rowCount = data.sections.reduce((sum, section) => sum + section.length, 0);
-            const height = 96 + data.sections.length * 36 + rowCount * 34 + bodyLines.length * 34 + 110;
+            const height = 130 + data.sections.length * 36 + rowCount * 36 + bodyLines.length * 34 + 110;
             const canvas = document.createElement("canvas");
             canvas.width = width;
             canvas.height = height;
             const c = canvas.getContext("2d");
 
-            c.fillStyle = "#f8fafc";
+            c.fillStyle = palette.stage;
             c.fillRect(0, 0, width, height);
-            c.fillStyle = "#ffffff";
+            c.fillStyle = palette.paper;
             c.fillRect(22, 16, width - 44, height - 32);
-            drawReceiptTear(c, 22, 16, width - 44, true);
-            drawReceiptTear(c, 22, height - 16, width - 44, false);
 
             c.save();
-            c.globalAlpha = 0.08;
-            c.fillStyle = "#09090b";
+            c.globalAlpha = 0.025;
+            c.fillStyle = palette.ink;
             for (let y = 30; y < height - 30; y += 7) {
                 c.fillRect(34, y, width - 68, 1);
             }
             c.restore();
 
             let y = 72;
-            c.fillStyle = "#09090b";
+            c.fillStyle = palette.ink;
             c.textAlign = "center";
-            c.font = "700 32px sans-serif";
+            c.font = `700 36px ${displayFont}`;
             c.fillText(data.title, width / 2, y);
-            y += 32;
-            c.fillStyle = "#71717a";
-            c.font = "20px sans-serif";
+            y += 34;
+            c.fillStyle = palette.muted;
+            c.font = `600 20px ${displayFont}`;
             c.fillText(data.subtitle, width / 2, y);
             y += 28;
-            drawDash(c, padding, y, contentWidth);
+            drawDash(c, padding, y, contentWidth, palette.line);
             y += 34;
 
             data.sections.forEach(section => {
                 c.textAlign = "left";
                 section.forEach(item => {
-                    c.fillStyle = "#71717a";
-                    c.font = "22px sans-serif";
+                    if (item.strong) {
+                        c.fillStyle = palette.accentSoft;
+                        roundRectPath(c, padding - 10, y - 27, contentWidth + 20, 42, 8);
+                        c.fill();
+                    }
+                    c.fillStyle = item.strong ? palette.accent : palette.muted;
+                    c.font = `600 22px ${displayFont}`;
                     c.fillText(item.label, padding, y);
-                    c.fillStyle = "#09090b";
+                    c.fillStyle = item.strong ? palette.accent : palette.ink;
                     c.textAlign = "right";
-                    c.font = `${item.strong ? "700 " : ""}22px sans-serif`;
+                    c.font = `${item.strong ? "700" : "600"} 22px ${displayFont}`;
                     c.fillText(String(item.value), width - padding, y);
                     c.textAlign = "left";
-                    y += item.strong ? 38 : 34;
+                    y += item.strong ? 44 : 36;
                 });
-                drawDash(c, padding, y - 12, contentWidth);
+                drawDash(c, padding, y - 12, contentWidth, palette.line);
                 y += 22;
             });
 
             if (bodyLines.length) {
-                c.fillStyle = "#27272a";
-                c.font = "22px sans-serif";
+                c.fillStyle = palette.accentSoft;
+                roundRectPath(c, padding - 10, y - 25, contentWidth + 20, bodyLines.length * 34 + 20, 8);
+                c.fill();
+                c.fillStyle = palette.accent;
+                c.fillRect(padding - 10, y - 25, 4, bodyLines.length * 34 + 20);
+                c.fillStyle = palette.ink;
+                c.font = `600 22px ${displayFont}`;
                 c.textAlign = "left";
                 bodyLines.forEach(line => {
                     c.fillText(line, padding, y);
                     y += 34;
                 });
-                drawDash(c, padding, y - 12, contentWidth);
+                drawDash(c, padding, y - 12, contentWidth, palette.line);
                 y += 22;
             }
 
-            c.fillStyle = "#71717a";
-            c.font = "19px sans-serif";
+            c.fillStyle = palette.muted;
+            c.font = `600 19px ${displayFont}`;
             c.textAlign = "left";
             c.fillText(data.footer[0], padding, y);
             c.textAlign = "right";
             c.fillText(data.footer[1], width - padding, y);
+
+            y += 48;
+            const markSize = 30;
+            const markX = (width - markSize) / 2;
+            const lineY = y - markSize / 2;
+            c.strokeStyle = palette.line;
+            c.lineWidth = 1;
+            c.beginPath();
+            c.moveTo(padding, lineY);
+            c.lineTo(markX - 16, lineY);
+            c.moveTo(markX + markSize + 16, lineY);
+            c.lineTo(width - padding, lineY);
+            c.stroke();
+            c.strokeStyle = palette.accent;
+            roundRectPath(c, markX, y - markSize, markSize, markSize, 8);
+            c.stroke();
+            c.fillStyle = palette.accent;
+            c.textAlign = "center";
+            c.font = `700 18px ${displayFont}`;
+            c.fillText("休", width / 2, y - 8);
             return canvas;
         }
 
-        function drawDash(ctx, x, y, width) {
+        function drawDash(ctx, x, y, width, color = "#d4d4d8") {
             ctx.save();
-            ctx.strokeStyle = "#d4d4d8";
+            ctx.strokeStyle = color;
             ctx.setLineDash([10, 8]);
             ctx.beginPath();
             ctx.moveTo(x, y);
@@ -4013,23 +4224,15 @@
             ctx.restore();
         }
 
-        function drawReceiptTear(ctx, x, y, width, top) {
-            ctx.save();
-            ctx.fillStyle = "#f8fafc";
-            const teeth = 28;
-            const step = width / teeth;
+        function roundRectPath(ctx, x, y, width, height, radius) {
+            const r = Math.min(radius, width / 2, height / 2);
             ctx.beginPath();
-            ctx.moveTo(x, y);
-            for (let i = 0; i <= teeth; i++) {
-                const px = x + i * step;
-                const py = y + (i % 2 === 0 ? 0 : (top ? 10 : -10));
-                ctx.lineTo(px, py);
-            }
-            ctx.lineTo(x + width, top ? y - 18 : y + 18);
-            ctx.lineTo(x, top ? y - 18 : y + 18);
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + width, y, x + width, y + height, r);
+            ctx.arcTo(x + width, y + height, x, y + height, r);
+            ctx.arcTo(x, y + height, x, y, r);
+            ctx.arcTo(x, y, x + width, y, r);
             ctx.closePath();
-            ctx.fill();
-            ctx.restore();
         }
 
         function wrapCanvasText(ctx, text, maxWidth) {
@@ -4774,35 +4977,39 @@
                 calendarApi.message = "本地中国日历数据已就绪";
                 return;
             }
-            if (location.hostname === "restcal.abohack.com") {
-                calendarApi.failedYears.add(year);
-                calendarApi.status = calendarApi.years.size ? "partial" : "fallback";
-                calendarApi.message = calendarApi.years.size
-                    ? "部分年份使用本地中国日历数据"
-                    : "正在使用本地备用日历数据";
-                return;
-            }
             const controller = new AbortController();
             const timeout = window.setTimeout(() => controller.abort(), 4500);
             try {
-                const response = await fetch(CALENDAR_API.yearJson(year), {
-                    cache: "force-cache",
-                    signal: controller.signal
-                });
-                if (!response.ok) throw new Error(`${year} 年接口返回 ${response.status}`);
-                const json = await response.json();
-                calendarApi.years.set(year, normalizeRemoteCalendarYear(json));
-                calendarApi.status = "api";
-                calendarApi.message = `Connected ${CALENDAR_API.sourceName} API`;
+                const sources = [
+                    {url: CALENDAR_API.localYearJson(year), remote: false},
+                    {url: CALENDAR_API.remoteYearJson(year), remote: true}
+                ];
+                let loaded = false;
+                for (const source of sources) {
+                    const response = await fetch(source.url, {
+                        cache: source.remote ? "no-cache" : "force-cache",
+                        signal: controller.signal
+                    });
+                    if (response.status === 404) continue;
+                    if (!response.ok) throw new Error(`${year} 年接口返回 ${response.status}`);
+                    const json = await response.json();
+                    if (!json || typeof json !== "object" || Array.isArray(json)
+                        || typeof json.holidays !== "object" || typeof json.workdays !== "object") {
+                        throw new Error(`${year} 年接口数据格式不正确`);
+                    }
+                    calendarApi.years.set(year, normalizeRemoteCalendarYear(json));
+                    calendarApi.status = source.remote ? "api" : "bundled";
+                    calendarApi.message = source.remote
+                        ? `已从 ${CALENDAR_API.sourceName} 获取 ${year} 年数据`
+                        : "本地中国日历数据已就绪";
+                    loaded = true;
+                    break;
+                }
+                if (!loaded) throw new Error(`${year} 年官方数据尚未发布`);
             } catch (error) {
                 calendarApi.failedYears.add(year);
-                if (!calendarApi.years.size) {
-                    calendarApi.status = "fallback";
-                    calendarApi.message = "远程日历暂不可用，正在使用本地备用数据";
-                } else {
-                    calendarApi.status = "partial";
-                    calendarApi.message = "部分年份使用远程数据，部分年份使用本地备用数据";
-                }
+                calendarApi.status = "unavailable";
+                calendarApi.message = `${year} 年官方节假日数据尚未发布`;
             } finally {
                 window.clearTimeout(timeout);
             }

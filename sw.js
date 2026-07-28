@@ -1,8 +1,9 @@
 /* 休历 Service Worker
  * 发布新版本时递增 CACHE_VERSION，旧缓存会在 activate 阶段清除。 */
-const CACHE_VERSION = "v1.5.7";
+const CACHE_VERSION = "v1.5.15";
 const APP_CACHE = `xiuli-app-${CACHE_VERSION}`;
 const FONT_CACHE = "xiuli-fonts-v1";
+const CALENDAR_CACHE = "xiuli-calendar-data-v1";
 
 const PRECACHE = [
     "./",
@@ -46,7 +47,7 @@ self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys()
             .then(keys => Promise.all(
-                keys.filter(key => key !== APP_CACHE && key !== FONT_CACHE)
+                keys.filter(key => key !== APP_CACHE && key !== FONT_CACHE && key !== CALENDAR_CACHE)
                     .map(key => caches.delete(key))
             ))
             .then(() => self.clients.claim())
@@ -59,8 +60,14 @@ self.addEventListener("fetch", event => {
 
     const url = new URL(request.url);
 
-    // 字体等 CDN 资源：URL 带版本号不可变，cache-first
-    if (url.hostname === "cdn.jsdelivr.net") {
+    // 未打包的新年份日历数据：优先联网获取官方更新，离线时使用最近一次成功缓存。
+    if (url.hostname === "cdn.jsdelivr.net" && url.pathname.includes("/chinese-days/")) {
+        event.respondWith(networkFirst(request, CALENDAR_CACHE));
+        return;
+    }
+
+    // 字体 CDN 资源：URL 带版本号不可变，cache-first
+    if (url.hostname === "cdn.jsdelivr.net" && url.pathname.includes("/@fontsource/")) {
         event.respondWith(cacheFirst(request, FONT_CACHE));
         return;
     }
@@ -110,6 +117,15 @@ function cacheFirst(request, cacheName) {
             return response;
         });
     });
+}
+
+function networkFirst(request, cacheName) {
+    return fetch(request).then(response => {
+        if (!response.ok) throw new Error(`Uncacheable response ${response.status}`);
+        const copy = response.clone();
+        caches.open(cacheName).then(cache => cache.put(request, copy));
+        return response;
+    }).catch(() => caches.match(request).then(cached => cached || Response.error()));
 }
 
 function isCacheable(response) {
