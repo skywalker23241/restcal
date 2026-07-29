@@ -9,6 +9,11 @@
     "scripts": {
         "start": "electron .",
         "serve": "node server.js",
+        "build:calendar": "node scripts/build-calendar-bundle.js",
+        "screenshots": "node scripts/readme-screenshots.cjs",
+        "verify:structure": "node scripts/verify-structure.js",
+        "verify:server": "node scripts/verify-server.js",
+        "verify:mobile": "electron scripts/verify-mobile.js",
         "dist": "electron-builder --win"
     },
     "devDependencies": {
@@ -23,16 +28,7 @@
         },
         "files": [
             "desktop/**",
-            "app.html",
-            "app-i18n-v1.4.9.js",
-            "calendar-years.js",
-            "onboarding.js",
-            "product-tour.js",
-            "styles.css",
-            "manifest.webmanifest",
-            "sw.js",
-            "icons/**",
-            "vendor/**",
+            "public/**",
             "LICENSE"
         ],
         "win": {
@@ -41,7 +37,7 @@
                 "zip",
                 "nsis"
             ],
-            "icon": "icons/icon-512.png"
+            "icon": "public/assets/icons/icon-512.png"
         },
         "portable": {
             "artifactName": "休历-${version}-portable.exe"

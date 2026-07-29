@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="icons/icon-192.png" width="88" alt="休历图标">
+<img src="public/assets/icons/icon-192.png" width="88" alt="休历图标">
 
 # 休历 · RestCal
 
@@ -14,7 +14,7 @@
 
 **[🌐 立即使用](https://restcal.abohack.com/app.html)** · [产品主页](https://restcal.abohack.com) · [Telegram 频道](https://t.me/restcalabohack) · **[下载 v1.5.1 离线版](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.5.1)** · [问题反馈](https://github.com/skywalker23241/restcal-abohack/issues)
 
-<img src="docs/screenshots/overview-light.png" alt="休历天视图：当日日历卡片、假期额度、出勤和预计实发概览" width="100%">
+<img src="public/assets/images/screenshots/overview-light.png" alt="休历天视图：当日日历卡片、假期额度、出勤和预计实发概览" width="100%">
 
 *文档中的截图均为演示数据*
 
@@ -48,12 +48,12 @@
 
 ### 📊 月度与年度统计
 
-<img src="docs/screenshots/statistics.png" alt="统计页面：月度与年度切换、年度图表和假期额度使用情况" width="100%">
+<img src="public/assets/images/screenshots/statistics.png" alt="统计页面：月度与年度切换、年度图表和假期额度使用情况" width="100%">
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/year-stats.png" alt="年度统计：每月请假天数柱状图"></td>
-    <td width="50%"><img src="docs/screenshots/year-heatmap.png" alt="年度统计：全年每日状态热力图"></td>
+    <td width="50%"><img src="public/assets/images/screenshots/year-stats.png" alt="年度统计：每月请假天数柱状图"></td>
+    <td width="50%"><img src="public/assets/images/screenshots/year-heatmap.png" alt="年度统计：全年每日状态热力图"></td>
   </tr>
 </table>
 
@@ -63,7 +63,7 @@
 
 ### 🧰 三个专注工具
 
-<img src="docs/screenshots/tools.png" alt="工具页面：工资核算与工资条、生成请假条和购票提醒" width="100%">
+<img src="public/assets/images/screenshots/tools.png" alt="工具页面：工资核算与工资条、生成请假条和购票提醒" width="100%">
 
 - 工资核算与工资条：计算请假扣款、预计实发并导出工资条图片。
 - 生成请假条：读取已保存记录，生成可复制或下载的正式请假条。
@@ -71,14 +71,14 @@
 
 ### 💰 工资核算与工资条
 
-<div align="center"><img src="docs/screenshots/salary-slip.png" alt="热敏小票风格的工资条预览" width="420"></div>
+<div align="center"><img src="public/assets/images/screenshots/salary-slip.png" alt="热敏小票风格的工资条预览" width="420"></div>
 
 - 按月薪、固定扣除（五险一金等）和各请假类型的扣款比例，实时估算当月扣薪与实际到手。
 - 一键生成热敏小票风格的工资条，可下载为 PNG 图片。计算规则见[工资计算说明](#-工资计算说明)。
 
 ### 📝 一键生成请假条
 
-<div align="center"><img src="docs/screenshots/leave-note.png" alt="请假条生成器：左侧填写信息，右侧实时预览小票" width="820"></div>
+<div align="center"><img src="public/assets/images/screenshots/leave-note.png" alt="请假条生成器：左侧填写信息，右侧实时预览小票" width="820"></div>
 
 - 填写请假类型、起止日期和理由，实时生成正式的请假条文本与小票预览。
 - 申请人、称呼、工作交接等默认值自动记忆，可复制文本或下载小票图片。
@@ -89,13 +89,13 @@
 
 ### 🌙 深色模式
 
-<img src="docs/screenshots/overview-dark.png" alt="休历深色主题" width="100%">
+<img src="public/assets/images/screenshots/overview-dark.png" alt="休历深色主题" width="100%">
 
 默认跟随系统，也可在顶栏于自动、浅色、深色之间手动切换。
 
 ### 📱 移动端与 PWA
 
-<div align="center"><img src="docs/screenshots/overview-mobile.png" alt="移动端天视图：当日卡片、概览和底部导航" width="340"></div>
+<div align="center"><img src="public/assets/images/screenshots/overview-mobile.png" alt="移动端天视图：当日卡片、概览和底部导航" width="340"></div>
 
 - 响应式布局，手机上使用紧凑概览、天视图卡片、底部导航和便于触控的记录弹层。
 - 设置二级页面提供明确的返回入口，记录弹层支持底部抽屉交互。
@@ -103,7 +103,7 @@
 
 ### ☁️ 备份与云同步
 
-<div align="center"><img src="docs/screenshots/settings.png" alt="设置面板：工作制度、工资、额度、模板和数据同步" width="560"></div>
+<div align="center"><img src="public/assets/images/screenshots/settings.png" alt="设置面板：工作制度、工资、额度、模板和数据同步" width="560"></div>
 
 - 数据默认保存在本机浏览器 `localStorage`，不经过任何服务器。
 - CSV 导入导出：同时保存日历记录、个人资料、工作制度、工资、假期额度、请假条默认值、主题和语言，适合手动备份和跨浏览器迁移；导入前自动校验格式。
@@ -117,7 +117,7 @@
 | **桌面版** | Windows 免浏览器使用 | 从 [v1.5.1 Release](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.5.1) 下载便携版、安装版或 ZIP |
 | **本地运行** | 开发或内网使用 | 克隆仓库后 `node server.js`，访问 `http://localhost:8765/app.html` |
 
-也可以直接双击打开 `app.html` 使用（站点根路径的 `index.html` 是介绍页，应用本体在 `app.html`）。`file://` 模式本身可以离线运行，但浏览器不会注册 Service Worker，也不能将其安装为 PWA；需要 PWA 能力时请通过 HTTP(S) 打开。
+也可以直接双击打开 `public/app.html` 使用（`public/index.html` 是介绍页，应用本体在 `public/app.html`）。`file://` 模式本身可以离线运行，但浏览器不会注册 Service Worker，也不能将其安装为 PWA；需要 PWA 能力时请通过 HTTP(S) 打开。
 
 ### 安装为应用（PWA）
 
@@ -127,7 +127,7 @@
 - Android：浏览器菜单中的「添加到主屏幕」。
 - iOS Safari：分享菜单中的「添加到主屏幕」。
 
-安装后离线也能使用：应用壳、节假日、农历和节气数据都已打包在本地（`vendor/` 目录，含 2004–2026 年），由 Service Worker 缓存。仅标题字体来自 CDN，离线时回退到系统字体。
+安装后离线也能使用：应用壳、节假日、农历和节气数据都已打包在 `public/assets/vendor/` 中（含 2004–2026 年），由 Service Worker 缓存。仅标题字体来自 CDN，离线时回退到系统字体。
 
 ## 💻 桌面版（Windows）
 
@@ -167,16 +167,16 @@ npm run dist
 
 1. 将项目提交到 GitHub 仓库。
 2. 进入仓库 `Settings` → `Pages`。
-3. Source 选择 `Deploy from a branch`。
-4. Branch 选择 `main`，目录选择 `/root`。
-5. 保存后访问 GitHub Pages 地址。
+3. Source 选择 `GitHub Actions`。
+4. 推送到 `main` 后，仓库自带的 Pages 工作流会发布 `public/`。
+5. 工作流完成后访问 GitHub Pages 地址。
 
 ### Netlify 部署与网页版 WebDAV
 
 浏览器不能直接访问未开放 CORS 的 WebDAV 服务。Netlify 部署会自动启用仓库中的同源 Function，网页请求 `/__webdav` 时由该 Function 安全转发，因此用户无需安装扩展或填写额外代理地址。
 
 1. 在 Netlify 选择 `Add new project` → `Import an existing project`，连接本仓库。
-2. Build command 留空，Publish directory 填 `.`，然后部署。
+2. Build command 留空，Publish directory 填 `public`，然后部署。
 3. 在 `Domain management` 中绑定自定义域名，并按 Netlify 提示修改 DNS。
 4. 打开线上站点的设置 → WebDAV 云备份，填写地址、用户名和密码，点击「测试连接」。坚果云需使用在安全选项中生成的应用专用密码。
 
@@ -238,32 +238,29 @@ WEBDAV_ALLOWED_HOSTS=dav.jianguoyun.com,dav.example.com
 
 ## 📅 节假日数据源
 
-节假日、调休、农历和节气数据来自 [Chinese Days](https://chinese-days.yaavi.me/)，2004–2026 年数据已打包在 `vendor/chinese-days/` 中，不依赖网络。
+节假日、调休、农历和节气数据来自 [Chinese Days](https://chinese-days.yaavi.me/)，2004–2026 年数据已打包在 `public/assets/vendor/chinese-days/` 中，不依赖网络。
 
-对于尚未打包的新年份，页面会自动请求 Chinese Days 的 jsDelivr 年度数据，并将成功响应缓存供离线使用。如果官方数据尚未发布，页面会明确提示并暂停该年度的出勤、工资与购票提醒计算，避免把普通周末规则误当成正式放假安排。新一年的官方数据发布后，也可以下载 `https://cdn.jsdelivr.net/npm/chinese-days/dist/years/<年份>.json` 放入 `vendor/chinese-days/years/`，再运行 `node tools/build-calendar-bundle.js` 更新离线数据包。
+对于尚未打包的新年份，页面会自动请求 Chinese Days 的 jsDelivr 年度数据，并将成功响应缓存供离线使用。如果官方数据尚未发布，页面会明确提示并暂停该年度的出勤、工资与购票提醒计算，避免把普通周末规则误当成正式放假安排。新一年的官方数据发布后，也可以下载 `https://cdn.jsdelivr.net/npm/chinese-days/dist/years/<年份>.json` 放入 `public/assets/vendor/chinese-days/years/`，再运行 `npm run build:calendar` 更新离线数据包。
 
 ## 🧱 项目结构
 
 ```text
 .
-├── index.html            # 中英文介绍页（站点首页）
-├── app.html              # 应用主页面，包含 HTML 和 JS
-├── app-i18n-v1.4.9.js    # 中英文界面翻译与语言切换
-├── calendar-years.js     # 2004–2026 年离线日历数据包
-├── og-image.png          # 介绍页社交分享图
-├── sitemap.xml           # 站点地图（搜索引擎索引）
-├── robots.txt            # 爬虫规则，引用 sitemap
-├── styles.css            # 页面样式
-├── manifest.webmanifest  # PWA 应用清单
-├── sw.js                 # Service Worker，离线缓存
-├── icons/                # PWA 应用图标
-├── docs/screenshots/     # README 产品截图（演示数据）
-├── vendor/chinese-days/  # 本地化的节假日、农历数据（2004-2026）
-├── tools/make-icons.ps1  # 图标生成脚本
-├── tools/og-image.html   # 社交分享图源文件
+├── public/               # Netlify、GitHub Pages 与本地服务器的发布根目录
+│   ├── index.html        # 中英文介绍页（站点首页）
+│   ├── app.html          # 应用主页面
+│   ├── manifest.webmanifest
+│   ├── sw.js             # PWA 离线缓存
+│   └── assets/
+│       ├── css/          # 页面样式
+│       ├── js/           # 应用脚本与离线日历数据包
+│       ├── icons/        # PWA 与桌面版图标
+│       ├── images/       # 社交分享图与产品截图
+│       └── vendor/       # 本地化的节假日、农历数据
+├── scripts/              # 图标、截图、日历数据和布局验证脚本
+├── docs/roadmap.md       # 后续功能路线图
 ├── netlify/functions/webdav.mjs  # Netlify 网页版 WebDAV 同源服务
 ├── netlify.toml          # Netlify 发布与 Function 配置
-├── tools/readme-screenshots.cjs  # README 产品截图生成脚本（Playwright）
 ├── desktop/main.js       # Electron 桌面壳（Windows exe）
 ├── package.json          # 桌面版依赖与打包配置
 ├── server.js             # 本地静态预览服务器（含 WebDAV 同源代理）
@@ -274,7 +271,7 @@ WEBDAV_ALLOWED_HOSTS=dav.jianguoyun.com,dav.example.com
 
 欢迎提交 Issue 和 Pull Request，贡献流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-发布新版本时需要递增 `sw.js` 顶部的 `CACHE_VERSION`，否则已安装用户的静态资源不会更新。
+发布新版本时需要递增 `public/sw.js` 顶部的 `CACHE_VERSION`，否则已安装用户的静态资源不会更新。
 
 ## 📄 许可
 

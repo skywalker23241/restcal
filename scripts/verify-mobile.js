@@ -1,6 +1,6 @@
 /* 移动端布局验证脚本：用项目自带的 Electron 加载页面并截图。
- * 用法：npx electron tools/verify-mobile.js
- * 输出：tools/shots/*.png（各视口首页 + 请假条弹窗）。 */
+ * 用法：npm run verify:mobile
+ * 输出：scripts/shots/*.png（各视口首页 + 请假条弹窗）。 */
 const { app, BrowserWindow } = require("electron");
 const fs = require("fs");
 const path = require("path");

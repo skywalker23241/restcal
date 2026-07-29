@@ -4,8 +4,8 @@ const http = require("http");
 const https = require("https");
 const { pathToFileURL } = require("url");
 
-// 静态文件根目录：开发时是仓库根目录，打包后是 app.asar 根目录。
-const root = path.join(__dirname, "..");
+// 网页静态文件统一放在 public/；开发和打包后都从这里加载。
+const root = path.join(__dirname, "..", "public");
 
 const APP_SCHEME = "app";
 const APP_ORIGIN = `${APP_SCHEME}://xiuli`;
@@ -97,7 +97,7 @@ function createWindow() {
         minHeight: 560,
         autoHideMenuBar: true,
         backgroundColor: "#f6f3ed",
-        icon: path.join(root, "icons", "icon-512.png"),
+        icon: path.join(root, "assets", "icons", "icon-512.png"),
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
             contextIsolation: true,

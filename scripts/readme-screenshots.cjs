@@ -1,11 +1,11 @@
-// README 产品截图生成脚本：向本地应用注入演示数据，用 Playwright 批量截图到 docs/screenshots/。
+// README 产品截图生成脚本：向本地应用注入演示数据，用 Playwright 批量截图到 public/assets/images/screenshots/。
 // 演示数据以 2026-07 为基准月份，界面大改或换演示年份时按需调整 mark(...) 部分。
 //
 // 用法（playwright 不是项目依赖，任选其一）：
 //   1) npm i --no-save playwright && npx playwright install chromium
-//      node tools/readme-screenshots.cjs
+//      node scripts/readme-screenshots.cjs
 //   2) 已有全局/缓存的 playwright 时：
-//      NODE_PATH=<playwright 所在的 node_modules> node tools/readme-screenshots.cjs
+//      NODE_PATH=<playwright 所在的 node_modules> node scripts/readme-screenshots.cjs
 const {chromium} = require("playwright");
 const {spawn} = require("child_process");
 const fs = require("fs");
@@ -13,7 +13,7 @@ const http = require("http");
 const path = require("path");
 
 const REPO = path.resolve(__dirname, "..");
-const OUT = path.join(REPO, "docs", "screenshots");
+const OUT = path.join(REPO, "public", "assets", "images", "screenshots");
 const PORT = 8801;
 const BASE = `http://127.0.0.1:${PORT}`;
 

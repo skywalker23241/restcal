@@ -10,6 +10,10 @@ desktop.ini
 .vscode/
 .idea/
 
+# Local AI assistant state
+.agents/
+.claude/
+
 # Temporary files
 *.tmp
 *.temp
@@ -19,3 +23,6 @@ node_modules/
 
 # Desktop build output
 dist/
+
+# Visual verification output
+scripts/shots/

@@ -1,8 +1,8 @@
 # 生成 PWA 图标：基于 favicon 的「休」字设计渲染 PNG。
-# 用法：pwsh tools/make-icons.ps1
+# 用法：pwsh scripts/make-icons.ps1
 Add-Type -AssemblyName System.Drawing
 
-$outDir = Join-Path $PSScriptRoot "..\icons"
+$outDir = Join-Path $PSScriptRoot "..\public\assets\icons"
 New-Item -ItemType Directory -Force $outDir | Out-Null
 
 $bg = [System.Drawing.Color]::FromArgb(0xB4, 0x38, 0x2A)
@@ -56,7 +56,7 @@ function New-Icon([int]$size, [string]$file, [bool]$fullBleed, [float]$glyphScal
     $font.Dispose(); $fgBrush.Dispose(); $bgBrush.Dispose(); $fmt.Dispose(); $g.Dispose()
     $bmp.Save((Join-Path $outDir $file), [System.Drawing.Imaging.ImageFormat]::Png)
     $bmp.Dispose()
-    Write-Host "✓ icons/$file"
+    Write-Host "✓ public/assets/icons/$file"
 }
 
 New-Icon 192 "icon-192.png" $false 0.60

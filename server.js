@@ -3,7 +3,7 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 
-const root = __dirname;
+const root = path.join(__dirname, "public");
 const port = Number(process.env.PORT || 8765);
 
 const types = {
