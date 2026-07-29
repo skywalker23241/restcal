@@ -19,6 +19,7 @@
         "待发布": "Pending",
         "Chinese Days 发布该年度数据后，联网刷新页面即可自动获取。为避免误导，当前不计算该年度的出勤、工资和购票提醒。": "Once Chinese Days publishes data for this year, refresh while online to retrieve it automatically. To avoid misleading results, attendance, pay and ticket reminders are not calculated yet.",
         "今天": "Today", "上月": "Previous month", "下月": "Next month",
+        "请假 / 出勤": "Leave / attendance", "请假每日扣款": "Daily leave deduction", "距下个节假日": "Next holiday in", "请假天数 / 已出勤天数": "Leave days / attended days", "按本月应出勤天数折算，实际按请假类型比例计算": "Based on this month's expected workdays; actual deduction varies by leave type",
         "选择日期": "Pick a date", "清空": "Clear", "上一年": "Previous year", "下一年": "Next year",
         "年份": "Year", "月份": "Month", "年月选择": "Year and month", "月份导航": "Month navigation", "月份切换": "Change month", "工具操作": "Tools",
         "搜索与筛选": "Search and filters", "切换主题": "Switch theme", "设置": "Settings", "使用说明": "Help", "界面引导": "Interface tour", "CSV 备份与导入": "CSV backup and import",

@@ -318,7 +318,7 @@ h1 {
     left: 0;
     z-index: 15;
     display: none;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     border-top: 1px solid var(--border);
     background: color-mix(in srgb, var(--card) 94%, transparent);
     backdrop-filter: blur(10px);
@@ -428,28 +428,30 @@ h1 {
 }
 
 .overview-strip {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(118px, 1fr));
     align-items: stretch;
-    flex-wrap: wrap;
-    gap: 4px;
+    gap: 8px;
 }
 
 .overview-item {
     display: grid;
     align-content: center;
-    justify-items: start;
-    gap: 1px;
-    min-width: 88px;
-    padding: 6px 14px;
-    border: 0;
-    border-left: 1px solid var(--border);
-    background: transparent;
-    text-align: left;
+    justify-items: center;
+    gap: 3px;
+    min-width: 118px;
+    min-height: 62px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    overflow: hidden;
 }
 
 .overview-item:first-child {
-    border-left: 0;
-    padding-left: 0;
+    border-left: 1px solid var(--border);
 }
 
 .overview-label {
@@ -459,12 +461,15 @@ h1 {
 }
 
 .overview-value {
+    max-width: 100%;
     color: var(--foreground);
     font-family: var(--font-display);
     font-size: 17px;
     font-weight: 700;
     line-height: 1.25;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .overview-item.warn .overview-value {
@@ -473,19 +478,19 @@ h1 {
 
 .overview-item.is-action {
     cursor: pointer;
-    border-radius: var(--radius-sm);
-    transition: background var(--transition-fast) ease;
+    transition: background var(--transition-fast) ease, border-color var(--transition-fast) ease, box-shadow var(--transition-fast) ease;
 }
 
 .overview-item.is-action .overview-value {
     color: var(--primary);
-    font-size: 14px;
+    font-size: 15px;
     align-self: center;
 }
 
 @media (hover: hover) {
     .overview-item.is-action:hover {
         background: var(--accent);
+        border-color: color-mix(in srgb, var(--primary) 28%, var(--border));
     }
 }
 
@@ -1438,8 +1443,8 @@ h1 {
 
 @media (hover: hover) {
 
-    .btn:hover,
-    .control:hover {
+    .btn:not(:disabled):hover,
+    .control:not(:disabled):hover {
         background: var(--accent);
         color: var(--accent-foreground);
     }
@@ -1468,15 +1473,24 @@ h1 {
     font-size: 13px;
 }
 
+.btn.icon-only {
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+}
+
+.btn.icon-only .icon {
+    width: 18px;
+    height: 18px;
+}
+
 .icon {
     display: block;
     width: 17px;
     height: 17px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.7;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    fill: currentColor;
+    stroke: none;
 }
 
 .svg-defs {
@@ -1860,6 +1874,64 @@ h1 {
     font-size: 20px;
 }
 
+.note-marker {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: grid;
+    place-items: center;
+    width: 17px;
+    height: 17px;
+    color: var(--primary);
+}
+
+.note-marker .icon {
+    width: 15px;
+    height: 15px;
+}
+
+.week-row .note-marker {
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+}
+
+.week-row.has-note .week-dow {
+    padding-right: 18px;
+}
+
+.note-tooltip {
+    position: fixed;
+    z-index: 1202;
+    width: max-content;
+    max-width: min(260px, calc(100vw - 20px));
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--popover);
+    color: var(--popover-foreground);
+    box-shadow: var(--shadow-popover);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.55;
+    text-align: left;
+    overflow-wrap: anywhere;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(3px) scale(0.98);
+    transform-origin: bottom right;
+    transition: opacity var(--transition-fast) ease, transform var(--transition-fast) ease;
+}
+
+.note-tooltip[data-side="bottom"] {
+    transform-origin: top right;
+}
+
+.note-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
 /* 单行副标签：状态 / 补班 / 节假日 / 节气 / 农历，一格只说一件事 */
 .day-sub {
     max-width: 100%;
@@ -2210,10 +2282,27 @@ h1 {
 }
 
 .page-note {
-    max-width: 100%;
-    color: var(--muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    width: min(300px, 100%);
+    padding: 9px 11px;
+    border: 1px solid color-mix(in srgb, var(--primary) 24%, var(--border));
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--primary) 5%, var(--card));
+    color: var(--foreground);
     font-size: 13px;
     line-height: 1.6;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+.page-note .icon {
+    width: 15px;
+    height: 15px;
+    margin-top: 3px;
+    flex: 0 0 auto;
+    color: var(--primary);
 }
 
 .page-empty {
@@ -3494,11 +3583,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     font-weight: 700;
 }
 
-.receipt-period-copy span {
-    color: var(--muted);
-    font-size: 11px;
-}
-
 .receipt-signature {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -3863,6 +3947,25 @@ html.theme-anim #themeToggle .icon {
 .settings-nav-btn:focus-visible {
     outline: 0;
     box-shadow: 0 0 0 3px var(--ring-soft);
+}
+
+.settings-nav-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+}
+
+.settings-nav-label .icon {
+    width: 17px;
+    height: 17px;
+    flex: 0 0 auto;
+    opacity: 0.78;
+}
+
+.settings-nav-btn.active .icon {
+    color: var(--primary);
+    opacity: 1;
 }
 
 .settings-nav-advanced {
@@ -4284,6 +4387,11 @@ html.theme-anim #themeToggle .icon {
     align-items: center;
 }
 
+.day-modal-foot #modalClear .icon {
+    width: 16px;
+    height: 16px;
+}
+
 .foot-spacer {
     flex: 1 1 auto;
 }
@@ -4400,11 +4508,26 @@ html.theme-anim #themeToggle .icon {
     color: var(--foreground);
 }
 
+.conditional-reason:not([hidden]) {
+    animation: reason-field-in 0.18s ease both;
+}
+
+@keyframes reason-field-in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+}
+
 .day-advanced-body .field input {
     background: var(--card);
 }
 
 .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
     min-height: 44px;
     border-radius: var(--radius);
     border: 1px solid var(--border);
@@ -4414,8 +4537,14 @@ html.theme-anim #themeToggle .icon {
     transition: box-shadow 0.15s ease, border-color 0.15s ease, filter 0.15s ease, transform 0.12s ease;
 }
 
+.action-btn .icon {
+    width: 19px;
+    height: 19px;
+    flex: 0 0 auto;
+}
+
 @media (hover: hover) {
-    .action-btn:hover {
+    .action-btn:not(:disabled):hover {
         border-color: var(--ring);
         filter: saturate(1.04);
     }
@@ -4552,6 +4681,13 @@ html.theme-anim #themeToggle .icon {
         flex: 1 1 auto;
     }
 
+    .modal-foot .btn.icon-only {
+        width: 44px;
+        min-width: 44px;
+        flex: 0 0 44px;
+        padding: 0;
+    }
+
     .receipt-period {
         align-items: stretch;
         flex-direction: column;
@@ -4598,9 +4734,9 @@ html.theme-anim #themeToggle .icon {
         min-height: 40px;
     }
 
-    /* 设置入口由底部导航承担 */
-    #settingsToggle {
-        display: none;
+    .topbar-actions .icon-btn {
+        width: 40px;
+        min-width: 40px;
     }
 
     .calendar-toolbar {
@@ -4714,8 +4850,8 @@ html.theme-anim #themeToggle .icon {
     /* 概览压缩为 2×2 无边框网格，仅用虚线分隔 */
     .overview-strip {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
         overflow: visible;
         border: 0;
         border-radius: 0;
@@ -4725,22 +4861,19 @@ html.theme-anim #themeToggle .icon {
     .overview-item,
     .overview-item:first-child {
         min-width: 0;
-        padding: 9px 10px;
-        border: 0;
-        border-radius: 0;
-        background: transparent;
-    }
-
-    .overview-item:nth-child(odd) {
-        border-right: 1px dashed color-mix(in srgb, var(--border) 82%, transparent);
-    }
-
-    .overview-item:nth-child(-n+2) {
-        border-bottom: 1px dashed color-mix(in srgb, var(--border) 82%, transparent);
+        min-height: 64px;
+        padding: 7px 5px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
     }
 
     .overview-value {
-        font-size: 15px;
+        font-size: 14px;
+    }
+
+    .overview-label {
+        font-size: 10px;
     }
 
     .home-secondary {
@@ -5003,36 +5136,30 @@ html.theme-anim #themeToggle .icon {
     }
 
     .day-modal-foot {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        align-items: stretch;
+        display: flex;
+        align-items: center;
         gap: 8px;
     }
 
     .day-modal-foot .foot-spacer {
-        display: none;
-    }
-
-    .day-modal-foot #modalCancel {
-        grid-column: 1;
-        grid-row: 1;
-    }
-
-    .day-modal-foot #modalSave {
-        grid-column: 2;
-        grid-row: 1;
+        display: block;
+        flex: 1 1 auto;
     }
 
     .day-modal-foot .btn {
-        width: 100%;
-        min-width: 0;
-        flex: none;
+        width: auto;
+        min-width: auto;
+        flex: 0 0 auto;
+    }
+
+    .day-modal-foot .btn.icon-only {
+        width: 44px;
+        min-width: 44px;
     }
 
     .day-modal-foot .btn.danger-ghost {
-        grid-column: 1 / -1;
-        grid-row: 2;
-        min-height: 36px;
+        min-height: 40px;
+        padding-inline: 8px;
     }
 
     /* 单列改块级流布局：前后元素在流中不可能相互覆盖，由 body 统一滚动 */
@@ -5086,6 +5213,18 @@ html.theme-anim #themeToggle .icon {
     .weekday-row {
         gap: 4px;
         padding: 2px 8px 0;
+    }
+
+    .day-card .note-marker {
+        top: 5px;
+        right: 3px;
+        width: 13px;
+        height: 13px;
+    }
+
+    .day-card .note-marker .icon {
+        width: 11px;
+        height: 11px;
     }
 
     .day-card {

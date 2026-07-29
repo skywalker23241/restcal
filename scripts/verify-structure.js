@@ -58,6 +58,31 @@ if (!fs.readFileSync(path.join(repo, "README.en.md"), "utf8").includes("[简体�
     errors.push("README.en.md: Chinese language switch is missing");
 }
 
+const appHtml = fs.readFileSync(path.join(publicDir, "app.html"), "utf8");
+const symbolIds = new Set([...appHtml.matchAll(/<symbol\s+id="([^"]+)"/g)].map(match => match[1]));
+for (const match of appHtml.matchAll(/<use\s+href="#([^"$]+)"/g)) {
+    if (!symbolIds.has(match[1])) errors.push(`app.html: missing SVG symbol #${match[1]}`);
+}
+for (const id of symbolIds) {
+    const symbol = appHtml.match(new RegExp(`<symbol\\s+id="${id}"[^>]*viewBox="([^"]+)"`));
+    if (!symbol || symbol[1] !== "0 0 256 256") {
+        errors.push(`app.html: Phosphor symbol #${id} must use viewBox 0 0 256 256`);
+    }
+}
+for (const match of appHtml.matchAll(/<button\b([^>]*\bicon-only\b[^>]*)>([\s\S]*?)<\/button>/g)) {
+    const attributes = match[1];
+    const content = match[2];
+    if (!/\baria-label="[^"]+"/.test(attributes)) {
+        errors.push("app.html: icon-only button is missing aria-label");
+    }
+    if (!/\btitle="[^"]+"/.test(attributes)) {
+        errors.push("app.html: icon-only button is missing title");
+    }
+    if (!/<svg\b[\s\S]*?<use\s+href="#i-/.test(content)) {
+        errors.push("app.html: icon-only button is missing a local SVG icon");
+    }
+}
+
 const manifest = JSON.parse(fs.readFileSync(path.join(publicDir, "manifest.webmanifest"), "utf8"));
 for (const icon of manifest.icons || []) requireFile(localReference(icon.src), "manifest.webmanifest");
 
