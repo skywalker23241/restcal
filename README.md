@@ -1,5 +1,7 @@
 <div align="center">
 
+**简体中文** · [English](README.en.md)
+
 <img src="public/assets/icons/icon-192.png" width="88" alt="休历图标">
 
 # 休历 · RestCal
@@ -161,16 +163,6 @@ npm run dist
 
 ## 🛠 部署自己的实例
 
-### GitHub Pages
-
-这个项目是静态页面，可以直接部署到 GitHub Pages：
-
-1. 将项目提交到 GitHub 仓库。
-2. 进入仓库 `Settings` → `Pages`。
-3. Source 选择 `GitHub Actions`。
-4. 推送到 `main` 后，仓库自带的 Pages 工作流会发布 `public/`。
-5. 工作流完成后访问 GitHub Pages 地址。
-
 ### Netlify 部署与网页版 WebDAV
 
 浏览器不能直接访问未开放 CORS 的 WebDAV 服务。Netlify 部署会自动启用仓库中的同源 Function，网页请求 `/__webdav` 时由该 Function 安全转发，因此用户无需安装扩展或填写额外代理地址。
@@ -186,7 +178,7 @@ npm run dist
 WEBDAV_ALLOWED_HOSTS=dav.jianguoyun.com,dav.example.com
 ```
 
-填写逗号分隔的域名，不要包含协议或路径，然后重新部署。GitHub Pages 仍可展示静态页面，但无法运行 Netlify Function，所以网页版 WebDAV 仅在 Netlify、本地 `npm run serve` 和桌面版中可用。
+填写逗号分隔的域名，不要包含协议或路径，然后重新部署。网页版 WebDAV 可在 Netlify、本地 `npm run serve` 和桌面版中使用。
 
 ## 🔒 数据与隐私
 
@@ -246,7 +238,7 @@ WEBDAV_ALLOWED_HOSTS=dav.jianguoyun.com,dav.example.com
 
 ```text
 .
-├── public/               # Netlify、GitHub Pages 与本地服务器的发布根目录
+├── public/               # Netlify 与本地服务器的发布根目录
 │   ├── index.html        # 中英文介绍页（站点首页）
 │   ├── app.html          # 应用主页面
 │   ├── manifest.webmanifest
@@ -264,7 +256,8 @@ WEBDAV_ALLOWED_HOSTS=dav.jianguoyun.com,dav.example.com
 ├── desktop/main.js       # Electron 桌面壳（Windows exe）
 ├── package.json          # 桌面版依赖与打包配置
 ├── server.js             # 本地静态预览服务器（含 WebDAV 同源代理）
-└── README.md
+├── README.md             # 中文文档
+└── README.en.md          # English documentation
 ```
 
 ## 🤝 参与贡献

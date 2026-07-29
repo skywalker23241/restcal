@@ -5,6 +5,16 @@ const repo = path.resolve(__dirname, "..");
 const publicDir = path.join(repo, "public");
 const errors = [];
 
+function requireRepoFile(file, source) {
+    const absolute = path.resolve(repo, file);
+    const relative = path.relative(repo, absolute);
+    if (relative.startsWith("..") || path.isAbsolute(relative)) {
+        errors.push(`${source}: path escapes repository: ${file}`);
+    } else if (!fs.existsSync(absolute) || !fs.statSync(absolute).isFile()) {
+        errors.push(`${source}: missing ${file}`);
+    }
+}
+
 function requireFile(file, source = "project") {
     const absolute = path.resolve(publicDir, file);
     const relative = path.relative(publicDir, absolute);
@@ -28,6 +38,24 @@ for (const htmlName of ["index.html", "app.html"]) {
         const reference = localReference(match[1]);
         if (reference) requireFile(reference, htmlName);
     }
+}
+
+for (const readmeName of ["README.md", "README.en.md"]) {
+    const readme = fs.readFileSync(path.join(repo, readmeName), "utf8");
+    const references = readme.matchAll(/(?:src=["']([^"']+)["']|\]\(([^)]+)\))/gi);
+    for (const match of references) {
+        const reference = (match[1] || match[2]).split("#", 1)[0];
+        if (reference && !/^(?:[a-z]+:|#|\/\/)/i.test(reference)) {
+            requireRepoFile(reference, readmeName);
+        }
+    }
+}
+
+if (!fs.readFileSync(path.join(repo, "README.md"), "utf8").includes("[English](README.en.md)")) {
+    errors.push("README.md: English language switch is missing");
+}
+if (!fs.readFileSync(path.join(repo, "README.en.md"), "utf8").includes("[简体中文](README.md)")) {
+    errors.push("README.en.md: Chinese language switch is missing");
 }
 
 const manifest = JSON.parse(fs.readFileSync(path.join(publicDir, "manifest.webmanifest"), "utf8"));
@@ -57,4 +85,4 @@ if (errors.length) {
     process.exit(1);
 }
 
-console.log("Structure OK: HTML, manifest, Service Worker and Electron assets resolve inside public/.");
+console.log("Structure OK: bilingual README, HTML, manifest, Service Worker and Electron assets resolve.");
