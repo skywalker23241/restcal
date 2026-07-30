@@ -1,202 +1,547 @@
 <!doctype html>
 <!-- Source for /assets/images/og-image.png (1200x630). Render from the repo root with:
-     chrome --headless --screenshot=public/assets/images/og-image.png --window-size=1200,630 scripts/og-image.html -->
+     chrome --headless=new --hide-scrollbars --force-device-scale-factor=1
+     --virtual-time-budget=2500 --window-size=1200,630
+     --screenshot=public/assets/images/og-image.png scripts/og-image.html -->
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bodoni-moda@5/latin-600.css">
+    <meta name="viewport" content="width=1200, initial-scale=1">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bodoni-moda@5/latin-600-italic.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bodoni-moda@5/latin-700.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-serif-sc@5/700.css">
     <style>
         :root {
-            --paper: #f6f3ed;
-            --card: #fdfbf7;
-            --ink: #221e1a;
-            --muted: #837b6f;
-            --line: #e4ded1;
-            --seal: #b4382a;
-            --on-seal: #fdf3ee;
-            --st-work: #2f7d44;
-            --st-holiday: #bc3f2b;
-            --st-makeup: #9038c8;
-            --st-annual: #6d4fd2;
-            --st-weekend: #8a8273;
-            --font-display: "Bodoni Moda", Georgia, serif;
+            --paper: #f5f1e9;
+            --paper-deep: #ebe4d8;
+            --card: #fffdf9;
+            --ink: #211d19;
+            --muted: #746d63;
+            --line: #ddd4c5;
+            --seal: #b93b2d;
+            --seal-dark: #8f281e;
+            --on-seal: #fff7f1;
+            --annual: #6d4fd2;
+            --work: #2f7d44;
+            --font-display: "Bodoni Moda", Georgia, "Times New Roman", serif;
             --font-cjk: "Noto Serif SC", "Songti SC", "SimSun", serif;
-            --font-body: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            --font-body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                "Microsoft YaHei", sans-serif;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-        html, body { width: 1200px; height: 630px; overflow: hidden; }
+        html,
+        body {
+            width: 1200px;
+            height: 630px;
+            overflow: hidden;
+        }
 
         body {
-            font-family: var(--font-body);
-            background: var(--paper);
-            color: var(--ink);
             position: relative;
+            isolation: isolate;
+            background:
+                radial-gradient(circle at 87% 10%, rgba(185, 59, 45, 0.1), transparent 29%),
+                linear-gradient(135deg, #f8f5ef 0%, var(--paper) 58%, #eee8de 100%);
+            color: var(--ink);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
         body::before {
             content: "";
             position: absolute;
             inset: 0;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-            z-index: 3;
+            z-index: 8;
             pointer-events: none;
+            opacity: 0.44;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='.035'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
         }
 
         .frame {
             position: absolute;
-            inset: 26px;
-            border: 1px solid var(--line);
-            border-radius: 18px;
-            z-index: 1;
+            inset: 24px;
+            z-index: 7;
+            border: 1px solid rgba(120, 96, 67, 0.18);
+            border-radius: 24px;
+            pointer-events: none;
         }
 
-        .bg-kanji {
+        .frame::before,
+        .frame::after {
+            content: "";
             position: absolute;
-            right: -30px;
-            bottom: -110px;
-            font-family: var(--font-cjk);
-            font-weight: 700;
-            font-size: 460px;
-            line-height: 1;
-            color: rgba(180, 56, 42, 0.055);
-            z-index: 0;
+            width: 74px;
+            height: 74px;
+            border-color: rgba(185, 59, 45, 0.34);
         }
 
-        .content {
+        .frame::before {
+            top: 18px;
+            left: 18px;
+            border-top: 2px solid;
+            border-left: 2px solid;
+            border-radius: 9px 0 0;
+        }
+
+        .frame::after {
+            right: 18px;
+            bottom: 18px;
+            border-right: 2px solid;
+            border-bottom: 2px solid;
+            border-radius: 0 0 9px;
+        }
+
+        .orbit {
             position: absolute;
-            inset: 0;
+            right: -146px;
+            top: -238px;
+            width: 610px;
+            height: 610px;
+            z-index: -1;
+            border: 1px solid rgba(185, 59, 45, 0.12);
+            border-radius: 50%;
+        }
+
+        .orbit::before,
+        .orbit::after {
+            content: "";
+            position: absolute;
+            border: 1px solid rgba(185, 59, 45, 0.1);
+            border-radius: 50%;
+        }
+
+        .orbit::before {
+            inset: 60px;
+        }
+
+        .orbit::after {
+            inset: 122px;
+            background: rgba(185, 59, 45, 0.035);
+        }
+
+        .page {
+            position: relative;
             z-index: 2;
-            padding: 78px 92px 70px;
-            display: flex;
-            flex-direction: column;
+            height: 100%;
+            padding: 54px 60px 50px 64px;
         }
 
-        .brand { display: flex; align-items: center; gap: 20px; }
+        .topbar {
+            position: relative;
+            z-index: 4;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
 
         .mark {
             display: grid;
             place-items: center;
-            width: 62px;
-            height: 62px;
-            border-radius: 15px;
-            background: var(--seal);
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+            background: linear-gradient(145deg, #c84839, var(--seal));
             color: var(--on-seal);
+            box-shadow:
+                inset 0 0 0 2px rgba(255, 247, 241, 0.28),
+                0 8px 20px rgba(143, 40, 30, 0.16);
             font-family: var(--font-cjk);
+            font-size: 28px;
             font-weight: 700;
-            font-size: 36px;
-            box-shadow: inset 0 0 0 3px rgba(253, 243, 238, 0.3);
+            line-height: 1;
         }
 
-        .brand b {
+        .brand-name {
             font-family: var(--font-display);
+            font-size: 28px;
             font-weight: 700;
-            font-size: 40px;
-            letter-spacing: 0.01em;
+            line-height: 1;
+            letter-spacing: -0.02em;
         }
 
-        .brand span {
-            font-family: var(--font-cjk);
-            font-weight: 700;
-            font-size: 25px;
+        .brand-cn {
+            padding-left: 12px;
+            border-left: 1px solid var(--line);
             color: var(--muted);
-            margin-left: -6px;
-            margin-top: 6px;
+            font-family: var(--font-cjk);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+        }
+
+        .top-meta {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.11em;
+            text-transform: uppercase;
+        }
+
+        .top-meta .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--seal);
+        }
+
+        .hero-copy {
+            position: absolute;
+            top: 154px;
+            left: 64px;
+            z-index: 4;
+            width: 492px;
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            color: var(--seal);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 28px;
+            height: 2px;
+            border-radius: 99px;
+            background: var(--seal);
         }
 
         h1 {
             font-family: var(--font-display);
+            font-size: 84px;
             font-weight: 700;
-            font-size: 74px;
-            line-height: 1.07;
-            letter-spacing: -0.015em;
-            max-width: 17ch;
-            margin-top: 52px;
+            line-height: 0.88;
+            letter-spacing: -0.055em;
         }
 
-        h1 em { font-style: italic; color: var(--seal); }
+        h1 em {
+            display: block;
+            margin-left: 58px;
+            color: var(--seal);
+            font-weight: 600;
+        }
 
         .sub {
-            margin-top: 26px;
-            font-size: 25px;
+            width: 440px;
+            margin-top: 27px;
             color: var(--muted);
+            font-size: 17px;
+            line-height: 1.5;
         }
 
-        .sub i {
-            font-style: normal;
-            margin-inline: 12px;
-            opacity: 0.45;
+        .sub strong {
+            color: var(--ink);
+            font-weight: 700;
         }
 
-        .strip {
-            margin-top: auto;
-            display: grid;
-            grid-template-columns: repeat(7, 108px);
-            gap: 12px;
+        .trust-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 24px;
         }
 
-        .d {
-            height: 96px;
+        .trust {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            height: 30px;
+            padding: 0 11px;
             border: 1px solid var(--line);
-            border-radius: 14px;
-            background: var(--card);
-            display: grid;
-            gap: 2px;
-            align-content: center;
-            justify-items: center;
-            box-shadow: 0 2px 8px rgba(64, 45, 30, 0.06);
+            border-radius: 999px;
+            background: rgba(255, 253, 249, 0.72);
+            color: #5f584f;
+            font-size: 11px;
+            font-weight: 700;
         }
 
-        .d .n { font-family: var(--font-display); font-weight: 600; font-size: 30px; line-height: 1.1; }
+        .trust i {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--work);
+        }
 
-        .d .s { font-size: 15px; font-weight: 600; color: var(--muted); font-family: var(--font-cjk); }
+        .product-stack {
+            position: absolute;
+            top: 120px;
+            right: 59px;
+            z-index: 3;
+            width: 555px;
+            height: 445px;
+        }
 
-        .d.hol { background: #f4e6e2; border-color: rgba(188, 63, 43, 0.32); }
-        .d.hol .n, .d.hol .s { color: var(--st-holiday); }
+        .product-stack::before {
+            content: "";
+            position: absolute;
+            left: 24px;
+            top: 38px;
+            width: 500px;
+            height: 354px;
+            z-index: -2;
+            border-radius: 23px;
+            background: var(--seal);
+            opacity: 0.12;
+            transform: rotate(3deg);
+        }
 
-        .d.att { background: #eef3ec; }
-        .d.att .s { color: var(--st-work); font-family: var(--font-body); }
+        .product-stack::after {
+            content: "休";
+            position: absolute;
+            right: -30px;
+            bottom: -27px;
+            z-index: -1;
+            color: rgba(185, 59, 45, 0.08);
+            font-family: var(--font-cjk);
+            font-size: 168px;
+            font-weight: 700;
+            line-height: 1;
+        }
 
-        .d.mk { background: #f1e6f7; border-color: rgba(144, 56, 200, 0.3); }
-        .d.mk .s { color: var(--st-makeup); }
+        .device {
+            position: absolute;
+            overflow: hidden;
+            border: 1px solid rgba(80, 59, 40, 0.2);
+            background: var(--card);
+            box-shadow:
+                0 30px 70px -22px rgba(57, 36, 20, 0.34),
+                0 4px 14px rgba(57, 36, 20, 0.09);
+        }
 
-        .d.an { background: #ebe8f9; border-color: rgba(109, 79, 210, 0.3); }
-        .d.an .s { color: var(--st-annual); }
+        .desktop {
+            top: 18px;
+            left: 0;
+            width: 500px;
+            height: 354px;
+            border-radius: 20px;
+        }
 
-        .d.wk { background: #efede7; }
-        .d.wk .n { color: var(--muted); }
+        .device-bar {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            height: 34px;
+            padding: 0 15px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(250, 247, 241, 0.96);
+        }
+
+        .traffic {
+            display: flex;
+            gap: 6px;
+        }
+
+        .traffic i {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #d8d0c4;
+        }
+
+        .traffic i:first-child {
+            background: var(--seal);
+        }
+
+        .desktop-shot {
+            display: block;
+            width: 500px;
+            height: 320px;
+            object-fit: cover;
+            object-position: top center;
+        }
+
+        .phone {
+            position: absolute;
+            right: 0;
+            bottom: 5px;
+            z-index: 5;
+            width: 178px;
+            height: 369px;
+            padding: 7px;
+            overflow: visible;
+            border: 1px solid #171513;
+            border-radius: 32px;
+            background: linear-gradient(145deg, #3d3935 0%, #171513 38%, #302c28 100%);
+            box-shadow:
+                0 30px 50px -18px rgba(42, 28, 18, 0.42),
+                0 7px 18px rgba(42, 28, 18, 0.16);
+        }
+
+        .phone::before {
+            content: "";
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            z-index: 8;
+            width: 48px;
+            height: 13px;
+            transform: translateX(-50%);
+            border-radius: 999px;
+            background: #090807;
+            box-shadow: inset -7px 0 0 #12100f;
+        }
+
+        .phone::after {
+            content: "";
+            position: absolute;
+            top: 95px;
+            left: -4px;
+            width: 3px;
+            height: 43px;
+            border-radius: 3px 0 0 3px;
+            background: #282521;
+            box-shadow: 0 52px 0 #282521;
+        }
+
+        .phone-screen {
+            position: relative;
+            z-index: 2;
+            width: 164px;
+            height: 355px;
+            overflow: hidden;
+            border-radius: 25px;
+            background: var(--paper);
+        }
+
+        .mobile-shot {
+            display: block;
+            width: 164px;
+            height: auto;
+            max-width: none;
+        }
+
+        .power-button {
+            position: absolute;
+            top: 112px;
+            right: -4px;
+            width: 3px;
+            height: 61px;
+            border-radius: 0 3px 3px 0;
+            background: #282521;
+        }
+
+        .home-indicator {
+            position: absolute;
+            left: 50%;
+            bottom: 11px;
+            z-index: 8;
+            width: 48px;
+            height: 3px;
+            transform: translateX(-50%);
+            border-radius: 999px;
+            background: rgba(28, 25, 22, 0.78);
+        }
+
+        .footer-line {
+            position: absolute;
+            left: 64px;
+            bottom: 50px;
+            z-index: 4;
+            display: flex;
+            align-items: center;
+            gap: 17px;
+        }
+
+        .open-source {
+            display: inline-flex;
+            align-items: center;
+            height: 34px;
+            padding: 0 14px;
+            border-radius: 8px;
+            background: var(--ink);
+            color: var(--card);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+        }
+
+        .url {
+            color: var(--muted);
+            font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+            font-size: 12px;
+            font-weight: 600;
+        }
     </style>
 </head>
 
 <body>
-    <div class="frame"></div>
-    <div class="bg-kanji">休</div>
+    <div class="frame" aria-hidden="true"></div>
+    <div class="orbit" aria-hidden="true"></div>
 
-    <div class="content">
-        <div class="brand">
-            <span class="mark">休</span>
-            <b>RestCal</b>
-            <span>休历</span>
-        </div>
+    <main class="page">
+        <header class="topbar">
+            <div class="brand">
+                <span class="mark" aria-hidden="true">休</span>
+                <span class="brand-name">RestCal</span>
+                <span class="brand-cn">休历</span>
+            </div>
+            <div class="top-meta">
+                <span>Private by default</span>
+                <i class="dot" aria-hidden="true"></i>
+                <span>Free &amp; open source</span>
+            </div>
+        </header>
 
-        <h1>Leave, attendance &amp; holidays in one <em>clean calendar</em>.</h1>
+        <section class="hero-copy">
+            <p class="eyebrow">Leave · Attendance · Holidays · Pay</p>
+            <h1>Rest,<em>calculated.</em></h1>
+            <p class="sub">See <strong>leave, attendance, statutory holidays and pay</strong> together — before a day off becomes a payroll surprise.</p>
+            <div class="trust-row" aria-label="Product benefits">
+                <span class="trust"><i></i>No account</span>
+                <span class="trust"><i></i>Local-first</span>
+                <span class="trust"><i></i>Optional sync</span>
+            </div>
+        </section>
 
-        <p class="sub">Leave tracking<i>·</i>Working-day math<i>·</i>Salary deductions<i>·</i>Free &amp; open source</p>
+        <section class="product-stack" aria-label="RestCal product preview">
+            <div class="device desktop">
+                <div class="device-bar">
+                    <span class="traffic" aria-hidden="true"><i></i><i></i><i></i></span>
+                </div>
+                <img class="desktop-shot" src="../public/assets/images/screenshots/overview-light.png"
+                    alt="RestCal desktop day view">
+            </div>
+            <div class="device phone">
+                <div class="phone-screen">
+                    <img class="mobile-shot" src="../public/assets/images/screenshots/overview-mobile.png"
+                        alt="RestCal day view on iPhone">
+                </div>
+                <span class="power-button" aria-hidden="true"></span>
+                <span class="home-indicator" aria-hidden="true"></span>
+            </div>
+        </section>
 
-        <div class="strip">
-            <div class="d hol"><span class="n">6</span><span class="s">中秋</span></div>
-            <div class="d hol"><span class="n">7</span><span class="s">休</span></div>
-            <div class="d hol"><span class="n">8</span><span class="s">休</span></div>
-            <div class="d att"><span class="n">9</span><span class="s">✓</span></div>
-            <div class="d an"><span class="n">10</span><span class="s">年假</span></div>
-            <div class="d mk"><span class="n">11</span><span class="s">班</span></div>
-            <div class="d wk"><span class="n">12</span><span class="s">廿一</span></div>
-        </div>
-    </div>
+        <footer class="footer-line">
+            <span class="open-source">Open RestCal free</span>
+            <span class="url">restcal.abohack.com</span>
+        </footer>
+    </main>
 </body>
 
 </html>
