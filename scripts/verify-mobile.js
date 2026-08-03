@@ -180,9 +180,16 @@ async function run() {
         await capture(win, `leave-filled-bottom-${w}`);
         await win.webContents.executeJavaScript("document.getElementById('closeLeaveGenerator').click(); undefined");
         await wait(400);
-        // 打开日期弹窗（当月 15 号）
+        // 打开日期弹窗（当月第一个可标记工作日）
         await win.webContents.executeJavaScript(
-            "openModal(`${currentYear}-${String(currentMonth).padStart(2, \"0\")}-15`); undefined"
+            `(() => {
+                const date = getMonthDates(currentYear, currentMonth).find(item => getDayInfo(item).isWorkday);
+                if (!date) throw new Error("当前月份没有可验证的工作日");
+                const iso = toISO(date);
+                state.records[iso] = {...(state.records[iso] || {}), status: "work", note: "布局验证备注"};
+                openModal(iso);
+                return iso;
+            })()`
         );
         await wait(600);
         const reasonFieldAudit = await win.webContents.executeJavaScript(`
@@ -297,6 +304,35 @@ async function run() {
         `);
         if (!backdropCloseAudit) {
             throw new Error(`${w}px direct backdrop click did not close day modal`);
+        }
+        await wait(400);
+        const weekendNoteAudit = await win.webContents.executeJavaScript(`
+            (() => {
+                const date = getMonthDates(currentYear, currentMonth).find(item => getDayInfo(item).isWeekend);
+                if (!date) return null;
+                const iso = toISO(date);
+                openModal(iso);
+                const note = document.getElementById("modalNote");
+                const save = document.getElementById("modalSave");
+                const statusesDisabled = [...document.querySelectorAll(".action-grid-primary .action-btn")]
+                    .every(button => button.disabled);
+                const advancedOpen = document.getElementById("modalAdvanced").open;
+                const saveEnabled = !save.disabled;
+                note.value = "周末备注验证";
+                save.click();
+                return {
+                    iso,
+                    statusesDisabled,
+                    advancedOpen,
+                    saveEnabled,
+                    note: state.records[iso]?.note,
+                    status: state.records[iso]?.status || ""
+                };
+            })()
+        `);
+        if (!weekendNoteAudit || !weekendNoteAudit.statusesDisabled || !weekendNoteAudit.advancedOpen
+            || !weekendNoteAudit.saveEnabled || weekendNoteAudit.note !== "周末备注验证" || weekendNoteAudit.status) {
+            throw new Error(`${w}px weekend note audit failed: ${JSON.stringify(weekendNoteAudit)}`);
         }
         await wait(400);
         // 打开设置，验证桌面侧栏与移动端目录的图标和对齐

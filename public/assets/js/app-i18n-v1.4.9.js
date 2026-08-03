@@ -208,9 +208,11 @@
         "将重置个人资料、工作制度和工资配置。请假记录不会被删除。": "This resets your profile, work schedule and pay settings. Leave records are not deleted.",
         "清除所有本地数据？": "Clear all local data?",
         "将删除全部请假记录、个人与工资设置、主题与语言偏好以及 WebDAV 配置，且无法恢复。建议先导出 CSV 备份。": "This deletes all leave records, personal and pay settings, theme and language preferences, and the WebDAV config. It cannot be undone. Export a CSV backup first.",
-        "记录已保存": "Record saved", "CSV 已导出": "CSV exported",
+        "记录已保存": "Record saved", "周末备注已保存": "Weekend note saved", "CSV 已导出": "CSV exported",
         "选择状态": "Choose status", "理由": "Reason", "仅自己可见": "Only visible to you", "清除记录": "Clear record", "请选择有效的日期范围": "Choose a valid date range",
         "选择范围后保存，会应用到范围内所有工作日，自动跳过周末和节假日。": "Saving with a range applies to every workday in it; weekends and holidays are skipped automatically.",
+        "周末可添加备注，状态不可标记": "Weekends support notes only; status marking is unavailable.", "周末只能添加备注，不能标记出勤状态。": "Weekends support notes only; attendance status cannot be marked.",
+        "可选择多个周末，保存后会将同一条备注应用到所选周末。": "Select multiple weekends to apply the same note to them.", "所选范围没有周末日期。": "The selected range contains no weekends.",
         "元旦": "New Year's Day", "春节": "Spring Festival", "清明节": "Qingming Festival", "劳动节": "Labour Day", "端午节": "Dragon Boat Festival", "中秋": "Mid-Autumn Festival", "中秋节": "Mid-Autumn Festival", "国庆节": "National Day",
         "小寒": "Minor Cold", "大寒": "Major Cold", "立春": "Start of Spring", "雨水": "Rain Water", "惊蛰": "Awakening of Insects", "春分": "Spring Equinox", "清明": "Pure Brightness", "谷雨": "Grain Rain", "立夏": "Start of Summer", "小满": "Grain Buds", "芒种": "Grain in Ear", "夏至": "Summer Solstice", "小暑": "Minor Heat", "大暑": "Major Heat", "立秋": "Start of Autumn", "处暑": "End of Heat", "白露": "White Dew", "秋分": "Autumn Equinox", "寒露": "Cold Dew", "霜降": "Frost Descent", "立冬": "Start of Winter", "小雪": "Minor Snow", "大雪": "Major Snow", "冬至": "Winter Solstice"
     };
@@ -295,6 +297,7 @@
                 [/^上次备份：(.+)$/, "Last backup: $1"],
                 [/^已清除 (\d+) 条记录$/, "Cleared $1 records"],
                 [/^已保存 (\d+) 天记录$/, "Saved records for $1 days"],
+                [/^已保存 (\d+) 个周末备注$/, "Saved notes for $1 weekends"],
                 [/^共 (\d+) 条记录$/, "$1 records"],
                 [/^额度 (\d+(?:\.\d+)?) 天$/, "Allowance: $1 days"],
                 [/^今天 (\d{2}:\d{2})$/, "Today $1"],

@@ -44,7 +44,7 @@ The application interface can switch between Chinese and English. Language, them
 
 - The day view emphasizes the current date, lunar date, solar terms, and record status; week, month, and year views support planning at different levels.
 - Every view combines Gregorian and lunar dates, solar terms, statutory holidays, adjusted working days, and weekends.
-- Mark five statuses with one click: present, personal leave, sick leave, annual leave, and time off in lieu. Leave reasons and notes are supported.
+- Mark five statuses with one click: present, personal leave, sick leave, annual leave, and time off in lieu. Leave reasons and notes are supported, and weekends can have standalone notes.
 - Apply a status to a date range while automatically skipping weekends and holidays.
 - Search leave records by keyword, status, or date range.
 

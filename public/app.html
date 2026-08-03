@@ -829,7 +829,7 @@
                                 <input id="modalEndDate" type="date">
                             </div>
                         </div>
-                        <p class="notice">选择范围后保存，会应用到范围内所有工作日，自动跳过周末和节假日。</p>
+                        <p class="notice" id="modalRangeNotice">选择范围后保存，会应用到范围内所有工作日，自动跳过周末和节假日。</p>
                         <div class="field">
                             <label for="modalNote">备注 <em>选填</em></label>
                             <input id="modalNote" placeholder="仅自己可见">
@@ -1125,6 +1125,7 @@
             modalReasonField: document.getElementById("modalReasonField"),
             modalReason: document.getElementById("modalReason"),
             modalNote: document.getElementById("modalNote"),
+            modalRangeNotice: document.getElementById("modalRangeNotice"),
             modalGenerateDoc: document.getElementById("modalGenerateDoc"),
             modalClear: document.getElementById("modalClear"),
             modalSave: document.getElementById("modalSave"),
@@ -2869,7 +2870,7 @@
         function renderRecentRecords() {
             if (!els.recentRecords) return;
             const entries = Object.entries(state.records)
-                .filter(([, record]) => record?.status)
+                .filter(([, record]) => record?.status || record?.note)
                 .sort(([a], [b]) => b.localeCompare(a))
                 .slice(0, 6);
             if (!entries.length) {
@@ -2878,10 +2879,11 @@
             }
             els.recentRecords.innerHTML = entries.map(([iso, record]) => {
                 const meta = [record.reason, record.note].filter(Boolean).join(" · ");
+                const label = record.status ? STATUS_LABELS[record.status] || "" : "备注";
                 return `
         <button class="recent-row" type="button" data-record-date="${escapeHtml(iso)}">
           <span class="recent-date">${escapeHtml(iso)}</span>
-          <span class="tag ${record.status}">${escapeHtml(STATUS_LABELS[record.status] || "")}</span>
+          <span class="tag ${record.status || ""}">${escapeHtml(label)}</span>
           <span class="recent-meta">${escapeHtml(meta || weekdayName(fromISO(iso)))}</span>
         </button>
       `;
@@ -3054,6 +3056,8 @@
             const info = getDayInfo(date);
             const record = state.records[iso] || {};
             const editable = info.isWorkday;
+            const weekendNoteOnly = info.isWeekend;
+            const noteEditable = editable || weekendNoteOnly;
             dayModalBackdropPress = false;
             activeDate = iso;
             selectedDate = iso;
@@ -3061,30 +3065,40 @@
             document.querySelectorAll(".day-card.selected").forEach(card => card.classList.remove("selected"));
             document.querySelector(`[data-date="${iso}"]`)?.classList.add("selected");
             els.modalTitle.textContent = `${date.getMonth() + 1}月${date.getDate()}日 ${weekdayName(date)}`;
-            els.modalSubtitle.textContent = modalSubtitleText(date, info, editable);
+            els.modalSubtitle.textContent = modalSubtitleText(date, info, editable, noteEditable);
             els.modalStartDate.value = iso;
             els.modalEndDate.value = iso;
             els.modalReason.value = record.reason || "";
             els.modalNote.value = record.note || "";
+            els.modalNote.disabled = !noteEditable;
             document.querySelectorAll("[data-action]").forEach(button => {
                 button.disabled = !editable;
                 button.classList.toggle("active", button.dataset.action === pendingStatus);
             });
             updateReasonFieldVisibility(pendingStatus);
-            els.modalSave.disabled = !editable;
+            els.modalSave.disabled = !noteEditable;
             els.modalClear.hidden = !record.status && !record.reason && !record.note;
-            els.modalAdvanced.open = false;
+            els.modalAdvanced.open = weekendNoteOnly;
+            if (els.modalRangeNotice) {
+                els.modalRangeNotice.textContent = weekendNoteOnly
+                    ? "可选择多个周末，保存后会将同一条备注应用到所选周末。"
+                    : "选择范围后保存，会应用到范围内所有工作日，自动跳过周末和节假日。";
+            }
             updateModalDocButton();
             openBackdrop(els.dayModal);
-            els.dayModal.querySelector(".action-btn:not(:disabled)")?.focus({preventScroll: true});
+            const initialFocus = weekendNoteOnly
+                ? els.modalNote
+                : els.dayModal.querySelector(".action-btn:not(:disabled)");
+            initialFocus?.focus({preventScroll: true});
         }
 
-        function modalSubtitleText(date, info, editable) {
+        function modalSubtitleText(date, info, editable, noteEditable = editable) {
             const parts = [toISO(date), getLunarText(date)];
             if (info.holidayName) parts.push(info.holidayName);
             if (info.makeupName) parts.push(info.makeupName);
             if (!info.holidayName && !info.makeupName && info.isWeekend) parts.push("周末");
-            if (!editable) parts.push("休息日仅展示详情");
+            if (noteEditable && !editable) parts.push("周末可添加备注，状态不可标记");
+            else if (!editable) parts.push("休息日仅展示详情");
             return parts.filter(Boolean).join(" · ");
         }
 
@@ -3596,7 +3610,7 @@
                     record?.note
                 ].filter(Boolean).join(" "));
                 if (query && !text.includes(query)) continue;
-                if (!hasFilter && !record?.status && !info.holidayName && !info.makeupName && !isSameDate(date, today)) continue;
+                if (!hasFilter && !record?.status && !record?.note && !info.holidayName && !info.makeupName && !isSameDate(date, today)) continue;
 
                 results.push(buildSearchResult(iso, date, info, record));
                 if (results.length >= 80) break;
@@ -3716,8 +3730,12 @@
 
         function chooseStatus(status) {
             if (!activeDate) return;
-            if (!isConfiguredWorkday(fromISO(activeDate))) {
-                els.modalSubtitle.textContent = "休息日仅展示详情，状态保存会跳过非工作日。";
+            const date = fromISO(activeDate);
+            const info = getDayInfo(date);
+            if (!isConfiguredWorkday(date, info)) {
+                els.modalSubtitle.textContent = info.isWeekend
+                    ? "周末只能添加备注，不能标记出勤状态。"
+                    : "休息日仅展示详情，状态保存会跳过非工作日。";
                 return;
             }
             pendingStatus = status;
@@ -3742,6 +3760,7 @@
 
         function clearActiveRecord() {
             if (!activeDate) return;
+            const weekendNoteOnly = getDayInfo(fromISO(activeDate)).isWeekend;
             // 默认只清除当前日期；展开「更多选项」并填写有效范围时按范围清除
             let start = activeDate;
             let end = activeDate;
@@ -3754,7 +3773,8 @@
                 }
             }
             const removed = {};
-            rangeDates(start, end).forEach(iso => {
+            const dates = rangeDates(start, end).filter(iso => !weekendNoteOnly || getDayInfo(fromISO(iso)).isWeekend);
+            dates.forEach(iso => {
                 if (state.records[iso]) {
                     removed[iso] = state.records[iso];
                     delete state.records[iso];
@@ -3807,7 +3827,10 @@
         }
 
         function saveModalRecord(options = {}) {
-            if (!activeDate || !pendingStatus || pendingStatus === "clear") return;
+            if (!activeDate) return;
+            const activeInfo = getDayInfo(fromISO(activeDate));
+            const weekendNoteOnly = activeInfo.isWeekend;
+            if ((!pendingStatus || pendingStatus === "clear") && !weekendNoteOnly) return;
             const start = els.modalStartDate.value || activeDate;
             const end = els.modalEndDate.value || start;
             if (!isValidISODate(start) || !isValidISODate(end) || start > end) {
@@ -3816,20 +3839,44 @@
             }
             const reason = LEAVE_STATUSES.includes(pendingStatus) ? els.modalReason.value.trim() : "";
             const note = els.modalNote.value.trim();
-            const dates = rangeDates(start, end).filter(iso => isConfiguredWorkday(fromISO(iso)));
+            const dates = rangeDates(start, end).filter(iso => weekendNoteOnly
+                ? getDayInfo(fromISO(iso)).isWeekend
+                : isConfiguredWorkday(fromISO(iso)));
             if (!dates.length) {
-                els.modalSubtitle.textContent = "所选范围没有可标记的工作日。";
+                els.modalSubtitle.textContent = weekendNoteOnly
+                    ? "所选范围没有周末日期。"
+                    : "所选范围没有可标记的工作日。";
                 return;
             }
-            dates.forEach(iso => {
-                state.records[iso] = {
-                    status: pendingStatus,
-                    leaveType: LEAVE_STATUSES.includes(pendingStatus) ? STATUS_LABELS[pendingStatus] : "",
-                    reason,
-                    note,
-                    updatedAt: new Date().toISOString()
-                };
-            });
+            const updatedAt = new Date().toISOString();
+            if (weekendNoteOnly) {
+                dates.forEach(iso => {
+                    const existing = state.records[iso] || {};
+                    if (note) {
+                        state.records[iso] = {
+                            status: existing.status || "",
+                            leaveType: existing.leaveType || "",
+                            reason: existing.reason || "",
+                            note,
+                            updatedAt
+                        };
+                    } else if (!existing.status && !existing.leaveType && !existing.reason) {
+                        delete state.records[iso];
+                    } else {
+                        state.records[iso] = {...existing, note: "", updatedAt};
+                    }
+                });
+            } else {
+                dates.forEach(iso => {
+                    state.records[iso] = {
+                        status: pendingStatus,
+                        leaveType: LEAVE_STATUSES.includes(pendingStatus) ? STATUS_LABELS[pendingStatus] : "",
+                        reason,
+                        note,
+                        updatedAt
+                    };
+                });
+            }
 
             if (LEAVE_STATUSES.includes(pendingStatus)) {
                 els.leaveStart.value = start;
@@ -3841,7 +3888,9 @@
             saveState();
             if (!options.keepOpen) {
                 closeModal();
-                showToast(dates.length > 1 ? `已保存 ${dates.length} 天记录` : "记录已保存");
+                showToast(weekendNoteOnly
+                    ? (dates.length > 1 ? `已保存 ${dates.length} 个周末备注` : "周末备注已保存")
+                    : (dates.length > 1 ? `已保存 ${dates.length} 天记录` : "记录已保存"));
             }
             render();
         }
@@ -4548,13 +4597,25 @@
                 if (!iso && !statusText && userDataText) continue;
                 if (!isValidISODate(iso)) throw new Error(`第 ${i + 1} 行日期格式不正确。`);
                 const status = Object.entries(STATUS_LABELS).find(([, label]) => label === statusText)?.[0];
-                if (!status) throw new Error(`第 ${i + 1} 行状态必须是${Object.values(STATUS_LABELS).join("、")}。`);
-                if (!getDayInfo(fromISO(iso)).isWorkday) throw new Error(`第 ${i + 1} 行不是可标记的工作日。`);
+                const note = row[index["备注"]] || "";
+                const info = getDayInfo(fromISO(iso));
+                if (!status) {
+                    if (statusText || !note || !info.isWeekend) throw new Error(`第 ${i + 1} 行状态必须是${Object.values(STATUS_LABELS).join("、")}，周末可只填写备注。`);
+                    imported[iso] = {
+                        status: "",
+                        leaveType: "",
+                        reason: "",
+                        note,
+                        updatedAt: new Date().toISOString()
+                    };
+                    continue;
+                }
+                if (!info.isWorkday) throw new Error(`第 ${i + 1} 行不是可标记的工作日。`);
                 imported[iso] = {
                     status,
                     leaveType: row[index["请假类型"]] || (LEAVE_STATUSES.includes(status) ? STATUS_LABELS[status] : ""),
                     reason: row[index["请假理由"]] || "",
-                    note: row[index["备注"]] || "",
+                    note,
                     updatedAt: new Date().toISOString()
                 };
             }
