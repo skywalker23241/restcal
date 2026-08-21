@@ -160,7 +160,7 @@
     <main class="app">
         <header class="topbar">
             <div class="brand">
-                <div class="logo">休</div>
+                <img class="logo" src="assets/icons/icon-192.png" alt="" aria-hidden="true">
                 <h1>休历</h1>
             </div>
             <nav class="app-nav" aria-label="主导航">
@@ -367,7 +367,7 @@
     <div class="onboarding-backdrop" id="onboardingBackdrop" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle">
         <div class="onboarding-card">
             <div class="onboarding-topline">
-                <div class="onboarding-brand"><span class="logo">休</span><span>RestCal</span></div>
+                <div class="onboarding-brand"><img class="logo" src="assets/icons/icon-192.png" alt="" aria-hidden="true"><span>RestCal</span></div>
                 <span class="onboarding-step-label" id="onboardingStepLabel">1 / 5</span>
             </div>
             <div class="onboarding-progress" aria-hidden="true"><span id="onboardingProgress"></span></div>
@@ -2638,7 +2638,7 @@
           <div class="page-number">${date.getDate()}</div>
           <div class="page-lunar">${getLunarText(date)}</div>
           ${festival ? `<div class="page-festival">${escapeHtml(festival)}</div>` : ""}
-          <div class="page-divider" aria-hidden="true"><span>休</span></div>
+          <div class="page-divider" aria-hidden="true"><img src="assets/icons/icon-192.png" alt=""></div>
           <div class="page-status">
             ${statusTags.length ? `<div class="tags">${statusTags.join("")}</div>` : ""}
             ${record?.reason ? `<div class="page-reason">${escapeHtml(record.reason)}</div>` : ""}
@@ -4147,7 +4147,7 @@
           <span>${escapeHtml(data.footer[0])}</span>
           <span>${escapeHtml(data.footer[1])}</span>
         </div>
-        <div class="receipt-signature" aria-hidden="true"><span class="receipt-signature-mark">休</span></div>
+        <div class="receipt-signature" aria-hidden="true"><img class="receipt-signature-mark" src="assets/icons/icon-192.png" alt=""></div>
       `;
         }
 
@@ -4260,7 +4260,7 @@
             if (document.fonts?.ready) {
                 await document.fonts.ready.catch(() => {});
             }
-            const canvas = receiptCanvas(currentReceipt);
+            const canvas = await receiptCanvas(currentReceipt);
             const a = document.createElement("a");
             a.href = canvas.toDataURL("image/png");
             a.download = `${currentReceipt.filename}.png`;
@@ -4269,7 +4269,16 @@
             a.remove();
         }
 
-        function receiptCanvas(data) {
+        function loadBrandIcon() {
+            return new Promise((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => resolve(image);
+                image.onerror = reject;
+                image.src = "assets/icons/icon-192.png";
+            });
+        }
+
+        async function receiptCanvas(data) {
             const width = 720;
             const padding = 54;
             const contentWidth = width - padding * 2;
@@ -4380,13 +4389,14 @@
             c.moveTo(markX + markSize + 16, lineY);
             c.lineTo(width - padding, lineY);
             c.stroke();
-            c.strokeStyle = palette.accent;
-            roundRectPath(c, markX, y - markSize, markSize, markSize, 8);
-            c.stroke();
-            c.fillStyle = palette.accent;
-            c.textAlign = "center";
-            c.font = `700 18px ${displayFont}`;
-            c.fillText("休", width / 2, y - 8);
+            const brandIcon = await loadBrandIcon().catch(() => null);
+            if (brandIcon) {
+                c.save();
+                roundRectPath(c, markX, y - markSize, markSize, markSize, 8);
+                c.clip();
+                c.drawImage(brandIcon, markX, y - markSize, markSize, markSize);
+                c.restore();
+            }
             return canvas;
         }
 

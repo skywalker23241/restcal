@@ -225,18 +225,13 @@ button {
 }
 
 .logo {
-    display: grid;
-    place-items: center;
+    display: block;
     width: 32px;
     height: 32px;
     border-radius: var(--radius-sm);
     border: 0;
-    color: var(--primary-foreground);
-    background: var(--primary);
-    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--primary-foreground) 35%, transparent);
-    font-family: var(--font-display);
-    font-size: 17px;
-    font-weight: 700;
+    object-fit: cover;
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 18%, transparent);
     flex: 0 0 auto;
 }
 
@@ -2233,7 +2228,7 @@ h1 {
     letter-spacing: 0.06em;
 }
 
-/* 分隔线：居中一枚“休”字印 */
+/* 分隔线：居中显示品牌图标 */
 .page-divider {
     display: flex;
     align-items: center;
@@ -2251,18 +2246,14 @@ h1 {
     background: var(--border);
 }
 
-.page-divider span {
-    display: grid;
-    place-items: center;
+.page-divider img {
+    display: block;
     width: 22px;
     height: 22px;
-    border: 1px solid color-mix(in srgb, var(--primary) 45%, var(--border));
     border-radius: 5px;
-    color: var(--primary);
-    font-family: var(--font-display);
-    font-size: 12px;
+    object-fit: cover;
     transform: rotate(-4deg);
-    opacity: 0.75;
+    opacity: 0.85;
 }
 
 .page-status {
@@ -3599,17 +3590,11 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .receipt-signature-mark {
-    display: grid;
-    place-items: center;
+    display: block;
     width: 28px;
     height: 28px;
-    border: 1px solid color-mix(in srgb, var(--receipt-accent) 55%, var(--receipt-line));
     border-radius: 8px;
-    color: var(--receipt-accent);
-    font-family: var(--font-display);
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1;
+    object-fit: cover;
 }
 
 .receipt-period-controls {
@@ -3731,13 +3716,13 @@ html.theme-anim #themeToggle .icon {
 .onboarding-topline, .onboarding-actions { display: flex; align-items: center; gap: 10px; }
 .onboarding-topline { justify-content: space-between; }
 .onboarding-brand { display: flex; align-items: center; gap: 9px; font: 700 1.05rem var(--font-display); }
-.onboarding-brand .logo { width: 30px; height: 30px; font-size: 18px; }
+.onboarding-brand .logo { width: 30px; height: 30px; }
 .onboarding-step-label { color: var(--muted); font-size: 12px; }
 .onboarding-progress { height: 3px; margin: 18px 0 28px; overflow: hidden; border-radius: 99px; background: var(--secondary); }
 .onboarding-progress span { display: block; height: 100%; border-radius: inherit; background: var(--primary); transition: width .2s ease; }
 .onboarding-content { min-width: 0; max-width: 100%; min-height: 300px; display: flex; flex-direction: column; justify-content: center; }
 .onboarding-hero, .onboarding-heading { text-align: center; }
-.onboarding-mark { display: grid; place-items: center; width: 68px; height: 68px; margin: 0 auto 18px; border-radius: 20px; color: var(--primary-foreground); background: var(--primary); font: 700 40px var(--font-display); box-shadow: 0 10px 28px color-mix(in srgb, var(--primary) 22%, transparent); }
+.onboarding-mark { display: block; width: 68px; height: 68px; margin: 0 auto 18px; border-radius: 20px; object-fit: cover; box-shadow: 0 10px 28px color-mix(in srgb, var(--primary) 22%, transparent); }
 .onboarding-content h1 { margin: 0 0 9px; font: 700 clamp(1.65rem, 4vw, 2.35rem)/1.18 var(--font-display); }
 .onboarding-content p { max-width: 44ch; margin: 0 auto; color: var(--muted); }
 .onboarding-benefits { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 24px; }
@@ -4709,7 +4694,6 @@ html.theme-anim #themeToggle .icon {
     .logo {
         width: 30px;
         height: 30px;
-        font-size: 16px;
     }
 
     h1 {
