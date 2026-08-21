@@ -31,6 +31,7 @@
     --st-sick: #bb2a66;
     --st-annual: #6d4fd2;
     --st-comp: #0e7a70;
+    --st-overtime: #2563eb;
     --st-holiday: #bc3f2b;
     --st-makeup: #9038c8;
     --st-weekend: #8a8273;
@@ -43,6 +44,7 @@
     --tint-sick: color-mix(in srgb, var(--st-sick) var(--tint-strength), var(--card));
     --tint-annual: color-mix(in srgb, var(--st-annual) var(--tint-strength), var(--card));
     --tint-comp: color-mix(in srgb, var(--st-comp) var(--tint-strength), var(--card));
+    --tint-overtime: color-mix(in srgb, var(--st-overtime) var(--tint-strength), var(--card));
     --tint-holiday: color-mix(in srgb, var(--st-holiday) var(--tint-strength), var(--card));
     --tint-makeup: color-mix(in srgb, var(--st-makeup) var(--tint-strength), var(--card));
     --tint-weekend: color-mix(in srgb, var(--st-weekend) 12%, var(--card));
@@ -51,6 +53,7 @@
     --heat-sick: color-mix(in srgb, var(--st-sick) var(--heat-strength), var(--card));
     --heat-annual: color-mix(in srgb, var(--st-annual) var(--heat-strength), var(--card));
     --heat-comp: color-mix(in srgb, var(--st-comp) var(--heat-strength), var(--card));
+    --heat-overtime: color-mix(in srgb, var(--st-overtime) var(--heat-strength), var(--card));
     --heat-holiday: color-mix(in srgb, var(--st-holiday) var(--heat-strength), var(--card));
     --heat-makeup: color-mix(in srgb, var(--st-makeup) var(--heat-strength), var(--card));
     --heat-weekend: color-mix(in srgb, var(--st-weekend) 42%, var(--card));
@@ -59,6 +62,7 @@
     --line-sick: color-mix(in srgb, var(--st-sick) 38%, transparent);
     --line-annual: color-mix(in srgb, var(--st-annual) 38%, transparent);
     --line-comp: color-mix(in srgb, var(--st-comp) 38%, transparent);
+    --line-overtime: color-mix(in srgb, var(--st-overtime) 38%, transparent);
     --line-holiday: color-mix(in srgb, var(--st-holiday) 38%, transparent);
     --line-makeup: color-mix(in srgb, var(--st-makeup) 38%, transparent);
 
@@ -145,6 +149,7 @@
     --st-sick: #e87fae;
     --st-annual: #ab94ec;
     --st-comp: #6cc7ba;
+    --st-overtime: #60a5fa;
     --st-holiday: #e8826b;
     --st-makeup: #c489e8;
     --st-weekend: #968d7c;
@@ -1949,6 +1954,7 @@ h1 {
 .day-sub.kind-sick { color: var(--st-sick); }
 .day-sub.kind-annual { color: var(--st-annual); }
 .day-sub.kind-comp { color: var(--st-comp); }
+.day-sub.kind-overtime { color: var(--st-overtime); }
 .day-sub.kind-makeup { color: var(--st-makeup); }
 .day-sub.kind-holiday { color: var(--st-holiday); }
 
@@ -2009,6 +2015,11 @@ h1 {
 :is(.day-card, .week-row).status-comp {
     background: var(--tint-comp);
     border-color: var(--line-comp);
+}
+
+:is(.day-card, .week-row).status-overtime {
+    background: var(--tint-overtime);
+    border-color: var(--line-overtime);
 }
 
 .solar {
@@ -2448,6 +2459,11 @@ h1 {
     color: var(--st-comp);
 }
 
+.mini-day.st-overtime {
+    background: var(--tint-overtime);
+    color: var(--st-overtime);
+}
+
 .mini-day.today {
     box-shadow: inset 0 0 0 1.2px var(--primary);
     color: var(--primary);
@@ -2520,6 +2536,12 @@ h1 {
     border-color: var(--line-comp);
     background: var(--card);
     color: var(--st-comp);
+}
+
+.tag.overtime {
+    border-color: var(--line-overtime);
+    background: var(--card);
+    color: var(--st-overtime);
 }
 
 .tag.holiday {
@@ -2830,6 +2852,10 @@ h1 {
 
 .heat-cell.comp {
     background: var(--heat-comp);
+}
+
+.heat-cell.overtime {
+    background: var(--heat-overtime);
 }
 
 .heat-cell.holiday {
@@ -4348,13 +4374,51 @@ html.theme-anim #themeToggle .icon {
     gap: 8px;
 }
 
-/* 日期弹窗：状态选择一行五枚 */
+/* 日期弹窗 */
 .day-modal {
-    width: min(460px, 100%);
+    width: min(480px, 100%);
 }
 
 .action-grid-primary {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.action-grid-primary .action-btn {
+    min-height: 48px;
+    padding: 0 10px;
+    font-size: 14px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.conditional-overtime {
+    padding: 10px 12px;
+    background: var(--tint-overtime);
+    border: 1px solid var(--line-overtime);
+    border-radius: var(--radius-md);
+}
+
+.conditional-overtime .range-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px;
+}
+
+.conditional-overtime select {
+    min-height: 38px;
+    padding: 4px 8px;
+    font-size: 13px;
+}
+
+.conditional-reason textarea {
+    min-height: 44px;
+    padding: 8px 10px;
+    font-size: 13px;
+    resize: vertical;
 }
 
 .field-group {
@@ -4563,6 +4627,12 @@ html.theme-anim #themeToggle .icon {
     border-color: var(--line-comp);
     background: var(--card);
     color: var(--st-comp);
+}
+
+.action-btn.overtime {
+    border-color: var(--line-overtime);
+    background: var(--card);
+    color: var(--st-overtime);
 }
 
 .action-btn.active {
@@ -5108,15 +5178,17 @@ html.theme-anim #themeToggle .icon {
         white-space: normal;
     }
 
-    /* 五个状态保持一行，缩小字号保证触控目标 */
+    /* 六个状态按 3x2 排布，保持充裕触控面积与清爽间距 */
     .action-grid-primary {
-        gap: 5px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
     }
 
     .action-grid-primary .action-btn {
         min-height: 46px;
-        padding: 0 2px;
+        padding: 0 8px;
         font-size: 13px;
+        gap: 6px;
     }
 
     .day-modal-foot {

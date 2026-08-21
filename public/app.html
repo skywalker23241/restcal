@@ -114,6 +114,12 @@
         <symbol id="i-status-comp" viewBox="0 0 256 256">
             <path d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm-8-48A95.44,95.44,0,0,0,60.08,60.15C52.81,67.51,46.35,74.59,40,82V64a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16H49c7.15-8.42,14.27-16.35,22.39-24.57a80,80,0,1,1,1.66,114.75,8,8,0,1,0-11,11.64A96,96,0,1,0,128,32Z" />
         </symbol>
+        <symbol id="i-status-overtime" viewBox="0 0 256 256">
+            <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm64-88a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v48h48A8,8,0,0,1,192,128Z" />
+        </symbol>
+        <symbol id="i-export-ics" viewBox="0 0 256 256">
+            <path d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-42.34-66.34a8,8,0,0,1,0,11.32l-32,32a8,8,0,0,1-11.32,0l-32-32a8,8,0,0,1,11.32-11.32L120,158.69V120a8,8,0,0,1,16,0v38.69l18.34-18.35A8,8,0,0,1,165.66,141.66Z" />
+        </symbol>
         <symbol id="i-settings-profile" viewBox="0 0 256 256">
             <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM74.08,197.5a64,64,0,0,1,107.84,0,87.83,87.83,0,0,1-107.84,0ZM96,120a32,32,0,1,1,32,32A32,32,0,0,1,96,120Zm97.76,66.41a79.66,79.66,0,0,0-36.06-28.75,48,48,0,1,0-59.4,0,79.66,79.66,0,0,0-36.06,28.75,88,88,0,1,1,131.52,0Z" />
         </symbol>
@@ -342,6 +348,16 @@
                         <span class="tool-card-action" id="ticketToolAction">查看提醒 <span
                                 aria-hidden="true">→</span></span>
                     </button>
+                    <button class="tool-card" id="icsToolBtn" type="button">
+                        <span class="tool-card-icon"><svg class="icon">
+                                <use href="#i-export-ics" />
+                            </svg></span>
+                        <span class="tool-card-copy">
+                            <strong>日历导出 (.ics)</strong>
+                            <small>导出请假、节假日与抢票提醒至系统日历</small>
+                        </span>
+                        <span class="tool-card-action">导出日历 <span aria-hidden="true">→</span></span>
+                    </button>
                 </div>
                 <section class="tool-detail" id="ticketToolPanel" aria-label="购票提醒" hidden>
                     <div class="section-head">
@@ -510,6 +526,8 @@
                             </div>
                             <div class="field"><label for="estimatedTaxInput">个税预估 <em>选填</em></label><input id="estimatedTaxInput" inputmode="decimal" type="number" min="0" step="50" placeholder="例如 300"></div>
                             <div class="field"><label for="paydayInput">发薪日 <em>选填</em></label><input id="paydayInput" inputmode="numeric" type="number" min="1" max="31" step="1" placeholder="例如 10"></div>
+                            <div class="field"><label for="specialDeductionInput">专项附加扣除（元 / 月） <em>选填</em></label><input id="specialDeductionInput" inputmode="decimal" type="number" min="0" step="100" placeholder="例如 2000"></div>
+                            <div class="field"><label for="taxCalculationMode">个税计算模式</label><select id="taxCalculationMode"><option value="simple">固定个税预估</option><option value="cumulative">阶梯个税（自然年累计预扣）</option></select></div>
                         </div>
                         <h4 class="settings-subhead">请假扣款比例（%）</h4>
                         <div class="settings-grid">
@@ -550,6 +568,24 @@
                                 <label for="compQuotaInput">调休额度（天 / 年）</label>
                                 <input id="compQuotaInput" inputmode="decimal" type="number" min="0" step="0.5"
                                     placeholder="例如 2">
+                            </div>
+                            <div class="field">
+                                <label for="annualExpireRule">年假有效期</label>
+                                <select id="annualExpireRule">
+                                    <option value="next-03-31" selected>次年 3 月 31 日清零 (推荐)</option>
+                                    <option value="next-06-30">次年 6 月 30 日清零</option>
+                                    <option value="current-12-31">当年度 12 月 31 日清零</option>
+                                    <option value="none">永久有效 / 不自动清零</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="compExpireRule">调休有效期</label>
+                                <select id="compExpireRule">
+                                    <option value="next-03-31">次年 3 月 31 日清零</option>
+                                    <option value="next-06-30">次年 6 月 30 日清零</option>
+                                    <option value="current-12-31">当年度 12 月 31 日清零</option>
+                                    <option value="none" selected>永久有效 / 不自动清零</option>
+                                </select>
                             </div>
                         </div>
                         <div class="quota-line" id="settingsQuotaStatus" aria-live="polite"></div>
@@ -599,6 +635,17 @@
                                 <input id="importCsv" type="file" accept=".csv,text/csv" hidden>
                             </div>
                             <p class="notice" id="csvNotice" aria-live="polite"></p>
+                        </div>
+                        <div class="settings-card" id="icsCard">
+                            <div class="settings-card-head">
+                                <strong>日历文件导出 (.ics)</strong>
+                                <span class="settings-card-meta">RFC 5545</span>
+                            </div>
+                            <p class="notice">将请假、出勤、节假日调休和抢票提醒导出为标准日历文件，支持导入 Apple 日历、Google 日历、飞书与企微。</p>
+                            <div class="csv-actions">
+                                <button class="btn" id="exportIcsCurrentYear" type="button">导出当前年 (.ics)</button>
+                                <button class="btn" id="exportIcsAll" type="button">导出全部记录 (.ics)</button>
+                            </div>
                         </div>
                         <div class="settings-card" id="webdavCard">
                             <div class="settings-card-head">
@@ -807,15 +854,37 @@
                     <div class="field-group-label" id="statusChoiceLabel">选择状态</div>
                     <div class="action-grid action-grid-primary">
                         <button class="action-btn work" data-action="work" type="button"><svg class="icon" aria-hidden="true"><use href="#i-status-work" /></svg><span>出勤</span></button>
+                        <button class="action-btn overtime" data-action="overtime" type="button"><svg class="icon" aria-hidden="true"><use href="#i-status-overtime" /></svg><span>加班</span></button>
+                        <button class="action-btn comp" data-action="comp" type="button"><svg class="icon" aria-hidden="true"><use href="#i-status-comp" /></svg><span>调休</span></button>
+                        <button class="action-btn annual" data-action="annual" type="button"><svg class="icon" aria-hidden="true"><use href="#i-status-annual" /></svg><span>年假</span></button>
                         <button class="action-btn personal" data-action="personal" type="button"><svg class="icon" aria-hidden="true"><use href="#i-status-personal" /></svg><span>事假</span></button>
                         <button class="action-btn sick" data-action="sick" type="button"><svg class="icon" aria-hidden="true"><use href="#i-status-sick" /></svg><span>病假</span></button>
-                        <button class="action-btn annual" data-action="annual" type="button"><svg class="icon" aria-hidden="true"><use href="#i-status-annual" /></svg><span>年假</span></button>
-                        <button class="action-btn comp" data-action="comp" type="button"><svg class="icon" aria-hidden="true"><use href="#i-status-comp" /></svg><span>调休</span></button>
+                    </div>
+                </div>
+                <div class="field conditional-overtime" id="modalOvertimeField" hidden>
+                    <div class="range-grid">
+                        <div class="field">
+                            <label for="modalOvertimeHours">加班工时</label>
+                            <select id="modalOvertimeHours">
+                                <option value="4">半天 (4 小时)</option>
+                                <option value="8" selected>全天 (8 小时)</option>
+                                <option value="12">1.5 天 (12 小时)</option>
+                                <option value="16">2.0 天 (16 小时)</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="modalOvertimeRate">调休换算倍率</label>
+                            <select id="modalOvertimeRate">
+                                <option value="1" selected>1.0x (1:1 调休)</option>
+                                <option value="2">2.0x (双倍调休)</option>
+                                <option value="3">3.0x (三倍调休)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="field conditional-reason" id="modalReasonField" hidden>
                     <label for="modalReason">理由 <em>选填</em></label>
-                    <textarea id="modalReason" rows="2" placeholder="选择请假类型时填写"></textarea>
+                    <textarea id="modalReason" rows="1" placeholder="选择请假类型时填写"></textarea>
                 </div>
                 <details class="day-advanced" id="modalAdvanced">
                     <summary>更多选项</summary>
@@ -863,6 +932,7 @@
 
     <script src="assets/vendor/chinese-days/index.min.js"></script>
     <script src="assets/js/calendar-years.js"></script>
+    <script src="assets/js/ics-exporter.js"></script>
     <script src="assets/js/app-i18n-v1.4.9.js"></script>
     <script src="assets/js/onboarding.js"></script>
     <script src="assets/js/product-tour.js"></script>
@@ -893,9 +963,19 @@
             personal: "事假",
             sick: "病假",
             annual: "年假",
-            comp: "调休"
+            comp: "调休",
+            overtime: "加班"
         };
         const LEAVE_STATUSES = ["personal", "sick", "annual", "comp"];
+        const TAX_BRACKETS = [
+            { limit: 36000, rate: 0.03, quick: 0 },
+            { limit: 144000, rate: 0.10, quick: 2520 },
+            { limit: 300000, rate: 0.20, quick: 16920 },
+            { limit: 420000, rate: 0.25, quick: 31920 },
+            { limit: 660000, rate: 0.30, quick: 52920 },
+            { limit: 960000, rate: 0.35, quick: 85920 },
+            { limit: Infinity, rate: 0.45, quick: 181920 }
+        ];
         const DEFAULT_RATES = {
             personal: 100,
             sick: 50,
@@ -905,7 +985,8 @@
         const DEFAULT_USER_DATA = {
             profile: {name: "", company: "", hireDate: ""},
             workSchedule: {workdaysPerWeek: 5, restDays: [0, 6], dailyWorkHours: 8, scheduleType: "standard"},
-            salary: {monthlySalary: 0, fixedDeductions: 0, estimatedTax: 0, payday: null},
+            salary: {monthlySalary: 0, fixedDeductions: 0, estimatedTax: 0, specialDeductions: 0, taxMode: "simple", payday: null},
+            quotaRules: {annualExpireRule: "next-03-31", compExpireRule: "none"},
             onboardingCompleted: false,
             onboardingSkipped: false
         };
@@ -1014,6 +1095,8 @@
             salaryInput: document.getElementById("salaryInput"),
             deductionInput: document.getElementById("deductionInput"),
             estimatedTaxInput: document.getElementById("estimatedTaxInput"),
+            specialDeductionInput: document.getElementById("specialDeductionInput"),
+            taxCalculationMode: document.getElementById("taxCalculationMode"),
             paydayInput: document.getElementById("paydayInput"),
             personalRateInput: document.getElementById("personalRateInput"),
             sickRateInput: document.getElementById("sickRateInput"),
@@ -1028,6 +1111,8 @@
             salaryReceiptNext: document.getElementById("salaryReceiptNext"),
             annualQuotaInput: document.getElementById("annualQuotaInput"),
             compQuotaInput: document.getElementById("compQuotaInput"),
+            annualExpireRule: document.getElementById("annualExpireRule"),
+            compExpireRule: document.getElementById("compExpireRule"),
             profileNameInput: document.getElementById("profileNameInput"),
             companyInput: document.getElementById("companyInput"),
             hireDateInput: document.getElementById("hireDateInput"),
@@ -1039,6 +1124,9 @@
             settingsQuotaStatus: document.getElementById("settingsQuotaStatus"),
             exportCsv: document.getElementById("exportCsv"),
             importCsv: document.getElementById("importCsv"),
+            icsToolBtn: document.getElementById("icsToolBtn"),
+            exportIcsCurrentYear: document.getElementById("exportIcsCurrentYear"),
+            exportIcsAll: document.getElementById("exportIcsAll"),
             csvNotice: document.getElementById("csvNotice"),
             dataStatusLine: document.getElementById("dataStatusLine"),
             toolsWebdavHint: document.getElementById("toolsWebdavHint"),
@@ -1125,6 +1213,9 @@
             modalEndDate: document.getElementById("modalEndDate"),
             modalReasonField: document.getElementById("modalReasonField"),
             modalReason: document.getElementById("modalReason"),
+            modalOvertimeField: document.getElementById("modalOvertimeField"),
+            modalOvertimeHours: document.getElementById("modalOvertimeHours"),
+            modalOvertimeRate: document.getElementById("modalOvertimeRate"),
             modalNote: document.getElementById("modalNote"),
             modalRangeNotice: document.getElementById("modalRangeNotice"),
             modalGenerateDoc: document.getElementById("modalGenerateDoc"),
@@ -1971,6 +2062,8 @@
                 els.salaryInput,
                 els.deductionInput,
                 els.estimatedTaxInput,
+                els.specialDeductionInput,
+                els.taxCalculationMode,
                 els.paydayInput,
                 els.personalRateInput,
                 els.sickRateInput,
@@ -1978,13 +2071,20 @@
                 els.compRateInput,
                 els.annualQuotaInput,
                 els.compQuotaInput,
+                els.annualExpireRule,
+                els.compExpireRule,
                 els.applicantName,
                 els.leaveRecipientInput,
                 els.personalReasonInput,
                 els.sickReasonInput,
-                els.leaveHandoffInput
-                ,els.profileNameInput, els.companyInput, els.hireDateInput, els.workdaysInput, els.dailyHoursInput, els.scheduleTypeInput
-            ].forEach(input => {
+                els.leaveHandoffInput,
+                els.profileNameInput,
+                els.companyInput,
+                els.hireDateInput,
+                els.workdaysInput,
+                els.dailyHoursInput,
+                els.scheduleTypeInput
+            ].filter(Boolean).forEach(input => {
                 input.addEventListener("input", () => {
                     syncSettingsFromInputs();
                     saveState();
@@ -2053,9 +2153,17 @@
                 const button = event.target instanceof Element ? event.target.closest("[data-open-settings-dynamic]") : null;
                 if (button) openSettings(button.dataset.openSettingsDynamic);
             });
-            document.addEventListener("click", event => {
-                const button = event.target instanceof Element ? event.target.closest("[data-csv-export]") : null;
-                if (button) exportCsv();
+            els.icsToolBtn?.addEventListener("click", () => exportIcsFile(currentYear));
+            els.exportIcsCurrentYear?.addEventListener("click", () => exportIcsFile(currentYear));
+            els.exportIcsAll?.addEventListener("click", () => exportIcsFile(null));
+            [els.taxCalculationMode, els.annualExpireRule, els.compExpireRule].filter(Boolean).forEach(sel => {
+                sel.addEventListener("change", () => {
+                    syncSettingsFromInputs();
+                    saveState();
+                    renderStats();
+                    renderSalary();
+                    renderHomeExtras();
+                });
             });
 
             els.guideToggle.addEventListener("click", openGuide);
@@ -2843,6 +2951,28 @@
                     actionLabel: "查看额度",
                     settings: "quota"
                 });
+            } else if (annualQuota > 0) {
+                const expRule = state.quotaRules?.annualExpireRule || "next-03-31";
+                if (expRule !== "none") {
+                    let expYear = today.getFullYear();
+                    let expMonth = 3;
+                    let expDay = 31;
+                    if (expRule === "next-06-30") { expMonth = 6; expDay = 30; }
+                    else if (expRule === "current-12-31") { expMonth = 12; expDay = 31; }
+                    const expDate = new Date(expYear, expMonth - 1, expDay);
+                    const diff = diffDays(today, expDate);
+                    const targetYear = expRule.startsWith("next") && today.getMonth() < expMonth ? expYear - 1 : expYear;
+                    const remainingAnnual = Math.max(0, annualQuota - calculateStats(targetYear).annualLeave);
+                    if (diff >= 0 && diff <= 30 && remainingAnnual > 0) {
+                        alerts.push({
+                            tone: "warn",
+                            icon: "i-alert",
+                            text: `年假即将于 ${expMonth}月${expDay}日 清零，还剩 ${remainingAnnual} 天未使用`,
+                            actionLabel: "去规划",
+                            settings: "quota"
+                        });
+                    }
+                }
             }
             if (isWebdavConfigured()) {
                 const last = Date.parse(webdavConfig.lastBackupAt || "");
@@ -2917,21 +3047,91 @@
             els.salaryResult.innerHTML = receiptHtml(currentSalaryReceipt);
         }
 
-        function calculateSalarySnapshot(stats) {
+        function calculateCumulativeTax(year, targetMonth, currentMonthSalary, currentMonthLeaveDeduction) {
             const salary = cleanNumber(els.salaryInput.value);
             const deduction = cleanNumber(els.deductionInput.value);
-            const estimatedTax = cleanNumber(els.estimatedTaxInput.value);
+            const specialDeductions = cleanNumber(els.specialDeductionInput?.value || state.salary?.specialDeductions || 0);
+            const threshold = 5000;
+            const rates = getSalaryRates();
+
+            let cumulativeTaxablePrior = 0;
+            let cumulativeTaxPaidPrior = 0;
+
+            for (let m = 1; m < targetMonth; m++) {
+                const mStats = calculateStats(year, m);
+                const mDaily = mStats.expectedWorkdays > 0 ? salary / mStats.expectedWorkdays : 0;
+                const mLeaveDeduction = LEAVE_STATUSES.reduce((sum, status) => {
+                    return sum + mDaily * mStats.leaveByStatus[status] * (rates[status] / 100);
+                }, 0);
+                const mGross = Math.max(0, salary - mLeaveDeduction);
+                const mTaxable = Math.max(0, mGross - deduction - threshold - specialDeductions);
+                cumulativeTaxablePrior += mTaxable;
+            }
+
+            if (cumulativeTaxablePrior > 0) {
+                const bracket = TAX_BRACKETS.find(b => cumulativeTaxablePrior <= b.limit) || TAX_BRACKETS[TAX_BRACKETS.length - 1];
+                cumulativeTaxPaidPrior = Math.max(0, cumulativeTaxablePrior * bracket.rate - bracket.quick);
+            }
+
+            const currentGross = Math.max(0, currentMonthSalary - currentMonthLeaveDeduction);
+            const currentTaxable = Math.max(0, currentGross - deduction - threshold - specialDeductions);
+            const cumulativeTaxableTotal = cumulativeTaxablePrior + currentTaxable;
+
+            let cumulativeTaxTotal = 0;
+            let bracketMatched = TAX_BRACKETS[0];
+            if (cumulativeTaxableTotal > 0) {
+                bracketMatched = TAX_BRACKETS.find(b => cumulativeTaxableTotal <= b.limit) || TAX_BRACKETS[TAX_BRACKETS.length - 1];
+                cumulativeTaxTotal = Math.max(0, cumulativeTaxableTotal * bracketMatched.rate - bracketMatched.quick);
+            }
+
+            const currentMonthTax = Math.max(0, cumulativeTaxTotal - cumulativeTaxPaidPrior);
+            return {
+                currentMonthTax,
+                cumulativeTaxTotal,
+                cumulativeTaxPaidPrior,
+                cumulativeTaxableTotal,
+                taxRate: bracketMatched.rate * 100,
+                specialDeductions
+            };
+        }
+
+        function calculateSalarySnapshot(stats, year = currentYear, month = currentMonth) {
+            const salary = cleanNumber(els.salaryInput.value);
+            const deduction = cleanNumber(els.deductionInput.value);
+            const isCumulative = (els.taxCalculationMode?.value || state.salary?.taxMode) === "cumulative";
             const daily = stats.expectedWorkdays > 0 ? salary / stats.expectedWorkdays : 0;
             const rates = getSalaryRates();
             const leaveDeduction = LEAVE_STATUSES.reduce((sum, status) => {
                 return sum + daily * stats.leaveByStatus[status] * (rates[status] / 100);
             }, 0);
+
+            let estimatedTax = cleanNumber(els.estimatedTaxInput.value);
+            let taxDetails = null;
+
+            if (isCumulative && salary > 0) {
+                taxDetails = calculateCumulativeTax(year, month, salary, leaveDeduction);
+                estimatedTax = taxDetails.currentMonthTax;
+            }
+
             const actual = Math.max(0, salary - leaveDeduction - deduction - estimatedTax);
-            return {salary, deduction, estimatedTax, daily, leaveDeduction, actual};
+            return {salary, deduction, estimatedTax, isCumulative, taxDetails, daily, leaveDeduction, actual};
         }
 
-        function buildSalaryReceipt({stats, salary, deduction, estimatedTax, daily, leaveDeduction, actual}, year, month) {
+        function buildSalaryReceipt({stats, salary, deduction, estimatedTax, isCumulative, taxDetails, daily, leaveDeduction, actual}, year, month) {
             const monthText = `${year}-${String(month).padStart(2, "0")}`;
+            const deductionItems = [
+                {label: "请假扣款", value: formatMoney(leaveDeduction)},
+                {label: "五险一金", value: formatMoney(deduction)}
+            ];
+
+            if (isCumulative && taxDetails) {
+                deductionItems.push({label: "专项扣除", value: formatMoney(taxDetails.specialDeductions)});
+                deductionItems.push({label: `个税预扣 (${taxDetails.taxRate}%)`, value: formatMoney(estimatedTax)});
+            } else {
+                deductionItems.push({label: "个税预估", value: formatMoney(estimatedTax)});
+            }
+            deductionItems.push({label: "实际到手", value: formatMoney(actual), strong: true});
+
             return {
                 kind: "salary",
                 title: "工资条",
@@ -2948,14 +3148,10 @@
                         {label: "已出勤", value: `${stats.actualWorkdays} 天`},
                         {label: "请假合计", value: `${stats.totalLeave} 天`},
                         {label: "事假 / 病假", value: `${stats.personalLeave} / ${stats.sickLeave} 天`},
-                        {label: "年假 / 调休", value: `${stats.annualLeave} / ${stats.compLeave} 天`}
+                        {label: "年假 / 调休", value: `${stats.annualLeave} / ${stats.compLeave} 天`},
+                        {label: "加班工时", value: `${stats.overtimeHours || 0} 小时 (${stats.overtimeDays || 0} 天)`}
                     ],
-                    [
-                        {label: "请假扣款", value: formatMoney(leaveDeduction)},
-                        {label: "固定扣除", value: formatMoney(deduction)},
-                        {label: "个税预估", value: formatMoney(estimatedTax)},
-                        {label: "实际到手", value: formatMoney(actual), strong: true}
-                    ]
+                    deductionItems
                 ],
                 footer: [toISO(new Date()), "仅供个人核算"]
             };
@@ -2963,20 +3159,21 @@
 
         function renderQuotaSummary(yearStats) {
             const annualQuota = cleanNumber(els.annualQuotaInput.value);
-            const compQuota = cleanNumber(els.compQuotaInput.value);
+            const baseCompQuota = cleanNumber(els.compQuotaInput.value);
+            const compTotal = baseCompQuota + (yearStats.overtimeCompEarned || 0);
             els.quotaSummary.innerHTML = [
                 quotaLine("年假", yearStats.annualLeave, annualQuota),
-                quotaLine("调休", yearStats.compLeave, compQuota)
+                quotaLine("调休", yearStats.compLeave, compTotal, false, yearStats.overtimeCompEarned || 0)
             ].join("");
             if (els.settingsQuotaStatus) {
                 els.settingsQuotaStatus.innerHTML = [
                     quotaLine("年假", yearStats.annualLeave, annualQuota, true),
-                    quotaLine("调休", yearStats.compLeave, compQuota, true)
+                    quotaLine("调休", yearStats.compLeave, compTotal, true, yearStats.overtimeCompEarned || 0)
                 ].join("");
             }
         }
 
-        function quotaLine(label, used, quota, inSettings = false) {
+        function quotaLine(label, used, quota, inSettings = false, overtimeCompEarned = 0) {
             if (quota <= 0) {
                 if (inSettings) {
                     return `
@@ -2996,9 +3193,10 @@
             }
             const remaining = Math.max(0, quota - used);
             const percent = quota > 0 ? Math.min(100, (used / quota) * 100) : 0;
+            const extraBadge = overtimeCompEarned > 0 ? ` <small style="color:var(--muted);font-weight:normal;">(含加班折算 +${overtimeCompEarned} 天)</small>` : "";
             return `
         <div class="quota-item">
-          <div class="quota-text"><strong>${label}</strong>：已用 ${used} 天 / 额度 ${quota} 天 / 剩余 ${remaining} 天</div>
+          <div class="quota-text"><strong>${label}</strong>：已用 ${used} 天 / 额度 ${quota} 天${extraBadge} / 剩余 ${remaining} 天</div>
           <div class="quota-meter"><span style="width:${percent}%"></span></div>
         </div>
       `;
@@ -3073,11 +3271,14 @@
             els.modalNote.value = record.note || "";
             els.modalNote.disabled = !noteEditable;
             document.querySelectorAll("[data-action]").forEach(button => {
-                button.disabled = !editable;
+                const isOvertime = button.dataset.action === "overtime";
+                button.disabled = !(editable || isOvertime);
                 button.classList.toggle("active", button.dataset.action === pendingStatus);
             });
+            if (els.modalOvertimeHours) els.modalOvertimeHours.value = String(record.overtimeHours || 8);
+            if (els.modalOvertimeRate) els.modalOvertimeRate.value = String(record.overtimeRate || 1);
             updateReasonFieldVisibility(pendingStatus);
-            els.modalSave.disabled = !noteEditable;
+            els.modalSave.disabled = !noteEditable && pendingStatus !== "overtime";
             els.modalClear.hidden = !record.status && !record.reason && !record.note;
             els.modalAdvanced.open = weekendNoteOnly;
             if (els.modalRangeNotice) {
@@ -3098,7 +3299,7 @@
             if (info.holidayName) parts.push(info.holidayName);
             if (info.makeupName) parts.push(info.makeupName);
             if (!info.holidayName && !info.makeupName && info.isWeekend) parts.push("周末");
-            if (noteEditable && !editable) parts.push("周末可添加备注，状态不可标记");
+            if (noteEditable && !editable) parts.push("可添加备注或加班记录");
             else if (!editable) parts.push("休息日仅展示详情");
             return parts.filter(Boolean).join(" · ");
         }
@@ -3126,8 +3327,23 @@
             state.settings.leaveHandoff = els.leaveHandoffInput.value.trim();
             state.profile = {name: els.profileNameInput.value.trim(), company: els.companyInput.value.trim(), hireDate: els.hireDateInput.value};
             state.workSchedule = {workdaysPerWeek: clampInt(els.workdaysInput.value, 1, 7, 5), restDays: [...els.restDaysPicker.querySelectorAll("input:checked")].map(input => Number(input.value)), dailyWorkHours: clampNumber(els.dailyHoursInput.value, 0.5, 24, 8), scheduleType: els.scheduleTypeInput.value || "standard"};
-            state.salary = {monthlySalary: state.settings.salary, fixedDeductions: state.settings.deduction, estimatedTax: cleanNumber(els.estimatedTaxInput.value), payday: els.paydayInput.value ? clampInt(els.paydayInput.value, 1, 31, 10) : null};
+            state.salary = {
+                monthlySalary: state.settings.salary,
+                fixedDeductions: state.settings.deduction,
+                estimatedTax: cleanNumber(els.estimatedTaxInput.value),
+                specialDeductions: cleanNumber(els.specialDeductionInput?.value || 0),
+                taxMode: els.taxCalculationMode?.value || "simple",
+                payday: els.paydayInput.value ? clampInt(els.paydayInput.value, 1, 31, 10) : null
+            };
+            state.quotaRules = {
+                annualExpireRule: els.annualExpireRule?.value || "next-03-31",
+                compExpireRule: els.compExpireRule?.value || "none"
+            };
             state.settings.estimatedTax = state.salary.estimatedTax;
+            state.settings.specialDeductions = state.salary.specialDeductions;
+            state.settings.taxMode = state.salary.taxMode;
+            state.settings.annualExpireRule = state.quotaRules.annualExpireRule;
+            state.settings.compExpireRule = state.quotaRules.compExpireRule;
             state.settings.payday = state.salary.payday;
         }
 
@@ -3135,6 +3351,10 @@
             els.salaryInput.value = state.settings.salary || "";
             els.deductionInput.value = state.settings.deduction || "";
             els.estimatedTaxInput.value = state.salary.estimatedTax || state.settings.estimatedTax || "";
+            if (els.specialDeductionInput) els.specialDeductionInput.value = state.salary.specialDeductions || state.settings.specialDeductions || "";
+            if (els.taxCalculationMode) els.taxCalculationMode.value = state.salary.taxMode || state.settings.taxMode || "simple";
+            if (els.annualExpireRule) els.annualExpireRule.value = state.quotaRules?.annualExpireRule || state.settings.annualExpireRule || "next-03-31";
+            if (els.compExpireRule) els.compExpireRule.value = state.quotaRules?.compExpireRule || state.settings.compExpireRule || "none";
             els.paydayInput.value = state.salary.payday || state.settings.payday || "";
             els.personalRateInput.value = settingNumber("personalRate", DEFAULT_RATES.personal);
             els.sickRateInput.value = settingNumber("sickRate", DEFAULT_RATES.sick);
@@ -3733,9 +3953,9 @@
             if (!activeDate) return;
             const date = fromISO(activeDate);
             const info = getDayInfo(date);
-            if (!isConfiguredWorkday(date, info)) {
+            if (!isConfiguredWorkday(date, info) && status !== "overtime") {
                 els.modalSubtitle.textContent = info.isWeekend
-                    ? "周末只能添加备注，不能标记出勤状态。"
+                    ? "周末只能添加备注或加班记录，不能标记请假/出勤状态。"
                     : "休息日仅展示详情，状态保存会跳过非工作日。";
                 return;
             }
@@ -3755,8 +3975,12 @@
         }
 
         function updateReasonFieldVisibility(status) {
-            if (!els.modalReasonField) return;
-            els.modalReasonField.hidden = !LEAVE_STATUSES.includes(status);
+            if (els.modalReasonField) {
+                els.modalReasonField.hidden = !LEAVE_STATUSES.includes(status) && status !== "overtime";
+            }
+            if (els.modalOvertimeField) {
+                els.modalOvertimeField.hidden = status !== "overtime";
+            }
         }
 
         function clearActiveRecord() {
@@ -3838,11 +4062,12 @@
                 els.modalSubtitle.textContent = "请选择有效的日期范围";
                 return;
             }
-            const reason = LEAVE_STATUSES.includes(pendingStatus) ? els.modalReason.value.trim() : "";
+            const reason = LEAVE_STATUSES.includes(pendingStatus) || pendingStatus === "overtime" ? els.modalReason.value.trim() : "";
             const note = els.modalNote.value.trim();
-            const dates = rangeDates(start, end).filter(iso => weekendNoteOnly
-                ? getDayInfo(fromISO(iso)).isWeekend
-                : isConfiguredWorkday(fromISO(iso)));
+            const dates = rangeDates(start, end).filter(iso => {
+                if (pendingStatus === "overtime") return true;
+                return weekendNoteOnly ? getDayInfo(fromISO(iso)).isWeekend : isConfiguredWorkday(fromISO(iso));
+            });
             if (!dates.length) {
                 els.modalSubtitle.textContent = weekendNoteOnly
                     ? "所选范围没有周末日期。"
@@ -3850,7 +4075,7 @@
                 return;
             }
             const updatedAt = new Date().toISOString();
-            if (weekendNoteOnly) {
+            if (weekendNoteOnly && pendingStatus !== "overtime") {
                 dates.forEach(iso => {
                     const existing = state.records[iso] || {};
                     if (note) {
@@ -3866,6 +4091,20 @@
                     } else {
                         state.records[iso] = {...existing, note: "", updatedAt};
                     }
+                });
+            } else if (pendingStatus === "overtime") {
+                const overtimeHours = Number(els.modalOvertimeHours?.value) || 8;
+                const overtimeRate = Number(els.modalOvertimeRate?.value) || 1;
+                dates.forEach(iso => {
+                    state.records[iso] = {
+                        status: "overtime",
+                        leaveType: "加班",
+                        reason,
+                        note,
+                        overtimeHours,
+                        overtimeRate,
+                        updatedAt
+                    };
                 });
             } else {
                 dates.forEach(iso => {
@@ -3889,7 +4128,7 @@
             saveState();
             if (!options.keepOpen) {
                 closeModal();
-                showToast(weekendNoteOnly
+                showToast(weekendNoteOnly && pendingStatus !== "overtime"
                     ? (dates.length > 1 ? `已保存 ${dates.length} 个周末备注` : "周末备注已保存")
                     : (dates.length > 1 ? `已保存 ${dates.length} 天记录` : "记录已保存"));
             }
@@ -3906,6 +4145,9 @@
                 annualLeave: 0,
                 compLeave: 0,
                 totalLeave: 0,
+                overtimeDays: 0,
+                overtimeHours: 0,
+                overtimeCompEarned: 0,
                 holidayDays: 0,
                 weekendDays: 0,
                 attendedMarked: 0,
@@ -3923,6 +4165,13 @@
                 const record = state.records[iso];
                 if (info.isHoliday) stats.holidayDays += 1;
                 if (info.isWeekend) stats.weekendDays += 1;
+                if (record?.status === "overtime") {
+                    stats.overtimeDays += 1;
+                    const hours = Number(record.overtimeHours) || 8;
+                    const rate = Number(record.overtimeRate) || 1;
+                    stats.overtimeHours += hours;
+                    stats.overtimeCompEarned += (hours / 8) * rate;
+                }
                 if (isConfiguredWorkday(date, info)) {
                     stats.expectedWorkdays += 1;
                     if (LEAVE_STATUSES.includes(record?.status)) {
@@ -3939,6 +4188,49 @@
             stats.totalLeave = LEAVE_STATUSES.reduce((sum, status) => sum + stats.leaveByStatus[status], 0);
             stats.actualWorkdays = stats.attendedMarked;
             return stats;
+        }
+
+        function exportIcsFile(targetYear) {
+            if (!window.XiuliIcs) {
+                showToast("iCalendar 导出模块未加载", "danger");
+                return;
+            }
+            const years = targetYear
+                ? [targetYear]
+                : Array.from(new Set(Object.keys(state.records).map(iso => Number(iso.slice(0, 4))).concat([currentYear]))).sort();
+
+            const holidays = [];
+            const makeups = [];
+            const ticketReminders = [];
+
+            years.forEach(yr => {
+                const dates = getYearDates(yr);
+                dates.forEach(d => {
+                    const info = getDayInfo(d);
+                    if (info.isHoliday && info.holidayName) {
+                        holidays.push({ date: d, name: info.holidayName });
+                    }
+                    if (info.isWorkday && info.makeupName) {
+                        makeups.push({ date: d, name: info.makeupName });
+                    }
+                });
+                try {
+                    getTicketReminders(yr).forEach(t => ticketReminders.push(t));
+                } catch {}
+            });
+
+            const icsContent = XiuliIcs.generateIcs({
+                records: state.records,
+                holidays,
+                makeups,
+                ticketReminders,
+                targetYear,
+                statusLabels: STATUS_LABELS
+            });
+
+            const filename = targetYear ? `RestCal-${targetYear}年度日历.ics` : `RestCal-全量日历.ics`;
+            XiuliIcs.downloadIcs(icsContent, filename);
+            showToast(`已成功导出 ${filename}`);
         }
 
         function statsHeatmapHtml(scope, dates, stats) {
@@ -5551,11 +5843,29 @@
         function structuredState(base, source = {}) {
             const settings = base.settings || {};
             const result = {
-                records: base.records || {}, settings,
+                schemaVersion: 2,
+                records: base.records || {},
+                settings,
                 profile: {...DEFAULT_USER_DATA.profile, ...(source.profile || {}), name: source.profile?.name ?? settings.applicantName ?? ""},
                 workSchedule: {...DEFAULT_USER_DATA.workSchedule, ...(source.workSchedule || {}), restDays: Array.isArray(source.workSchedule?.restDays) ? source.workSchedule.restDays : [0, 6]},
-                salary: {...DEFAULT_USER_DATA.salary, ...(source.salary || {}), monthlySalary: source.salary?.monthlySalary ?? settings.salary ?? 0, fixedDeductions: source.salary?.fixedDeductions ?? settings.deduction ?? 0, estimatedTax: source.salary?.estimatedTax ?? settings.estimatedTax ?? 0, payday: source.salary?.payday ?? settings.payday ?? null},
-                onboardingCompleted: Boolean(source.onboardingCompleted), onboardingSkipped: Boolean(source.onboardingSkipped),
+                salary: {
+                    ...DEFAULT_USER_DATA.salary,
+                    ...(source.salary || {}),
+                    monthlySalary: source.salary?.monthlySalary ?? settings.salary ?? 0,
+                    fixedDeductions: source.salary?.fixedDeductions ?? settings.deduction ?? 0,
+                    estimatedTax: source.salary?.estimatedTax ?? settings.estimatedTax ?? 0,
+                    specialDeductions: source.salary?.specialDeductions ?? settings.specialDeductions ?? 0,
+                    taxMode: source.salary?.taxMode ?? settings.taxMode ?? "simple",
+                    payday: source.salary?.payday ?? settings.payday ?? null
+                },
+                quotaRules: {
+                    ...DEFAULT_USER_DATA.quotaRules,
+                    ...(source.quotaRules || {}),
+                    annualExpireRule: source.quotaRules?.annualExpireRule ?? settings.annualExpireRule ?? "next-03-31",
+                    compExpireRule: source.quotaRules?.compExpireRule ?? settings.compExpireRule ?? "none"
+                },
+                onboardingCompleted: Boolean(source.onboardingCompleted),
+                onboardingSkipped: Boolean(source.onboardingSkipped),
                 productTourSeenVersion: Math.max(0, Number(source.productTourSeenVersion) || 0),
                 setupBannerDismissed: Boolean(source.setupBannerDismissed)
             };

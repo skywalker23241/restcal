@@ -231,7 +231,7 @@ async function run() {
                     && note.selectionEnd === note.value.length;
                 note.dispatchEvent(new PointerEvent("pointerdown", {bubbles: true, pointerId: 1}));
                 modal.dispatchEvent(new PointerEvent("pointerup", {bubbles: true, pointerId: 1}));
-                modal.dispatchEvent(new MouseEvent("click", {bubbles: true}));
+                note.dispatchEvent(new MouseEvent("click", {bubbles: true}));
                 return {
                     openAfterSelectAll,
                     openAfterSelectionDrag: modal.classList.contains("open")
@@ -254,7 +254,7 @@ async function run() {
                 };
             })
         `);
-        if (statusButtons.length !== 5 || statusButtons.some(item =>
+        if (statusButtons.length !== 6 || statusButtons.some(item =>
             item.width < 50 || item.height < 42 || item.icon < 15 || !item.href.startsWith("#i-status-")
         )) {
             throw new Error(`${w}px status button layout failed: ${JSON.stringify(statusButtons)}`);
@@ -314,7 +314,7 @@ async function run() {
                 openModal(iso);
                 const note = document.getElementById("modalNote");
                 const save = document.getElementById("modalSave");
-                const statusesDisabled = [...document.querySelectorAll(".action-grid-primary .action-btn")]
+                const statusesDisabled = [...document.querySelectorAll(".action-grid-primary .action-btn:not(.overtime)")]
                     .every(button => button.disabled);
                 const advancedOpen = document.getElementById("modalAdvanced").open;
                 const saveEnabled = !save.disabled;

@@ -214,7 +214,19 @@
         "周末可添加备注，状态不可标记": "Weekends support notes only; status marking is unavailable.", "周末只能添加备注，不能标记出勤状态。": "Weekends support notes only; attendance status cannot be marked.",
         "可选择多个周末，保存后会将同一条备注应用到所选周末。": "Select multiple weekends to apply the same note to them.", "所选范围没有周末日期。": "The selected range contains no weekends.",
         "元旦": "New Year's Day", "春节": "Spring Festival", "清明节": "Qingming Festival", "劳动节": "Labour Day", "端午节": "Dragon Boat Festival", "中秋": "Mid-Autumn Festival", "中秋节": "Mid-Autumn Festival", "国庆节": "National Day",
-        "小寒": "Minor Cold", "大寒": "Major Cold", "立春": "Start of Spring", "雨水": "Rain Water", "惊蛰": "Awakening of Insects", "春分": "Spring Equinox", "清明": "Pure Brightness", "谷雨": "Grain Rain", "立夏": "Start of Summer", "小满": "Grain Buds", "芒种": "Grain in Ear", "夏至": "Summer Solstice", "小暑": "Minor Heat", "大暑": "Major Heat", "立秋": "Start of Autumn", "处暑": "End of Heat", "白露": "White Dew", "秋分": "Autumn Equinox", "寒露": "Cold Dew", "霜降": "Frost Descent", "立冬": "Start of Winter", "小雪": "Minor Snow", "大雪": "Major Snow", "冬至": "Winter Solstice"
+        "小寒": "Minor Cold", "大寒": "Major Cold", "立春": "Start of Spring", "雨水": "Rain Water", "惊蛰": "Awakening of Insects", "春分": "Spring Equinox", "清明": "Pure Brightness", "谷雨": "Grain Rain", "立夏": "Start of Summer", "小满": "Grain Buds", "芒种": "Grain in Ear", "夏至": "Summer Solstice", "小暑": "Minor Heat", "大暑": "Major Heat", "立秋": "Start of Autumn", "处暑": "End of Heat", "白露": "White Dew", "秋分": "Autumn Equinox", "寒露": "Cold Dew", "霜降": "Frost Descent", "立冬": "Start of Winter", "小雪": "Minor Snow", "大雪": "Major Snow", "冬至": "Winter Solstice",
+        "加班": "Overtime", "加班工时": "Overtime hours", "加班工时（小时）": "Overtime hours", "调休换算倍率": "Comp rate",
+        "半天 (4 小时)": "Half day (4h)", "全天 (8 小时)": "Full day (8h)", "1.5 天 (12 小时)": "1.5 days (12h)", "2.0 天 (16 小时)": "2.0 days (16h)",
+        "1.0x (1:1 调休)": "1.0x (1:1 comp)", "2.0x (双倍调休)": "2.0x (2x comp)", "3.0x (三倍调休)": "3.0x (3x comp)",
+        "日历导出 (.ics)": "Calendar Export (.ics)", "日历文件导出 (.ics)": "iCalendar File Export (.ics)", "导出日历": "Export calendar",
+        "导出当前年 (.ics)": "Export current year (.ics)", "导出当前年日历 (.ics)": "Export current year (.ics)", "导出全部记录 (.ics)": "Export all records (.ics)",
+        "导出请假、节假日与抢票提醒至系统日历": "Export leave, holidays and ticket reminders to calendar apps",
+        "将请假、出勤、节假日调休和抢票提醒导出为标准日历文件，支持导入 Apple 日历、Google 日历、飞书与企微。": "Export leave, attendance, holidays and ticket reminders as RFC 5545 .ics for Apple Calendar, Google Calendar, Feishu and WeCom.",
+        "个税计算模式": "Tax calculation mode", "固定个税预估": "Fixed tax estimate", "阶梯个税（自然年累计预扣）": "Progressive tax (PRC cumulative withholding)",
+        "专项附加扣除（元 / 月）": "Special deductions (CNY/mo)", "专项扣除": "Special deductions",
+        "年假有效期": "Annual leave validity", "调休有效期": "Comp leave validity",
+        "次年 3 月 31 日清零 (推荐)": "Expires Mar 31 next year (Recommended)", "次年 3 月 31 日清零": "Expires Mar 31 next year", "次年 6 月 30 日清零": "Expires Jun 30 next year", "当年度 12 月 31 日清零": "Expires Dec 31 current year", "永久有效 / 不自动清零": "Never expires",
+        "可添加备注或加班记录": "Notes and overtime can be marked", "去规划": "Plan leave"
     };
 
     function translateCore(value) {
