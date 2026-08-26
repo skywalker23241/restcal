@@ -209,7 +209,7 @@ button {
 .app {
     width: min(1280px, 100%);
     margin: 0 auto;
-    padding: 16px 20px 28px;
+    padding: max(16px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 28px max(20px, env(safe-area-inset-left));
 }
 
 .topbar {
@@ -4800,10 +4800,10 @@ html.theme-anim #themeToggle .icon {
     }
 
     .app {
-        padding: 14px;
-        padding-left: max(14px, env(safe-area-inset-left));
+        padding-top: max(14px, env(safe-area-inset-top));
         padding-right: max(14px, env(safe-area-inset-right));
         padding-bottom: max(14px, env(safe-area-inset-bottom));
+        padding-left: max(14px, env(safe-area-inset-left));
     }
 
     /* 弹窗打开时固定 body，配合 JS 记录/恢复滚动位置，阻止 iOS 背景滚动 */
@@ -4827,7 +4827,7 @@ html.theme-anim #themeToggle .icon {
         border-left: 0;
         border-right: 0;
         border-bottom: 0;
-        padding-bottom: env(safe-area-inset-bottom);
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
     }
 
     .modal-backdrop.open>* {
@@ -4888,11 +4888,12 @@ html.theme-anim #themeToggle .icon {
 
     .bottom-nav {
         display: grid;
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
     }
 
     /* 给固定底部导航让位 */
     .app {
-        padding-bottom: calc(70px + env(safe-area-inset-bottom));
+        padding-bottom: calc(78px + env(safe-area-inset-bottom));
     }
 
     .topbar-actions .btn {
@@ -5094,6 +5095,8 @@ html.theme-anim #themeToggle .icon {
         max-height: none;
         border-radius: 0;
         border: 0;
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
     }
 
     .settings-backdrop.open .settings-page {
@@ -5385,11 +5388,11 @@ html.theme-anim #themeToggle .icon {
 
 @media (max-width: 420px) {
     .app {
-        padding: 12px;
+        padding-top: max(12px, env(safe-area-inset-top));
         padding-left: max(12px, env(safe-area-inset-left));
         padding-right: max(12px, env(safe-area-inset-right));
         /* 底部导航为 fixed，必须保留让位空间，否则页面尾部内容被遮住滑不到底 */
-        padding-bottom: calc(70px + env(safe-area-inset-bottom));
+        padding-bottom: calc(78px + env(safe-area-inset-bottom));
     }
 
     .calendar-grid {
