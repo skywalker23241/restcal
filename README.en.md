@@ -139,9 +139,9 @@ Latest offline release: [RestCal v1.6.0](https://github.com/skywalker23241/restc
 
 | Download | Purpose |
 |---|---|
-| [`休历-1.6.0-portable.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/%E4%BC%91%E5%8E%86-1.6.0-portable.exe) | Portable executable; no installation required |
-| [`休历-1.6.0-setup.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/%E4%BC%91%E5%8E%86-1.6.0-setup.exe) | Windows installer with a selectable installation directory |
-| [`休历-1.6.0-win.zip`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/%E4%BC%91%E5%8E%86-1.6.0-win.zip) | Extract and run `休历.exe` |
+| [`RestCal-1.6.0-portable.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/RestCal-1.6.0-portable.exe) | Portable executable; no installation required |
+| [`RestCal-1.6.0-setup.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/RestCal-1.6.0-setup.exe) | Windows installer with a selectable installation directory |
+| [`RestCal-1.6.0-win.zip`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/RestCal-1.6.0-win.zip) | Extract and run `休历.exe` |
 | [`SHA256SUMS-1.6.0.txt`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/SHA256SUMS-1.6.0.txt) | File-integrity checksums |
 
 All three packages include the application and Chinese calendar data for 2004–2026. The current builds are not code-signed, so Windows SmartScreen may display a warning on first launch.
