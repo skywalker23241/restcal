@@ -1,7 +1,7 @@
 {
     "name": "xiuli",
     "productName": "休历",
-    "version": "1.5.1",
+    "version": "1.6.0",
     "description": "休历 - 管理请假、出勤、工资扣除和节假日火车票购票提醒的本地日历工具",
     "license": "MIT",
     "author": "skywalker23241",

@@ -9,12 +9,12 @@
 **Leave, attendance, payroll estimates, and ticket reminders — one calendar for the Chinese workplace**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-![Release](https://img.shields.io/badge/release-v1.5.1-b4382a)
+![Release](https://img.shields.io/badge/release-v1.6.0-b4382a)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-5A0FC8)
 ![Zero Build](https://img.shields.io/badge/build-zero%20dependency-orange)
 ![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Windows-blue)
 
-**[🌐 Open RestCal](https://restcal.abohack.com/app.html)** · [Product site](https://restcal.abohack.com) · [Telegram](https://t.me/restcalabohack) · **[Download v1.5.1](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.5.1)** · [Report an issue](https://github.com/skywalker23241/restcal-abohack/issues)
+**[🌐 Open RestCal](https://restcal.abohack.com/app.html)** · [Product site](https://restcal.abohack.com) · [Telegram](https://t.me/restcalabohack) · **[Download v1.6.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)** · [Report an issue](https://github.com/skywalker23241/restcal-abohack/issues)
 
 <img src="public/assets/images/screenshots/overview-light.png" alt="RestCal day view with the daily calendar card, leave balance, attendance, and estimated take-home pay" width="100%">
 
@@ -30,7 +30,7 @@ It is a **zero-build, dependency-free frontend** written in native HTML, CSS, an
 
 The application interface can switch between Chinese and English. Language, theme, and all business settings are included in complete CSV and WebDAV backups.
 
-## 🆕 What's new in v1.5.1
+## 🆕 What's new in v1.6.0
 
 - Added a theme-aware date picker and improved year/month selection, calendar cards, and the week-view hierarchy.
 - Daily quotes now follow the interface language, with local fallback quotes when the network is unavailable.
@@ -118,7 +118,7 @@ The theme follows the system by default and can be switched manually between aut
 | Option | Best for | How to start |
 |---|---|---|
 | **Web app** | Most users | Open [restcal.abohack.com/app.html](https://restcal.abohack.com/app.html); it can be installed as a PWA |
-| **Windows app** | Browser-free use | Download the portable app, installer, or ZIP from the [v1.5.1 release](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.5.1) |
+| **Windows app** | Browser-free use | Download the portable app, installer, or ZIP from the [v1.6.0 release](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0) |
 | **Local server** | Development or intranet use | Clone the repository, run `node server.js`, and open `http://localhost:8765/app.html` |
 
 You can also open `public/app.html` directly (`public/index.html` is the product page). The application works offline under `file://`, but browsers do not register Service Workers or allow PWA installation in that mode. Use HTTP(S) when you need PWA features.
@@ -135,14 +135,14 @@ The application shell and bundled holiday, lunar-calendar, and solar-term data f
 
 ## 💻 Windows desktop app
 
-Latest offline release: [RestCal v1.5.1](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.5.1)
+Latest offline release: [RestCal v1.6.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)
 
 | Download | Purpose |
 |---|---|
-| [`RestCal-1.5.1-portable.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.5.1/RestCal-1.5.1-portable.exe) | Portable executable; no installation required |
-| [`RestCal-1.5.1-setup.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.5.1/RestCal-1.5.1-setup.exe) | Windows installer with a selectable installation directory |
-| [`RestCal-1.5.1-win.zip`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.5.1/RestCal-1.5.1-win.zip) | Extract and run `休历.exe` |
-| [`SHA256SUMS-1.5.1.txt`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.5.1/SHA256SUMS-1.5.1.txt) | File-integrity checksums |
+| [`休历-1.6.0-portable.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/%E4%BC%91%E5%8E%86-1.6.0-portable.exe) | Portable executable; no installation required |
+| [`休历-1.6.0-setup.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/%E4%BC%91%E5%8E%86-1.6.0-setup.exe) | Windows installer with a selectable installation directory |
+| [`休历-1.6.0-win.zip`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/%E4%BC%91%E5%8E%86-1.6.0-win.zip) | Extract and run `休历.exe` |
+| [`SHA256SUMS-1.6.0.txt`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/SHA256SUMS-1.6.0.txt) | File-integrity checksums |
 
 All three packages include the application and Chinese calendar data for 2004–2026. The current builds are not code-signed, so Windows SmartScreen may display a warning on first launch.
 

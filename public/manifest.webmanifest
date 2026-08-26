@@ -1,7 +1,7 @@
 {
     "name": "休历 - 请假、出勤与购票提醒",
     "short_name": "休历",
-    "description": "管理请假、出勤、工资扣除和节假日火车票购票提醒的本地日历工具。",
+    "description": "管理请假、加班、出勤、工资扣除和节假日提醒，支持 ICS 导出与离线使用的本地日历工具。",
     "lang": "zh-CN",
     "start_url": "app.html",
     "scope": "./",

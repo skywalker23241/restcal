@@ -9,12 +9,12 @@
 **请假、出勤、工资核算、购票提醒 —— 一页搞定的中国职场日历**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-![Release](https://img.shields.io/badge/release-v1.5.1-b4382a)
+![Release](https://img.shields.io/badge/release-v1.6.0-b4382a)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-5A0FC8)
 ![Zero Build](https://img.shields.io/badge/build-zero%20dependency-orange)
 ![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Windows-blue)
 
-**[🌐 立即使用](https://restcal.abohack.com/app.html)** · [产品主页](https://restcal.abohack.com) · [Telegram 频道](https://t.me/restcalabohack) · **[下载 v1.5.1 离线版](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.5.1)** · [问题反馈](https://github.com/skywalker23241/restcal-abohack/issues)
+**[🌐 立即使用](https://restcal.abohack.com/app.html)** · [产品主页](https://restcal.abohack.com) · [Telegram 频道](https://t.me/restcalabohack) · **[下载 v1.6.0 离线版](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)** · [问题反馈](https://github.com/skywalker23241/restcal-abohack/issues)
 
 <img src="public/assets/images/screenshots/overview-light.png" alt="休历天视图：当日日历卡片、假期额度、出勤和预计实发概览" width="100%">
 
@@ -30,7 +30,7 @@
 
 应用界面支持中文与英文一键切换；语言、主题以及所有业务设置都可以随 CSV 或 WebDAV 完整备份和恢复。
 
-## 🆕 v1.5.1 更新
+## 🆕 v1.6.0 更新
 
 - 新增统一主题样式的日期选择器，并优化年月选择、日历卡片和周视图信息层级。
 - 每日一言按界面语言切换中文/英文来源，网络不可用时继续使用本地名句。
@@ -118,7 +118,7 @@
 | 方式 | 适合场景 | 上手方法 |
 |---|---|---|
 | **在线版** | 大多数用户 | 直接打开 [restcal.abohack.com/app.html](https://restcal.abohack.com/app.html)，可安装为 PWA |
-| **桌面版** | Windows 免浏览器使用 | 从 [v1.5.1 Release](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.5.1) 下载便携版、安装版或 ZIP |
+| **桌面版** | Windows 免浏览器使用 | 从 [v1.6.0 Release](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0) 下载便携版、安装版或 ZIP |
 | **本地运行** | 开发或内网使用 | 克隆仓库后 `node server.js`，访问 `http://localhost:8765/app.html` |
 
 也可以直接双击打开 `public/app.html` 使用（`public/index.html` 是介绍页，应用本体在 `public/app.html`）。`file://` 模式本身可以离线运行，但浏览器不会注册 Service Worker，也不能将其安装为 PWA；需要 PWA 能力时请通过 HTTP(S) 打开。
@@ -135,14 +135,14 @@
 
 ## 💻 桌面版（Windows）
 
-最新离线版：[RestCal v1.5.1](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.5.1)
+最新离线版：[RestCal v1.6.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)
 
 | 下载 | 用途 |
 |---|---|
-| [`RestCal-1.5.1-portable.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.5.1/RestCal-1.5.1-portable.exe) | 免安装，下载后直接运行 |
-| [`RestCal-1.5.1-setup.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.5.1/RestCal-1.5.1-setup.exe) | Windows 安装程序，可选择安装目录 |
-| [`RestCal-1.5.1-win.zip`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.5.1/RestCal-1.5.1-win.zip) | 解压后运行 `休历.exe` |
-| [`SHA256SUMS-1.5.1.txt`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.5.1/SHA256SUMS-1.5.1.txt) | 下载文件完整性校验值 |
+| [`休历-1.6.0-portable.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/%E4%BC%91%E5%8E%86-1.6.0-portable.exe) | 免安装，下载后直接运行 |
+| [`休历-1.6.0-setup.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/%E4%BC%91%E5%8E%86-1.6.0-setup.exe) | Windows 安装程序，可选择安装目录 |
+| [`休历-1.6.0-win.zip`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/%E4%BC%91%E5%8E%86-1.6.0-win.zip) | 解压后运行 `休历.exe` |
+| [`SHA256SUMS-1.6.0.txt`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/SHA256SUMS-1.6.0.txt) | 下载文件完整性校验值 |
 
 三个程序包均包含应用和 2004–2026 年中国日历数据，无网络时也能使用。当前构建尚未进行代码签名，Windows SmartScreen 可能在首次运行时显示提醒。
 
