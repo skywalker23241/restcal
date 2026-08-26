@@ -170,6 +170,7 @@
                 <h1>休历</h1>
             </div>
             <nav class="app-nav" aria-label="主导航">
+                <span class="app-nav-indicator" aria-hidden="true"></span>
                 <button class="app-nav-btn" data-nav="calendar" type="button" aria-current="page"><svg class="icon"><use href="#i-nav-calendar-fill" /></svg><span>日历</span></button>
                 <button class="app-nav-btn" data-nav="stats" type="button"><svg class="icon"><use href="#i-nav-stats" /></svg><span>统计</span></button>
                 <button class="app-nav-btn" data-nav="tools" type="button"><svg class="icon"><use href="#i-nav-tools" /></svg><span>工具</span></button>
@@ -418,6 +419,7 @@
                         <select id="searchStatus">
                             <option value="all">全部类型</option>
                             <option value="work">出勤</option>
+                            <option value="overtime">加班</option>
                             <option value="leave">全部请假</option>
                             <option value="personal">事假</option>
                             <option value="sick">病假</option>
@@ -642,6 +644,16 @@
                                 <span class="settings-card-meta">RFC 5545</span>
                             </div>
                             <p class="notice">将请假、出勤、节假日调休和抢票提醒导出为标准日历文件，支持导入 Apple 日历、Google 日历、飞书与企微。</p>
+                            <div class="ics-options" aria-label="日历导出内容">
+                                <label><input type="checkbox" data-ics-category="leave" checked> 请假</label>
+                                <label><input type="checkbox" data-ics-category="overtime" checked> 加班</label>
+                                <label><input type="checkbox" data-ics-category="work"> 普通出勤</label>
+                                <label><input type="checkbox" data-ics-category="notes"> 仅备注</label>
+                                <label><input type="checkbox" data-ics-category="holidays" checked> 法定节假日</label>
+                                <label><input type="checkbox" data-ics-category="makeups" checked> 调休补班</label>
+                                <label><input type="checkbox" data-ics-category="tickets" checked> 抢票提醒</label>
+                                <label class="ics-time" for="icsTicketTime">抢票提醒时间 <select id="icsTicketTime" aria-label="抢票提醒时间"></select></label>
+                            </div>
                             <div class="csv-actions">
                                 <button class="btn" id="exportIcsCurrentYear" type="button">导出当前年 (.ics)</button>
                                 <button class="btn" id="exportIcsAll" type="button">导出全部记录 (.ics)</button>
@@ -656,34 +668,9 @@
                             <div class="csv-actions">
                                 <button class="btn primary" id="webdavUpload" type="button">立即备份</button>
                                 <button class="btn" id="webdavDownload" type="button">恢复数据</button>
-                                <button class="btn" id="webdavConfigure" type="button" aria-expanded="false" aria-controls="webdavConfigArea">配置 WebDAV</button>
+                                <button class="btn" id="webdavConfigure" type="button" aria-haspopup="dialog" aria-controls="webdavConfigModal">配置 WebDAV</button>
                             </div>
                             <p class="notice" id="webdavStatus" aria-live="polite"></p>
-                            <div class="webdav-config" id="webdavConfigArea" hidden>
-                                <div class="settings-grid">
-                                    <div class="field wide-field">
-                                        <label for="webdavUrl">服务器地址</label>
-                                        <input id="webdavUrl" type="url" autocomplete="off" spellcheck="false"
-                                            placeholder="https://dav.jianguoyun.com/dav/xiuli/">
-                                    </div>
-                                    <div class="field">
-                                        <label for="webdavUsername">用户名</label>
-                                        <input id="webdavUsername" autocomplete="off" spellcheck="false" placeholder="账号 / 邮箱">
-                                    </div>
-                                    <div class="field">
-                                        <label for="webdavPassword">密码</label>
-                                        <input id="webdavPassword" type="password" autocomplete="off" placeholder="建议使用应用专用密码">
-                                    </div>
-                                </div>
-                                <div class="csv-actions">
-                                    <button class="btn" id="webdavTest" type="button">测试连接</button>
-                                </div>
-                                <details class="settings-help">
-                                    <summary>连接帮助</summary>
-                                    <p class="notice">建议地址末尾带一层子目录（如 /dav/xiuli/），首次备份会自动创建。坚果云等服务请使用「应用专用密码」，不要使用登录密码。</p>
-                                    <p class="notice">恢复采用「合并」策略，不会删除本机已有记录。桌面版、本地服务及 Netlify 在线版均已绕过浏览器跨域限制。</p>
-                                </details>
-                            </div>
                         </div>
                     </section>
                     <section class="settings-panel" data-settings-panel="appearance" hidden>
@@ -746,6 +733,46 @@
                 <span class="settings-foot-note">更改会自动保存在本机浏览器</span>
                 <button class="btn primary icon-only" id="settingsDone" type="button" title="完成" aria-label="完成"><svg class="icon" aria-hidden="true"><use href="#i-action-done" /></svg></button>
             </footer>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="webdavConfigModal" role="dialog" aria-modal="true" aria-labelledby="webdavConfigTitle">
+        <div class="modal webdav-config-modal">
+            <div class="modal-head">
+                <div>
+                    <h2 id="webdavConfigTitle">配置 WebDAV</h2>
+                    <div class="subtitle">连接坚果云、Nextcloud、群晖等 WebDAV 服务。</div>
+                </div>
+                <button class="btn ghost icon-only" id="closeWebdavConfig" type="button" title="关闭" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#i-action-close" /></svg></button>
+            </div>
+            <div class="modal-body webdav-config" id="webdavConfigArea">
+                <div class="settings-grid">
+                    <div class="field wide-field">
+                        <label for="webdavUrl">服务器地址</label>
+                        <input id="webdavUrl" type="url" autocomplete="off" spellcheck="false"
+                            placeholder="https://dav.jianguoyun.com/dav/xiuli/">
+                    </div>
+                    <div class="field">
+                        <label for="webdavUsername">用户名</label>
+                        <input id="webdavUsername" autocomplete="off" spellcheck="false" placeholder="账号 / 邮箱">
+                    </div>
+                    <div class="field">
+                        <label for="webdavPassword">密码</label>
+                        <input id="webdavPassword" type="password" autocomplete="off" placeholder="建议使用应用专用密码">
+                    </div>
+                </div>
+                <p class="notice" id="webdavConfigStatus" aria-live="polite"></p>
+                <details class="settings-help">
+                    <summary>连接帮助</summary>
+                    <p class="notice">建议地址末尾带一层子目录（如 /dav/xiuli/），首次备份会自动创建。坚果云等服务请使用「应用专用密码」，不要使用登录密码。</p>
+                    <p class="notice">恢复采用「合并」策略，不会删除本机已有记录。桌面版、本地服务及 Netlify 在线版均已绕过浏览器跨域限制。</p>
+                </details>
+            </div>
+            <div class="modal-foot">
+                <button class="btn" id="webdavTest" type="button">测试连接</button>
+                <span class="foot-spacer" aria-hidden="true"></span>
+                <button class="btn primary" id="webdavConfigDone" type="button">完成</button>
+            </div>
         </div>
     </div>
 
@@ -865,12 +892,8 @@
                     <div class="range-grid">
                         <div class="field">
                             <label for="modalOvertimeHours">加班工时</label>
-                            <select id="modalOvertimeHours">
-                                <option value="4">半天 (4 小时)</option>
-                                <option value="8" selected>全天 (8 小时)</option>
-                                <option value="12">1.5 天 (12 小时)</option>
-                                <option value="16">2.0 天 (16 小时)</option>
-                            </select>
+                            <input id="modalOvertimeHours" type="number" min="0.5" max="24" step="0.5" value="2"
+                                inputmode="decimal" placeholder="例如 2.5">
                         </div>
                         <div class="field">
                             <label for="modalOvertimeRate">调休换算倍率</label>
@@ -880,7 +903,20 @@
                                 <option value="3">3.0x (三倍调休)</option>
                             </select>
                         </div>
+                        <div class="field">
+                            <label for="modalOvertimeScope">批量应用到</label>
+                            <select id="modalOvertimeScope">
+                                <option value="workdays">仅工作日</option>
+                                <option value="rest-days">仅休息日</option>
+                                <option value="all">全部日期</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="modalOvertimeReason">加班事由 <em>选填</em></label>
+                            <input id="modalOvertimeReason" placeholder="例如：项目上线">
+                        </div>
                     </div>
+                    <p class="notice">加班会作为附加记录保存，不会覆盖当天的出勤或请假状态。</p>
                 </div>
                 <div class="field conditional-reason" id="modalReasonField" hidden>
                     <label for="modalReason">理由 <em>选填</em></label>
@@ -956,7 +992,8 @@
             localYearJson: year => `assets/vendor/chinese-days/years/${year}.json`,
             remoteYearJson: year => `https://cdn.jsdelivr.net/npm/chinese-days/dist/years/${year}.json`
         };
-        const CSV_HEADERS = ["日期", "状态", "请假类型", "请假理由", "是否节假日", "是否周末", "备注"];
+        const CSV_REQUIRED_HEADERS = ["日期", "状态", "请假类型", "请假理由", "是否节假日", "是否周末", "备注"];
+        const CSV_HEADERS = ["日期", "状态", "请假类型", "请假理由", "加班工时", "调休倍率", "加班事由", "是否节假日", "是否周末", "备注", "更新时间"];
         const CSV_USER_DATA_HEADER = "用户设置(JSON)";
         const STATUS_LABELS = {
             work: "出勤",
@@ -1027,6 +1064,8 @@
         let activeDate = null;
         let selectedDate = null;
         let pendingStatus = null;
+        let pendingOvertime = false;
+        let overtimeTouched = false;
         let renderVersion = 0;
         let settingsRenderTimer = 0;
         let statsPeriodMode = "month";
@@ -1140,7 +1179,11 @@
             webdavBadge: document.getElementById("webdavBadge"),
             webdavMeta: document.getElementById("webdavMeta"),
             webdavConfigure: document.getElementById("webdavConfigure"),
+            webdavConfigModal: document.getElementById("webdavConfigModal"),
             webdavConfigArea: document.getElementById("webdavConfigArea"),
+            webdavConfigStatus: document.getElementById("webdavConfigStatus"),
+            closeWebdavConfig: document.getElementById("closeWebdavConfig"),
+            webdavConfigDone: document.getElementById("webdavConfigDone"),
             ticketToolToggle: document.getElementById("ticketToolToggle"),
             ticketToolHint: document.getElementById("ticketToolHint"),
             ticketToolAction: document.getElementById("ticketToolAction"),
@@ -1216,6 +1259,8 @@
             modalOvertimeField: document.getElementById("modalOvertimeField"),
             modalOvertimeHours: document.getElementById("modalOvertimeHours"),
             modalOvertimeRate: document.getElementById("modalOvertimeRate"),
+            modalOvertimeScope: document.getElementById("modalOvertimeScope"),
+            modalOvertimeReason: document.getElementById("modalOvertimeReason"),
             modalNote: document.getElementById("modalNote"),
             modalRangeNotice: document.getElementById("modalRangeNotice"),
             modalGenerateDoc: document.getElementById("modalGenerateDoc"),
@@ -1238,8 +1283,10 @@
             initEnhancedSelects();
             initNavigation();
             initCalendarSwipe();
+            initSheetDragGestures();
             initProductTour();
             bindEvents();
+            initSegmentedIndicators();
             fillSettingsInputs();
             renderRestDaysPicker();
             els.webdavUrl.value = webdavConfig.url || "";
@@ -1387,6 +1434,18 @@
                 opt.textContent = `${year} 年`;
                 els.salaryReceiptYear.appendChild(opt);
             }
+
+            const ticketTime = document.getElementById("icsTicketTime");
+            for (let hour = 0; hour < 24; hour++) {
+                for (const minute of [0, 30]) {
+                    const value = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+                    const opt = document.createElement("option");
+                    opt.value = value;
+                    opt.textContent = value;
+                    opt.selected = value === "09:00";
+                    ticketTime?.appendChild(opt);
+                }
+            }
         }
 
         function initEnhancedSelects() {
@@ -1394,9 +1453,10 @@
             [els.yearSelect, els.monthSelect].forEach(select => enhanceSelect(select));
             enhanceSelect(els.salaryReceiptYear, "year");
             enhanceSelect(els.salaryReceiptMonth, "month");
-            // 弹窗与设置里的原生下拉弹层无法主题化，统一替换为自定义 selectbox（field 变体铺满字段宽度）
-            ["searchStatus", "scheduleTypeInput", "leaveTypeForDoc"]
-                .forEach(id => enhanceSelect(document.getElementById(id), "field"));
+            // 所有业务下拉框统一替换为主题化 selectbox，避免任何平台原生菜单混入界面。
+            document.querySelectorAll("select").forEach(select => {
+                if (!enhancedSelects.has(select)) enhanceSelect(select, "field");
+            });
             // 原生日期输入的弹出面板同样无法主题化，替换为自定义日期选择器
             ["searchFrom", "searchTo", "hireDateInput", "leaveStart", "leaveEnd", "modalStartDate", "modalEndDate"]
                 .forEach(id => enhanceDateInput(document.getElementById(id)));
@@ -1421,8 +1481,13 @@
                     closeAllDateMenus();
                 }
             });
-            window.addEventListener("resize", repositionOpenDateMenus);
-            document.addEventListener("scroll", repositionOpenDateMenus, true);
+            window.addEventListener("resize", repositionOpenPickers);
+            document.addEventListener("scroll", repositionOpenPickers, true);
+        }
+
+        function repositionOpenPickers() {
+            repositionOpenDateMenus();
+            repositionOpenSelectMenus();
         }
 
         // 旧版设置分组名 → 新分类
@@ -1447,6 +1512,7 @@
             });
             syncCalendarModeUI();
             switchView("calendar");
+            window.addEventListener("resize", () => syncAppNavIndicator(currentView, false));
         }
 
         function setCalendarMode(mode) {
@@ -1480,6 +1546,7 @@
 
         function switchView(name) {
             if (!["calendar", "stats", "tools"].includes(name)) return;
+            const previousView = currentView;
             currentView = name;
             document.body.dataset.view = name;
             document.querySelectorAll("[data-view-panel]").forEach(panel => {
@@ -1493,7 +1560,82 @@
                 if (active) button.setAttribute("aria-current", "page");
                 else button.removeAttribute("aria-current");
             });
+            syncAppNavIndicator(name, previousView !== name);
             window.scrollTo({top: 0, behavior: "instant"});
+        }
+
+        function syncAppNavIndicator(name, animate = true) {
+            const nav = document.querySelector(".app-nav");
+            const indicator = nav?.querySelector(".app-nav-indicator");
+            const active = nav?.querySelector(`.app-nav-btn[data-nav="${name}"]`);
+            if (!nav || !indicator || !active) return;
+            const update = () => {
+                indicator.classList.toggle("no-transition", !animate);
+                indicator.style.width = `${active.offsetWidth}px`;
+                indicator.style.transform = `translateX(${active.offsetLeft - 3}px)`;
+                if (!animate) requestAnimationFrame(() => indicator.classList.remove("no-transition"));
+            };
+            if (nav.offsetWidth) update();
+            else requestAnimationFrame(update);
+        }
+
+        function initSegmentedIndicators() {
+            const groups = [...document.querySelectorAll(".segmented")];
+            groups.forEach(group => {
+                if (!group.querySelector(":scope > .segmented-indicator")) {
+                    const indicator = document.createElement("span");
+                    indicator.className = "segmented-indicator";
+                    indicator.setAttribute("aria-hidden", "true");
+                    group.prepend(indicator);
+                }
+                syncSegmentedIndicator(group, false);
+            });
+
+            const observer = new MutationObserver(mutations => {
+                const changedGroups = new Set();
+                mutations.forEach(mutation => {
+                    if (mutation.target.matches?.(".seg-btn")) {
+                        const group = mutation.target.closest(".segmented");
+                        if (group) changedGroups.add(group);
+                    }
+                });
+                changedGroups.forEach(group => syncSegmentedIndicator(group));
+            });
+            groups.forEach(group => observer.observe(group, {
+                subtree: true,
+                attributes: true,
+                attributeFilter: ["class", "aria-pressed"]
+            }));
+
+            const resizeObserver = new ResizeObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.target.offsetWidth) syncSegmentedIndicator(entry.target, false);
+                });
+            });
+            groups.forEach(group => resizeObserver.observe(group));
+
+            window.addEventListener("resize", () => syncAllSegmentedIndicators(false));
+            window.addEventListener("restcal:languagechange", () => {
+                requestAnimationFrame(() => syncAllSegmentedIndicators(false));
+            });
+        }
+
+        function syncAllSegmentedIndicators(animate = true) {
+            document.querySelectorAll(".segmented").forEach(group => syncSegmentedIndicator(group, animate));
+        }
+
+        function syncSegmentedIndicator(group, animate = true) {
+            const indicator = group?.querySelector(":scope > .segmented-indicator");
+            const active = group?.querySelector(":scope > .seg-btn.active");
+            if (!indicator || !active) return;
+            const update = () => {
+                indicator.classList.toggle("no-transition", !animate);
+                indicator.style.width = `${active.offsetWidth}px`;
+                indicator.style.transform = `translateX(${active.offsetLeft}px)`;
+                if (!animate) requestAnimationFrame(() => indicator.classList.remove("no-transition"));
+            };
+            if (group.offsetWidth) update();
+            else requestAnimationFrame(update);
         }
 
         function setSettingsPanel(name) {
@@ -1685,6 +1827,11 @@
             closeAllDateMenus();
             view.box.classList.add("open");
             view.trigger.setAttribute("aria-expanded", "true");
+            view.menu.classList.add("is-portal");
+            view.menu.style.visibility = "hidden";
+            document.body.appendChild(view.menu);
+            positionSelectMenu(select);
+            view.menu.style.visibility = "";
             if (focusSelected) {
                 (view.menu.querySelector(".select-option.is-selected") || view.menu.querySelector(".select-option"))?.focus();
             }
@@ -1695,7 +1842,120 @@
             if (!view) return;
             view.box.classList.remove("open");
             view.trigger.setAttribute("aria-expanded", "false");
+            if (view.menu.classList.contains("is-portal")) {
+                view.menu.classList.remove("is-portal");
+                view.menu.removeAttribute("style");
+                view.box.appendChild(view.menu);
+            }
             if (returnFocus) view.trigger.focus();
+        }
+
+        function initSheetDragGestures() {
+            document.querySelectorAll(".modal-backdrop").forEach(backdrop => {
+                const drawer = backdrop.firstElementChild;
+                if (!drawer || drawer.querySelector(":scope > .sheet-drag-handle")) return;
+                const handle = document.createElement("div");
+                handle.className = "sheet-drag-handle";
+                handle.setAttribute("aria-hidden", "true");
+                drawer.prepend(handle);
+
+                let startY = 0;
+                let currentY = 0;
+                let startedAt = 0;
+                let pointerId = null;
+
+                const reset = () => {
+                    drawer.classList.remove("sheet-dragging");
+                    drawer.style.removeProperty("transform");
+                    drawer.style.removeProperty("transition");
+                    handle.style.removeProperty("cursor");
+                    pointerId = null;
+                };
+
+                handle.addEventListener("pointerdown", event => {
+                    if (!isNarrowScreen() || !backdrop.classList.contains("open") || event.button > 0) return;
+                    pointerId = event.pointerId;
+                    startY = event.clientY;
+                    currentY = 0;
+                    startedAt = performance.now();
+                    drawer.getAnimations().forEach(animation => animation.finish());
+                    handle.setPointerCapture(pointerId);
+                    drawer.classList.add("sheet-dragging");
+                    handle.style.cursor = "grabbing";
+                });
+
+                window.addEventListener("pointermove", event => {
+                    if (event.pointerId !== pointerId) return;
+                    currentY = Math.max(0, event.clientY - startY);
+                    drawer.style.transform = `translateY(${currentY}px)`;
+                });
+
+                const finish = (event, cancelled = false) => {
+                    if (event.pointerId !== pointerId) return;
+                    if (handle.hasPointerCapture(pointerId)) handle.releasePointerCapture(pointerId);
+                    const duration = Math.max(1, performance.now() - startedAt);
+                    const velocity = currentY / duration;
+                    const threshold = Math.min(140, Math.max(80, drawer.getBoundingClientRect().height * 0.2));
+                    const shouldClose = !cancelled && (currentY >= threshold || (currentY >= 36 && velocity >= 0.65));
+                    drawer.classList.remove("sheet-dragging");
+                    drawer.style.transition = "transform 0.22s cubic-bezier(.22, 1, .36, 1)";
+                    if (shouldClose) {
+                        drawer.style.transform = `translateY(${window.innerHeight}px)`;
+                        window.setTimeout(() => {
+                            dismissBackdropFromDrag(backdrop);
+                            window.setTimeout(reset, 220);
+                        }, 160);
+                    } else {
+                        drawer.style.transform = "translateY(0)";
+                        window.setTimeout(reset, 230);
+                    }
+                };
+
+                window.addEventListener("pointerup", event => finish(event));
+                window.addEventListener("pointercancel", event => finish(event, true));
+            });
+        }
+
+        function dismissBackdropFromDrag(backdrop) {
+            const handlers = {
+                searchModal: closeSearch,
+                guideModal: dismissProductTourIntro,
+                settingsModal: closeSettings,
+                webdavConfigModal: closeWebdavConfigModal,
+                receiptModal: closeReceiptModal,
+                leaveGeneratorModal: closeLeaveGenerator,
+                dayModal: closeModal,
+                confirmModal: () => resolveConfirm(false)
+            };
+            (handlers[backdrop.id] || (() => closeBackdrop(backdrop)))();
+        }
+
+        function positionSelectMenu(select) {
+            const view = enhancedSelects.get(select);
+            if (!view?.box.classList.contains("open") || !view.menu.classList.contains("is-portal")) return;
+            const margin = 10;
+            const gap = 7;
+            const triggerRect = view.trigger.getBoundingClientRect();
+            const preferredWidth = Math.max(triggerRect.width, Math.min(view.menu.scrollWidth, 360));
+            const width = Math.min(preferredWidth, window.innerWidth - margin * 2);
+            view.menu.style.width = `${width}px`;
+            const menuRect = view.menu.getBoundingClientRect();
+            const left = Math.min(Math.max(margin, triggerRect.left), Math.max(margin, window.innerWidth - width - margin));
+            const spaceBelow = window.innerHeight - triggerRect.bottom - gap - margin;
+            const spaceAbove = triggerRect.top - gap - margin;
+            const placeAbove = menuRect.height > spaceBelow && spaceAbove > spaceBelow;
+            const top = placeAbove
+                ? Math.max(margin, triggerRect.top - menuRect.height - gap)
+                : Math.min(triggerRect.bottom + gap, window.innerHeight - menuRect.height - margin);
+            view.menu.style.left = `${left}px`;
+            view.menu.style.top = `${Math.max(margin, top)}px`;
+            view.menu.dataset.placement = placeAbove ? "top" : "bottom";
+        }
+
+        function repositionOpenSelectMenus() {
+            enhancedSelects.forEach((view, select) => {
+                if (view.box.classList.contains("open")) positionSelectMenu(select);
+            });
         }
 
         function closeAllEnhancedSelects(exceptSelect = null) {
@@ -2153,7 +2413,10 @@
                 const button = event.target instanceof Element ? event.target.closest("[data-open-settings-dynamic]") : null;
                 if (button) openSettings(button.dataset.openSettingsDynamic);
             });
-            els.icsToolBtn?.addEventListener("click", () => exportIcsFile(currentYear));
+            els.icsToolBtn?.addEventListener("click", () => {
+                openSettings("data");
+                window.setTimeout(() => document.getElementById("icsCard")?.scrollIntoView({behavior: "smooth", block: "center"}), 220);
+            });
             els.exportIcsCurrentYear?.addEventListener("click", () => exportIcsFile(currentYear));
             els.exportIcsAll?.addEventListener("click", () => exportIcsFile(null));
             [els.taxCalculationMode, els.annualExpireRule, els.compExpireRule].filter(Boolean).forEach(sel => {
@@ -2203,11 +2466,11 @@
             els.webdavTest.addEventListener("click", runWebdavTest);
             els.webdavUpload.addEventListener("click", runWebdavUpload);
             els.webdavDownload.addEventListener("click", runWebdavDownload);
-            els.webdavConfigure.addEventListener("click", () => {
-                const open = els.webdavConfigArea.hidden;
-                els.webdavConfigArea.hidden = !open;
-                els.webdavConfigure.setAttribute("aria-expanded", String(open));
-                if (open) els.webdavUrl.focus({preventScroll: true});
+            els.webdavConfigure.addEventListener("click", openWebdavConfigModal);
+            els.closeWebdavConfig.addEventListener("click", closeWebdavConfigModal);
+            els.webdavConfigDone.addEventListener("click", closeWebdavConfigModal);
+            els.webdavConfigModal.addEventListener("click", event => {
+                if (event.target === els.webdavConfigModal) closeWebdavConfigModal();
             });
             els.generateDoc.addEventListener("click", generateLeaveDoc);
             [els.leaveTypeForDoc, els.leaveStart, els.leaveEnd, els.leaveReasonDoc, els.leaveApplicantDoc, els.leaveRecipientDoc, els.leaveHandoffDoc].forEach(input => {
@@ -2284,6 +2547,7 @@
                 if (productTour?.active) return skipProductTour();
                 if (els.confirmModal.classList.contains("open")) return resolveConfirm(false);
                 if (els.searchModal.classList.contains("open")) return closeSearch();
+                if (els.webdavConfigModal.classList.contains("open")) return closeWebdavConfigModal();
                 if (els.dayModal.classList.contains("open")) return closeModal();
                 if (els.receiptModal.classList.contains("open")) return closeReceiptModal();
                 if (els.leaveGeneratorModal.classList.contains("open")) return closeLeaveGenerator();
@@ -2397,9 +2661,10 @@
         function daySubInfo(date, info, record) {
             if (record?.status) {
                 return record.status === "work"
-                    ? {text: "✓", kind: "work"}
+                    ? {text: record.overtime ? `加 ${record.overtime.hours}h` : "✓", kind: record.overtime ? "overtime" : "work"}
                     : {text: STATUS_LABELS[record.status] || record.status, kind: record.status};
             }
+            if (record?.overtime) return {text: `加 ${record.overtime.hours}h`, kind: "overtime"};
             if (info.makeupName) return {text: "班", kind: "makeup"};
             const solarTerm = getSolarTermText(date);
             if (info.isHoliday) {
@@ -2472,6 +2737,7 @@
                 info.isWeekend ? "is-weekend" : "",
                 iso === selectedDate ? "selected" : "",
                 record?.status ? `status-${record.status}` : "",
+                record?.overtime ? "has-overtime" : "",
                 record?.note ? "has-note" : "",
                 "clickable"
             ].filter(Boolean).join(" ");
@@ -2527,6 +2793,7 @@
                     info.isHoliday ? "is-holiday" : "",
                     iso === selectedDate ? "selected" : "",
                     record?.status ? `status-${record.status}` : "",
+                    record?.overtime ? "has-overtime" : "",
                     record?.note ? "has-note" : "",
                     "clickable"
                 ].filter(Boolean).join(" ");
@@ -2534,10 +2801,10 @@
                 if (record?.note) row.dataset.note = record.note;
                 row.setAttribute("aria-label", dayAriaLabel(date, info, record));
 
-                const detail = [record?.reason, record?.note].filter(Boolean).join(" · ");
+                const detail = [record?.reason, record?.overtime?.reason, record?.overtime ? `加班 ${record.overtime.hours} 小时` : "", record?.note].filter(Boolean).join(" · ");
                 const detailHtml = detail
                     ? escapeHtml(detail)
-                    : (!record?.status && !info.isHoliday && !info.isWeekend && !info.makeupName ? `<em>未标记</em>` : "");
+                    : (!record?.status && !record?.overtime && !info.isHoliday && !info.isWeekend && !info.makeupName ? `<em>未标记</em>` : "");
                 row.innerHTML = `
           <span class="week-lunar">${getLunarText(date)}</span>
           <strong class="solar">${date.getDate()}</strong>
@@ -2719,6 +2986,7 @@
 
             const statusTags = [];
             if (record?.status) statusTags.push(tag(STATUS_LABELS[record.status], `${record.status} primary-state`));
+            if (record?.overtime) statusTags.push(tag(`加班 ${record.overtime.hours} 小时`, "overtime"));
             if (info.makeupName) statusTags.push(tag("调休上班", "makeup primary-state"));
 
             const emptyText = info.isHoliday ? "假期 · 好好休息"
@@ -2734,7 +3002,8 @@
                 "clickable",
                 isToday ? "today" : "",
                 info.isHoliday || info.isWeekend ? "is-red" : "",
-                record?.status ? `status-${record.status}` : ""
+                record?.status ? `status-${record.status}` : "",
+                record?.overtime ? "has-overtime" : ""
             ].filter(Boolean).join(" ");
             card.dataset.date = iso;
             card.setAttribute("aria-label", dayAriaLabel(date, info, record));
@@ -2751,7 +3020,7 @@
             ${statusTags.length ? `<div class="tags">${statusTags.join("")}</div>` : ""}
             ${record?.reason ? `<div class="page-reason">${escapeHtml(record.reason)}</div>` : ""}
             ${record?.note ? `<div class="page-note"><svg class="icon" aria-hidden="true"><use href="#i-note" /></svg><span>${escapeHtml(record.note)}</span></div>` : ""}
-            ${!record?.status && emptyText ? `<div class="page-empty">${emptyText}</div>` : ""}
+            ${!record?.status && !record?.overtime && emptyText ? `<div class="page-empty">${emptyText}</div>` : ""}
           </div>
           <figure class="page-quote">
             <blockquote class="page-quote-text">${escapeHtml(quote.content)}</blockquote>
@@ -2782,6 +3051,7 @@
                     const info = getDayInfo(date);
                     const record = state.records[toISO(date)];
                     const cls = record?.status ? `st-${record.status}`
+                        : record?.overtime ? "st-overtime"
                         : info.isHoliday ? "st-holiday"
                             : info.makeupName ? "st-makeup"
                                 : info.isWeekend ? "st-weekend" : "";
@@ -2835,6 +3105,7 @@
             else if (info.isWeekend) labels.push("周末");
             else labels.push("工作日");
             if (record?.reason) labels.push(record.reason);
+            if (record?.overtime) labels.push(`加班 ${record.overtime.hours} 小时${record.overtime.reason ? `，${record.overtime.reason}` : ""}`);
             if (record?.note) labels.push(record.note);
             return labels.filter(Boolean).join("，");
         }
@@ -3001,7 +3272,7 @@
         function renderRecentRecords() {
             if (!els.recentRecords) return;
             const entries = Object.entries(state.records)
-                .filter(([, record]) => record?.status || record?.note)
+                .filter(([, record]) => record?.status || record?.overtime || record?.note)
                 .sort(([a], [b]) => b.localeCompare(a))
                 .slice(0, 6);
             if (!entries.length) {
@@ -3009,12 +3280,12 @@
                 return;
             }
             els.recentRecords.innerHTML = entries.map(([iso, record]) => {
-                const meta = [record.reason, record.note].filter(Boolean).join(" · ");
-                const label = record.status ? STATUS_LABELS[record.status] || "" : "备注";
+                const meta = [record.reason, record.overtime?.reason, record.overtime ? `${record.overtime.hours} 小时` : "", record.note].filter(Boolean).join(" · ");
+                const label = record.status ? `${STATUS_LABELS[record.status] || ""}${record.overtime ? " + 加班" : ""}` : (record.overtime ? "加班" : "备注");
                 return `
         <button class="recent-row" type="button" data-record-date="${escapeHtml(iso)}">
           <span class="recent-date">${escapeHtml(iso)}</span>
-          <span class="tag ${record.status || ""}">${escapeHtml(label)}</span>
+          <span class="tag ${record.overtime && !record.status ? "overtime" : (record.status || "")}">${escapeHtml(label)}</span>
           <span class="recent-meta">${escapeHtml(meta || weekdayName(fromISO(iso)))}</span>
         </button>
       `;
@@ -3160,20 +3431,77 @@
         function renderQuotaSummary(yearStats) {
             const annualQuota = cleanNumber(els.annualQuotaInput.value);
             const baseCompQuota = cleanNumber(els.compQuotaInput.value);
-            const compTotal = baseCompQuota + (yearStats.overtimeCompEarned || 0);
+            const balances = calculateQuotaBalances(currentYear, annualQuota, baseCompQuota);
             els.quotaSummary.innerHTML = [
-                quotaLine("年假", yearStats.annualLeave, annualQuota),
-                quotaLine("调休", yearStats.compLeave, compTotal, false, yearStats.overtimeCompEarned || 0)
+                quotaLine("年假", balances.annual.used, balances.annual.total, false, balances.annual.carry),
+                quotaLine("调休", balances.comp.used, balances.comp.total, false, balances.comp.earned)
             ].join("");
             if (els.settingsQuotaStatus) {
                 els.settingsQuotaStatus.innerHTML = [
-                    quotaLine("年假", yearStats.annualLeave, annualQuota, true),
-                    quotaLine("调休", yearStats.compLeave, compTotal, true, yearStats.overtimeCompEarned || 0)
+                    quotaLine("年假", balances.annual.used, balances.annual.total, true, balances.annual.carry),
+                    quotaLine("调休", balances.comp.used, balances.comp.total, true, balances.comp.earned)
                 ].join("");
             }
         }
 
-        function quotaLine(label, used, quota, inSettings = false, overtimeCompEarned = 0) {
+        function calculateQuotaBalances(year, annualQuota, baseCompQuota) {
+            const reference = year === today.getFullYear() ? new Date(today) : new Date(year, 11, 31, 23, 59, 59);
+            const annualRule = state.quotaRules?.annualExpireRule || "next-03-31";
+            const compRule = state.quotaRules?.compExpireRule || "none";
+            const current = calculateStats(year);
+            const previous = calculateStats(year - 1);
+            const beforeExpiry = ruleCarriesIntoDate(annualRule, reference, year);
+            const annualCarry = beforeExpiry ? Math.max(0, annualQuota - previous.annualLeave) : 0;
+            const annualUsed = annualRule === "none"
+                ? countStatusThrough("annual", reference)
+                : current.annualLeave;
+            const annualTotal = annualRule === "none" ? annualQuota : annualQuota + annualCarry;
+
+            let compEarned;
+            let compUsed;
+            if (compRule === "none") {
+                compEarned = sumOvertimeThrough(reference);
+                compUsed = countStatusThrough("comp", reference);
+            } else {
+                const carry = ruleCarriesIntoDate(compRule, reference, year)
+                    ? Math.max(0, previous.overtimeCompEarned - previous.compLeave)
+                    : 0;
+                compEarned = current.overtimeCompEarned + carry;
+                compUsed = current.compLeave;
+            }
+
+            return {
+                annual: {used: roundQuota(annualUsed), total: roundQuota(annualTotal), carry: roundQuota(annualCarry)},
+                comp: {used: roundQuota(compUsed), total: roundQuota(baseCompQuota + compEarned), earned: roundQuota(compEarned)}
+            };
+        }
+
+        function ruleCarriesIntoDate(rule, reference, year) {
+            if (!rule.startsWith("next-")) return false;
+            const [, monthText, dayText] = rule.match(/^next-(\d{2})-(\d{2})$/) || [];
+            if (!monthText) return false;
+            return reference <= new Date(year, Number(monthText) - 1, Number(dayText), 23, 59, 59);
+        }
+
+        function countStatusThrough(status, reference) {
+            const end = toISO(reference);
+            return Object.entries(state.records).reduce((sum, [iso, record]) => sum + (iso <= end && record?.status === status ? 1 : 0), 0);
+        }
+
+        function sumOvertimeThrough(reference) {
+            const end = toISO(reference);
+            const dailyHours = Number(state.workSchedule?.dailyWorkHours) || 8;
+            return Object.entries(state.records).reduce((sum, [iso, record]) => {
+                if (iso > end || !record?.overtime) return sum;
+                return sum + ((Number(record.overtime.hours) || 0) / dailyHours) * (Number(record.overtime.rate) || 1);
+            }, 0);
+        }
+
+        function roundQuota(value) {
+            return Math.round((Number(value) || 0) * 100) / 100;
+        }
+
+        function quotaLine(label, used, quota, inSettings = false, extraEarned = 0) {
             if (quota <= 0) {
                 if (inSettings) {
                     return `
@@ -3193,7 +3521,8 @@
             }
             const remaining = Math.max(0, quota - used);
             const percent = quota > 0 ? Math.min(100, (used / quota) * 100) : 0;
-            const extraBadge = overtimeCompEarned > 0 ? ` <small style="color:var(--muted);font-weight:normal;">(含加班折算 +${overtimeCompEarned} 天)</small>` : "";
+            const extraLabel = label === "调休" ? "加班折算" : "上期结转";
+            const extraBadge = extraEarned > 0 ? ` <small style="color:var(--muted);font-weight:normal;">(含${extraLabel} +${extraEarned} 天)</small>` : "";
             return `
         <div class="quota-item">
           <div class="quota-text"><strong>${label}</strong>：已用 ${used} 天 / 额度 ${quota} 天${extraBadge} / 剩余 ${remaining} 天</div>
@@ -3254,13 +3583,15 @@
             const date = fromISO(iso);
             const info = getDayInfo(date);
             const record = state.records[iso] || {};
-            const editable = info.isWorkday;
+            const editable = isConfiguredWorkday(date, info);
             const weekendNoteOnly = info.isWeekend;
             const noteEditable = editable || weekendNoteOnly;
             dayModalBackdropPress = false;
             activeDate = iso;
             selectedDate = iso;
             pendingStatus = record.status || (editable ? "work" : "");
+            pendingOvertime = Boolean(record.overtime);
+            overtimeTouched = false;
             document.querySelectorAll(".day-card.selected").forEach(card => card.classList.remove("selected"));
             document.querySelector(`[data-date="${iso}"]`)?.classList.add("selected");
             els.modalTitle.textContent = `${date.getMonth() + 1}月${date.getDate()}日 ${weekdayName(date)}`;
@@ -3273,13 +3604,15 @@
             document.querySelectorAll("[data-action]").forEach(button => {
                 const isOvertime = button.dataset.action === "overtime";
                 button.disabled = !(editable || isOvertime);
-                button.classList.toggle("active", button.dataset.action === pendingStatus);
+                button.classList.toggle("active", isOvertime ? pendingOvertime : button.dataset.action === pendingStatus);
             });
-            if (els.modalOvertimeHours) els.modalOvertimeHours.value = String(record.overtimeHours || 8);
-            if (els.modalOvertimeRate) els.modalOvertimeRate.value = String(record.overtimeRate || 1);
+            if (els.modalOvertimeHours) els.modalOvertimeHours.value = String(record.overtime?.hours || 2);
+            if (els.modalOvertimeRate) els.modalOvertimeRate.value = String(record.overtime?.rate || 1);
+            if (els.modalOvertimeScope) els.modalOvertimeScope.value = editable ? "workdays" : "rest-days";
+            if (els.modalOvertimeReason) els.modalOvertimeReason.value = record.overtime?.reason || "";
             updateReasonFieldVisibility(pendingStatus);
-            els.modalSave.disabled = !noteEditable && pendingStatus !== "overtime";
-            els.modalClear.hidden = !record.status && !record.reason && !record.note;
+            els.modalSave.disabled = !noteEditable && !pendingOvertime;
+            els.modalClear.hidden = !record.status && !record.reason && !record.note && !record.overtime;
             els.modalAdvanced.open = weekendNoteOnly;
             if (els.modalRangeNotice) {
                 els.modalRangeNotice.textContent = weekendNoteOnly
@@ -3308,6 +3641,8 @@
             dayModalBackdropPress = false;
             activeDate = null;
             pendingStatus = null;
+            pendingOvertime = false;
+            overtimeTouched = false;
             closeBackdrop(els.dayModal);
         }
 
@@ -3473,15 +3808,27 @@
             renderWebdavCard();
             syncAppearanceControls();
             openBackdrop(els.settingsModal);
-            if (group === "webdav" && !isWebdavConfigured()) {
-                els.webdavConfigArea.hidden = false;
-                els.webdavConfigure.setAttribute("aria-expanded", "true");
-            }
+            if (group === "webdav" && !isWebdavConfigured()) window.setTimeout(openWebdavConfigModal, 220);
         }
 
         function closeSettings() {
             closeBackdrop(els.settingsModal);
             els.settingsPage?.classList.remove("subpage-open");
+        }
+
+        function openWebdavConfigModal() {
+            els.webdavUrl.value = webdavConfig.url || "";
+            els.webdavUsername.value = webdavConfig.username || "";
+            els.webdavPassword.value = webdavConfig.password || "";
+            els.webdavConfigStatus.textContent = els.webdavStatus.textContent || "填写连接信息后可先测试连接。";
+            openBackdrop(els.webdavConfigModal);
+            window.setTimeout(() => els.webdavUrl.focus({preventScroll: true}), 30);
+        }
+
+        function closeWebdavConfigModal() {
+            syncWebDavConfigFromInputs();
+            renderWebdavCard();
+            closeBackdrop(els.webdavConfigModal);
         }
 
         function firstVisible(selector) {
@@ -3828,10 +4175,13 @@
                     record?.status ? STATUS_LABELS[record.status] : "",
                     record?.leaveType,
                     record?.reason,
+                    record?.overtime ? "加班" : "",
+                    record?.overtime?.reason,
+                    record?.overtime?.hours,
                     record?.note
                 ].filter(Boolean).join(" "));
                 if (query && !text.includes(query)) continue;
-                if (!hasFilter && !record?.status && !record?.note && !info.holidayName && !info.makeupName && !isSameDate(date, today)) continue;
+                if (!hasFilter && !record?.status && !record?.overtime && !record?.note && !info.holidayName && !info.makeupName && !isSameDate(date, today)) continue;
 
                 results.push(buildSearchResult(iso, date, info, record));
                 if (results.length >= 80) break;
@@ -3862,6 +4212,7 @@
         function matchesSearchStatus(status, info, record) {
             if (status === "all") return true;
             if (status === "leave") return LEAVE_STATUSES.includes(record?.status);
+            if (status === "overtime") return Boolean(record?.overtime);
             if (status === "holiday") return info.isHoliday;
             if (status === "weekend") return info.isWeekend;
             return record?.status === status;
@@ -3869,12 +4220,13 @@
 
         function buildSearchResult(iso, date, info, record) {
             const label = record?.status
-                ? STATUS_LABELS[record.status]
+                ? `${STATUS_LABELS[record.status]}${record.overtime ? " + 加班" : ""}`
+                : record?.overtime ? "加班"
                 : (info.holidayName || (info.makeupName ? "调休上班" : info.isWeekend ? "周末" : "工作日"));
-            const meta = [weekdayName(date), getLunarText(date), info.holidayName, info.makeupName, record?.reason, record?.note]
+            const meta = [weekdayName(date), getLunarText(date), info.holidayName, info.makeupName, record?.reason, record?.overtime?.reason, record?.overtime ? `${record.overtime.hours} 小时` : "", record?.note]
                 .filter(Boolean)
                 .join(" · ");
-            const tone = record?.status || (info.isHoliday ? "holiday" : info.isWeekend ? "weekend" : "");
+            const tone = record?.status || (record?.overtime ? "overtime" : (info.isHoliday ? "holiday" : info.isWeekend ? "weekend" : ""));
             return {iso, label, meta, tone};
         }
 
@@ -3953,7 +4305,15 @@
             if (!activeDate) return;
             const date = fromISO(activeDate);
             const info = getDayInfo(date);
-            if (!isConfiguredWorkday(date, info) && status !== "overtime") {
+            if (status === "overtime") {
+                pendingOvertime = !pendingOvertime;
+                overtimeTouched = true;
+                document.querySelector('[data-action="overtime"]')?.classList.toggle("active", pendingOvertime);
+                updateReasonFieldVisibility(pendingStatus);
+                els.modalSave.disabled = false;
+                return;
+            }
+            if (!isConfiguredWorkday(date, info)) {
                 els.modalSubtitle.textContent = info.isWeekend
                     ? "周末只能添加备注或加班记录，不能标记请假/出勤状态。"
                     : "休息日仅展示详情，状态保存会跳过非工作日。";
@@ -3961,7 +4321,7 @@
             }
             pendingStatus = status;
             document.querySelectorAll("[data-action]").forEach(button => {
-                button.classList.toggle("active", button.dataset.action === status);
+                if (button.dataset.action !== "overtime") button.classList.toggle("active", button.dataset.action === status);
             });
             updateReasonFieldVisibility(status);
             updateModalDocButton();
@@ -3976,10 +4336,10 @@
 
         function updateReasonFieldVisibility(status) {
             if (els.modalReasonField) {
-                els.modalReasonField.hidden = !LEAVE_STATUSES.includes(status) && status !== "overtime";
+                els.modalReasonField.hidden = !LEAVE_STATUSES.includes(status);
             }
             if (els.modalOvertimeField) {
-                els.modalOvertimeField.hidden = status !== "overtime";
+                els.modalOvertimeField.hidden = !pendingOvertime;
             }
         }
 
@@ -4055,31 +4415,45 @@
             if (!activeDate) return;
             const activeInfo = getDayInfo(fromISO(activeDate));
             const weekendNoteOnly = activeInfo.isWeekend;
-            if ((!pendingStatus || pendingStatus === "clear") && !weekendNoteOnly) return;
+            if ((!pendingStatus || pendingStatus === "clear") && !weekendNoteOnly && !overtimeTouched) return;
             const start = els.modalStartDate.value || activeDate;
             const end = els.modalEndDate.value || start;
             if (!isValidISODate(start) || !isValidISODate(end) || start > end) {
                 els.modalSubtitle.textContent = "请选择有效的日期范围";
                 return;
             }
-            const reason = LEAVE_STATUSES.includes(pendingStatus) || pendingStatus === "overtime" ? els.modalReason.value.trim() : "";
+            const reason = LEAVE_STATUSES.includes(pendingStatus) ? els.modalReason.value.trim() : "";
             const note = els.modalNote.value.trim();
-            const dates = rangeDates(start, end).filter(iso => {
-                if (pendingStatus === "overtime") return true;
-                return weekendNoteOnly ? getDayInfo(fromISO(iso)).isWeekend : isConfiguredWorkday(fromISO(iso));
+            const allDates = rangeDates(start, end);
+            const statusDates = allDates.filter(iso => weekendNoteOnly
+                ? getDayInfo(fromISO(iso)).isWeekend
+                : isConfiguredWorkday(fromISO(iso)));
+            const overtimeScope = els.modalOvertimeScope?.value || "all";
+            const overtimeDates = allDates.filter(iso => {
+                const isWorkday = isConfiguredWorkday(fromISO(iso));
+                if (overtimeScope === "workdays") return isWorkday;
+                if (overtimeScope === "rest-days") return !isWorkday;
+                return true;
             });
-            if (!dates.length) {
+            if (!statusDates.length && !((pendingOvertime || overtimeTouched) && overtimeDates.length)) {
                 els.modalSubtitle.textContent = weekendNoteOnly
                     ? "所选范围没有周末日期。"
                     : "所选范围没有可标记的工作日。";
                 return;
             }
+            const overtimeHours = Number(els.modalOvertimeHours?.value);
+            const overtimeRate = Number(els.modalOvertimeRate?.value);
+            if (pendingOvertime && (!Number.isFinite(overtimeHours) || overtimeHours < 0.5 || overtimeHours > 24)) {
+                els.modalSubtitle.textContent = "加班工时应为 0.5–24 小时";
+                return;
+            }
             const updatedAt = new Date().toISOString();
-            if (weekendNoteOnly && pendingStatus !== "overtime") {
-                dates.forEach(iso => {
+            if (weekendNoteOnly) {
+                statusDates.forEach(iso => {
                     const existing = state.records[iso] || {};
                     if (note) {
                         state.records[iso] = {
+                            ...existing,
                             status: existing.status || "",
                             leaveType: existing.leaveType || "",
                             reason: existing.reason || "",
@@ -4087,34 +4461,45 @@
                             updatedAt
                         };
                     } else if (!existing.status && !existing.leaveType && !existing.reason) {
-                        delete state.records[iso];
+                        if (existing.overtime) state.records[iso] = {...existing, note: "", updatedAt};
+                        else delete state.records[iso];
                     } else {
                         state.records[iso] = {...existing, note: "", updatedAt};
                     }
                 });
-            } else if (pendingStatus === "overtime") {
-                const overtimeHours = Number(els.modalOvertimeHours?.value) || 8;
-                const overtimeRate = Number(els.modalOvertimeRate?.value) || 1;
-                dates.forEach(iso => {
-                    state.records[iso] = {
-                        status: "overtime",
-                        leaveType: "加班",
-                        reason,
-                        note,
-                        overtimeHours,
-                        overtimeRate,
-                        updatedAt
-                    };
-                });
             } else {
-                dates.forEach(iso => {
+                statusDates.forEach(iso => {
+                    const existing = state.records[iso] || {};
                     state.records[iso] = {
+                        ...existing,
                         status: pendingStatus,
                         leaveType: LEAVE_STATUSES.includes(pendingStatus) ? STATUS_LABELS[pendingStatus] : "",
                         reason,
                         note,
                         updatedAt
                     };
+                });
+            }
+
+            if (pendingOvertime) {
+                const overtimeReason = els.modalOvertimeReason?.value.trim() || "";
+                overtimeDates.forEach(iso => {
+                    const existing = state.records[iso] || {};
+                    state.records[iso] = {
+                        ...existing,
+                        note: existing.note || (iso === activeDate ? note : ""),
+                        overtime: {hours: overtimeHours, rate: overtimeRate || 1, reason: overtimeReason, updatedAt},
+                        updatedAt
+                    };
+                });
+            } else if (overtimeTouched) {
+                overtimeDates.forEach(iso => {
+                    const existing = state.records[iso];
+                    if (!existing?.overtime) return;
+                    const next = {...existing, updatedAt};
+                    delete next.overtime;
+                    if (!next.status && !next.reason && !next.note) delete state.records[iso];
+                    else state.records[iso] = next;
                 });
             }
 
@@ -4128,9 +4513,8 @@
             saveState();
             if (!options.keepOpen) {
                 closeModal();
-                showToast(weekendNoteOnly && pendingStatus !== "overtime"
-                    ? (dates.length > 1 ? `已保存 ${dates.length} 个周末备注` : "周末备注已保存")
-                    : (dates.length > 1 ? `已保存 ${dates.length} 天记录` : "记录已保存"));
+                const changedDates = new Set([...statusDates, ...(pendingOvertime || overtimeTouched ? overtimeDates : [])]).size;
+                showToast(changedDates > 1 ? `已保存 ${changedDates} 天记录` : "记录已保存");
             }
             render();
         }
@@ -4165,12 +4549,13 @@
                 const record = state.records[iso];
                 if (info.isHoliday) stats.holidayDays += 1;
                 if (info.isWeekend) stats.weekendDays += 1;
-                if (record?.status === "overtime") {
+                if (record?.overtime) {
                     stats.overtimeDays += 1;
-                    const hours = Number(record.overtimeHours) || 8;
-                    const rate = Number(record.overtimeRate) || 1;
+                    const hours = Number(record.overtime.hours) || 0;
+                    const rate = Number(record.overtime.rate) || 1;
+                    const dailyHours = Number(state.workSchedule?.dailyWorkHours) || 8;
                     stats.overtimeHours += hours;
-                    stats.overtimeCompEarned += (hours / 8) * rate;
+                    stats.overtimeCompEarned += (hours / dailyHours) * rate;
                 }
                 if (isConfiguredWorkday(date, info)) {
                     stats.expectedWorkdays += 1;
@@ -4225,7 +4610,9 @@
                 makeups,
                 ticketReminders,
                 targetYear,
-                statusLabels: STATUS_LABELS
+                statusLabels: STATUS_LABELS,
+                include: Object.fromEntries([...document.querySelectorAll("[data-ics-category]")].map(input => [input.dataset.icsCategory, input.checked])),
+                ticketReminderTime: document.getElementById("icsTicketTime")?.value || "09:00"
             });
 
             const filename = targetYear ? `RestCal-${targetYear}年度日历.ics` : `RestCal-全量日历.ics`;
@@ -4236,7 +4623,8 @@
         function statsHeatmapHtml(scope, dates, stats) {
             const cells = buildHeatCells(dates, scope === "year" || scope === "month");
             const annualQuota = cleanNumber(els.annualQuotaInput.value);
-            const annualRemaining = annualQuota > 0 ? Math.max(0, annualQuota - calculateStats(currentYear).annualLeave) : 0;
+            const annualBalance = calculateQuotaBalances(currentYear, annualQuota, cleanNumber(els.compQuotaInput.value)).annual;
+            const annualRemaining = annualQuota > 0 ? Math.max(0, annualBalance.total - annualBalance.used) : 0;
             const primary = scope === "month"
                 ? [
                     ["应出勤", stats.expectedWorkdays],
@@ -4245,6 +4633,7 @@
                     ["病假", stats.sickLeave],
                     ["调休", stats.compLeave],
                     ["年假", stats.annualLeave],
+                    ["加班小时", roundQuota(stats.overtimeHours)],
                     ["周末", stats.weekendDays],
                     ["节假日", stats.holidayDays],
                     ["剩余年假", annualRemaining]
@@ -4255,6 +4644,7 @@
                     ["病假", stats.sickLeave],
                     ["年假", stats.annualLeave],
                     ["调休", stats.compLeave],
+                    ["加班小时", roundQuota(stats.overtimeHours)],
                     ["节假日", stats.holidayDays]
                 ];
 
@@ -4339,6 +4729,7 @@
         <div class="summary-row months-summary-row">
           ${summaryChip("总请假", yearStats.totalLeave)}
           ${summaryChip("已出勤", yearStats.actualWorkdays)}
+          ${summaryChip("加班小时", roundQuota(yearStats.overtimeHours))}
           ${summaryChip("节假日", yearStats.holidayDays)}
           ${summaryChip("周末", yearStats.weekendDays)}
         </div>
@@ -4824,14 +5215,18 @@
                     STATUS_LABELS[record.status] || "",
                     record.leaveType || "",
                     record.reason || "",
+                    record.overtime?.hours ?? "",
+                    record.overtime?.rate ?? "",
+                    record.overtime?.reason || "",
                     info.isHoliday ? "是" : "否",
                     info.isWeekend ? "是" : "否",
                     record.note || "",
+                    record.updatedAt || "",
                     includesUserData ? "" : userDataJson
                 ]);
                 includesUserData = true;
             });
-            if (!includesUserData) rows.push(["", "", "", "", "", "", "", userDataJson]);
+            if (!includesUserData) rows.push([...CSV_HEADERS.map(() => ""), userDataJson]);
             const csv = "\ufeff" + rows.map(row => row.map(csvEscape).join(",")).join("\n");
             const blob = new Blob([csv], {type: "text/csv;charset=utf-8"});
             const url = URL.createObjectURL(blob);
@@ -4876,7 +5271,7 @@
         function validateImportedRows(rows) {
             if (rows.length < 2) throw new Error("CSV 内容为空。");
             const headers = rows[0].map(cell => cell.replace(/^\ufeff/, "").trim());
-            const missing = CSV_HEADERS.filter(header => !headers.includes(header));
+            const missing = CSV_REQUIRED_HEADERS.filter(header => !headers.includes(header));
             if (missing.length) throw new Error(`缺少字段：${missing.join("、")}。`);
 
             const index = Object.fromEntries(headers.map((header, i) => [header, i]));
@@ -4887,6 +5282,9 @@
                 if (!row.some(cell => cell.trim())) continue;
                 const iso = (row[index["日期"]] || "").trim();
                 const statusText = (row[index["状态"]] || "").trim();
+                const overtimeHoursText = index["加班工时"] === undefined ? "" : (row[index["加班工时"]] || "").trim();
+                const overtimeRateText = index["调休倍率"] === undefined ? "" : (row[index["调休倍率"]] || "").trim();
+                const overtimeReason = index["加班事由"] === undefined ? "" : (row[index["加班事由"]] || "");
                 const userDataText = index[CSV_USER_DATA_HEADER] === undefined ? "" : (row[index[CSV_USER_DATA_HEADER]] || "").trim();
                 if (userDataText && !userData) {
                     try {
@@ -4901,28 +5299,38 @@
                 if (!isValidISODate(iso)) throw new Error(`第 ${i + 1} 行日期格式不正确。`);
                 const status = Object.entries(STATUS_LABELS).find(([, label]) => label === statusText)?.[0];
                 const note = row[index["备注"]] || "";
-                const info = getDayInfo(fromISO(iso));
+                const overtimeHours = overtimeHoursText ? Number(overtimeHoursText) : null;
+                if (overtimeHoursText && (!Number.isFinite(overtimeHours) || overtimeHours < 0.5 || overtimeHours > 24)) {
+                    throw new Error(`第 ${i + 1} 行加班工时应为 0.5–24 小时。`);
+                }
+                const overtime = overtimeHours ? {
+                    hours: overtimeHours,
+                    rate: overtimeRateText ? clampNumber(overtimeRateText, 0.1, 10, 1) : 1,
+                    reason: overtimeReason,
+                    updatedAt: index["更新时间"] === undefined ? "" : (row[index["更新时间"]] || "")
+                } : null;
                 if (!status) {
-                    if (statusText || !note || !info.isWeekend) throw new Error(`第 ${i + 1} 行状态必须是${Object.values(STATUS_LABELS).join("、")}，周末可只填写备注。`);
+                    if (statusText || (!note && !overtime)) throw new Error(`第 ${i + 1} 行状态必须是${Object.values(STATUS_LABELS).join("、")}，也可只填写备注或加班。`);
                     imported[iso] = {
                         status: "",
                         leaveType: "",
                         reason: "",
                         note,
-                        updatedAt: new Date().toISOString()
+                        ...(overtime ? {overtime} : {}),
+                        updatedAt: index["更新时间"] === undefined ? new Date().toISOString() : ((row[index["更新时间"]] || "").trim() || new Date().toISOString())
                     };
                     continue;
                 }
-                if (!info.isWorkday) throw new Error(`第 ${i + 1} 行不是可标记的工作日。`);
                 imported[iso] = {
                     status,
                     leaveType: row[index["请假类型"]] || (LEAVE_STATUSES.includes(status) ? STATUS_LABELS[status] : ""),
                     reason: row[index["请假理由"]] || "",
                     note,
-                    updatedAt: new Date().toISOString()
+                    ...(overtime ? {overtime} : {}),
+                    updatedAt: index["更新时间"] === undefined ? new Date().toISOString() : ((row[index["更新时间"]] || "").trim() || new Date().toISOString())
                 };
             }
-            return {records: imported, userData};
+            return {records: normalizeRecords(imported, userData?.workSchedule || state.workSchedule), userData};
         }
 
         // ---- WebDav 云备份 ----
@@ -5025,6 +5433,7 @@
                 profile: state.profile,
                 workSchedule: state.workSchedule,
                 salary: state.salary,
+                quotaRules: state.quotaRules,
                 preferences: {
                     theme: getThemePreference(),
                     language: window.RestCalI18n?.getLanguage() || "zh"
@@ -5054,6 +5463,15 @@
             if (data.salary && typeof data.salary === "object" && !Array.isArray(data.salary)) {
                 state.salary = {...DEFAULT_USER_DATA.salary, ...state.salary, ...data.salary};
                 restored = true;
+            }
+            if (data.quotaRules && typeof data.quotaRules === "object" && !Array.isArray(data.quotaRules)) {
+                state.quotaRules = {...DEFAULT_USER_DATA.quotaRules, ...state.quotaRules, ...data.quotaRules};
+                restored = true;
+            } else if (data.settings && typeof data.settings === "object") {
+                state.quotaRules = {
+                    annualExpireRule: data.settings.annualExpireRule || state.quotaRules.annualExpireRule,
+                    compExpireRule: data.settings.compExpireRule || state.quotaRules.compExpireRule
+                };
             }
             if (data.preferences && typeof data.preferences === "object" && !Array.isArray(data.preferences)) {
                 if (THEME_SEQUENCE.includes(data.preferences.theme)) {
@@ -5261,6 +5679,7 @@
 
         function setWebdavStatus(text) {
             els.webdavStatus.textContent = text;
+            if (els.webdavConfigStatus) els.webdavConfigStatus.textContent = text;
         }
 
         function setWebdavBusy(busy) {
@@ -5271,10 +5690,8 @@
 
         function ensureWebdavConfigured() {
             if (!isWebdavConfigured()) {
-                els.webdavConfigArea.hidden = false;
-                els.webdavConfigure.setAttribute("aria-expanded", "true");
                 setWebdavStatus("请先填写服务器地址、用户名和密码。");
-                els.webdavUrl.focus({preventScroll: true});
+                openWebdavConfigModal();
                 return false;
             }
             return true;
@@ -5330,7 +5747,7 @@
             try {
                 const payload = JSON.stringify({
                     app: "xiuli",
-                    version: 2,
+                    version: 3,
                     exportedAt: new Date().toISOString(),
                     records: state.records,
                     ...backupUserDataSnapshot()
@@ -5407,7 +5824,8 @@
                     showToast("云端恢复失败，文件缺少记录数据", "error");
                     return;
                 }
-                const {merged, added, updated} = mergeRecords(state.records, remoteRecords);
+                const normalizedRemoteRecords = normalizeRecords(remoteRecords, parsed.workSchedule || state.workSchedule);
+                const {merged, added, updated} = mergeRecords(state.records, normalizedRemoteRecords);
                 state.records = merged;
                 const restoredUserData = restoreUserDataBackup(parsed.userData || parsed);
                 webdavConfig.lastVerifiedAt = new Date().toISOString();
@@ -5842,12 +6260,13 @@
 
         function structuredState(base, source = {}) {
             const settings = base.settings || {};
+            const workSchedule = {...DEFAULT_USER_DATA.workSchedule, ...(source.workSchedule || {}), restDays: Array.isArray(source.workSchedule?.restDays) ? source.workSchedule.restDays : [0, 6]};
             const result = {
-                schemaVersion: 2,
-                records: base.records || {},
+                schemaVersion: 3,
+                records: normalizeRecords(base.records || {}, workSchedule),
                 settings,
                 profile: {...DEFAULT_USER_DATA.profile, ...(source.profile || {}), name: source.profile?.name ?? settings.applicantName ?? ""},
-                workSchedule: {...DEFAULT_USER_DATA.workSchedule, ...(source.workSchedule || {}), restDays: Array.isArray(source.workSchedule?.restDays) ? source.workSchedule.restDays : [0, 6]},
+                workSchedule,
                 salary: {
                     ...DEFAULT_USER_DATA.salary,
                     ...(source.salary || {}),
@@ -5870,6 +6289,45 @@
                 setupBannerDismissed: Boolean(source.setupBannerDismissed)
             };
             return result;
+        }
+
+        function normalizeRecords(records, workSchedule = DEFAULT_USER_DATA.workSchedule) {
+            const normalized = {};
+            for (const [iso, value] of Object.entries(records || {})) {
+                if (!isValidISODate(iso) || !value || typeof value !== "object" || Array.isArray(value)) continue;
+                const record = {...value};
+                if (record.status === "overtime") {
+                    record.overtime = {
+                        hours: clampNumber(record.overtimeHours, 0.5, 24, 8),
+                        rate: clampNumber(record.overtimeRate, 0.1, 10, 1),
+                        reason: typeof record.reason === "string" ? record.reason : "",
+                        updatedAt: record.updatedAt || ""
+                    };
+                    record.status = inferLegacyOvertimeBaseStatus(iso, workSchedule);
+                    record.leaveType = "";
+                    record.reason = "";
+                    delete record.overtimeHours;
+                    delete record.overtimeRate;
+                } else if (record.overtime && typeof record.overtime === "object") {
+                    record.overtime = {
+                        hours: clampNumber(record.overtime.hours, 0.5, 24, 2),
+                        rate: clampNumber(record.overtime.rate, 0.1, 10, 1),
+                        reason: typeof record.overtime.reason === "string" ? record.overtime.reason : "",
+                        updatedAt: typeof record.overtime.updatedAt === "string" ? record.overtime.updatedAt : (record.updatedAt || "")
+                    };
+                }
+                normalized[iso] = record;
+            }
+            return normalized;
+        }
+
+        function inferLegacyOvertimeBaseStatus(iso, workSchedule) {
+            const date = fromISO(iso);
+            const yearData = HOLIDAY_DATA[date.getFullYear()];
+            if (yearData?.holidays?.some(item => item.date === iso)) return "";
+            if (yearData?.makeupWorkdays?.some(item => item.date === iso)) return "work";
+            const restDays = Array.isArray(workSchedule?.restDays) ? workSchedule.restDays : [0, 6];
+            return restDays.includes(date.getDay()) ? "" : "work";
         }
 
         function saveState() {

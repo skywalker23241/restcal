@@ -43,6 +43,140 @@ async function run() {
         // 应用首次打开会展示引导；本脚本测试主应用功能时明确跳过它。
         await win.webContents.executeJavaScript("if (typeof skipOnboarding === 'function') skipOnboarding(); undefined");
         await wait(300);
+        if (w === 360) {
+            const overtimeAudit = await win.webContents.executeJavaScript(`
+                (() => {
+                    const iso = "2026-08-26";
+                    delete state.records[iso];
+                    openModal(iso);
+                    chooseStatus("overtime");
+                    document.getElementById("modalOvertimeHours").value = "2.5";
+                    document.getElementById("modalOvertimeRate").value = "2";
+                    document.getElementById("modalOvertimeReason").value = "自动化验证";
+                    openEnhancedSelect(document.getElementById("modalOvertimeRate"));
+                    const selectMenu = document.getElementById("modalOvertimeRateMenu");
+                    const selectRect = selectMenu.getBoundingClientRect();
+                    const pickerAudit = {
+                        allSelectsEnhanced: [...document.querySelectorAll("select")].every(select => select.classList.contains("select-native") && enhancedSelects.has(select)),
+                        allDatesEnhanced: [...document.querySelectorAll('input[type="date"]')].every(input => input.classList.contains("select-native") && enhancedDateInputs.has(input)),
+                        hasNativeTimeInput: Boolean(document.querySelector('input[type="time"]')),
+                        portal: selectMenu.classList.contains("is-portal"),
+                        themed: getComputedStyle(selectMenu).backgroundColor !== "rgba(0, 0, 0, 0)",
+                        inViewport: selectRect.left >= 0 && selectRect.right <= innerWidth && selectRect.top >= 0 && selectRect.bottom <= innerHeight
+                    };
+                    closeEnhancedSelect(document.getElementById("modalOvertimeRate"));
+                    saveModalRecord();
+                    const saved = structuredClone(state.records[iso]);
+                    const migrated = normalizeRecords({
+                        [iso]: {status: "overtime", reason: "旧数据", overtimeHours: 3, overtimeRate: 2, updatedAt: "2026-08-26T00:00:00.000Z"}
+                    }, state.workSchedule)[iso];
+                    const csvRows = [
+                        [...CSV_HEADERS, CSV_USER_DATA_HEADER],
+                        ["2026-08-29", "", "", "", "3.5", "2", "周末发布", "否", "是", "备注", "2026-08-29T00:00:00.000Z", ""]
+                    ];
+                    const csvRecord = validateImportedRows(csvRows).records["2026-08-29"];
+                    delete state.records[iso];
+                    saveState();
+                    return {saved, migrated, csvRecord, pickerAudit};
+                })()
+            `);
+            if (overtimeAudit.saved?.status !== "work"
+                || overtimeAudit.saved?.overtime?.hours !== 2.5
+                || overtimeAudit.saved?.overtime?.rate !== 2
+                || overtimeAudit.migrated?.status !== "work"
+                || overtimeAudit.migrated?.overtime?.hours !== 3
+                || overtimeAudit.csvRecord?.status !== ""
+                || overtimeAudit.csvRecord?.overtime?.hours !== 3.5
+                || overtimeAudit.csvRecord?.overtime?.rate !== 2
+                || !overtimeAudit.pickerAudit?.allSelectsEnhanced
+                || !overtimeAudit.pickerAudit?.allDatesEnhanced
+                || overtimeAudit.pickerAudit?.hasNativeTimeInput
+                || !overtimeAudit.pickerAudit?.portal
+                || !overtimeAudit.pickerAudit?.themed
+                || !overtimeAudit.pickerAudit?.inViewport) {
+                throw new Error(`overtime data model audit failed: ${JSON.stringify(overtimeAudit)}`);
+            }
+
+            const handlePoint = await win.webContents.executeJavaScript(`
+                (() => {
+                    document.getElementById("searchToggle").click();
+                    const backdrop = document.getElementById("searchModal");
+                    backdrop.getAnimations().forEach(animation => animation.finish());
+                    backdrop.firstElementChild.getAnimations().forEach(animation => animation.finish());
+                    const rect = backdrop.querySelector(".sheet-drag-handle").getBoundingClientRect();
+                    return {x: Math.round(rect.left + rect.width / 2), y: Math.round(rect.top + rect.height / 2)};
+                })()
+            `);
+            win.webContents.sendInputEvent({type: "mouseDown", x: handlePoint.x, y: handlePoint.y, button: "left", clickCount: 1});
+            await wait(80);
+            win.webContents.sendInputEvent({type: "mouseMove", x: handlePoint.x, y: handlePoint.y + 150, button: "left"});
+            await wait(100);
+            win.webContents.sendInputEvent({type: "mouseUp", x: handlePoint.x, y: handlePoint.y + 150, button: "left", clickCount: 1});
+            await wait(520);
+            const dragAudit = await win.webContents.executeJavaScript(`
+                (() => {
+                    const backdrop = document.getElementById("searchModal");
+                    const drawer = backdrop.firstElementChild;
+                    return {closed: !backdrop.classList.contains("open"), backdropClass: backdrop.className, drawerClass: drawer.className, transform: drawer.style.transform};
+                })()
+            `);
+            if (!dragAudit.closed) throw new Error(`mobile sheet drag-to-close audit failed: ${JSON.stringify({handlePoint, dragAudit})}`);
+        }
+
+        if (w >= 768) {
+            const navIndicatorAudit = await win.webContents.executeJavaScript(`
+                (() => {
+                    const auditVisibleSegments = () => [...document.querySelectorAll(".segmented")]
+                        .filter(group => group.offsetWidth && group.offsetHeight)
+                        .map(group => {
+                            const active = group.querySelector(":scope > .seg-btn.active");
+                            const indicator = group.querySelector(":scope > .segmented-indicator");
+                            indicator?.getAnimations().forEach(animation => animation.finish());
+                            indicator?.classList.remove("no-transition");
+                            const activeRect = active?.getBoundingClientRect();
+                            const indicatorRect = indicator?.getBoundingClientRect();
+                            return {
+                                id: group.id || group.className,
+                                hasIndicator: Boolean(indicator),
+                                widthMatch: Boolean(activeRect && indicatorRect && Math.abs(activeRect.width - indicatorRect.width) < 1),
+                                leftMatch: Boolean(activeRect && indicatorRect && Math.abs(activeRect.left - indicatorRect.left) < 1),
+                                transition: Boolean(indicator && getComputedStyle(indicator).transitionDuration !== "0s")
+                            };
+                        });
+                    switchView("calendar");
+                    const calendarSegments = auditVisibleSegments();
+                    switchView("stats");
+                    setStatsPeriodMode("year");
+                    syncAllSegmentedIndicators(false);
+                    const statsSegments = auditVisibleSegments();
+                    openSettings("appearance");
+                    syncAllSegmentedIndicators(false);
+                    const appearanceSegments = auditVisibleSegments()
+                        .filter(item => ["themeChoice", "languageChoice"].includes(item.id));
+                    closeSettings();
+                    const nav = document.querySelector(".app-nav");
+                    const active = nav.querySelector('[data-nav="stats"]');
+                    const indicator = nav.querySelector(".app-nav-indicator");
+                    indicator.getAnimations().forEach(animation => animation.finish());
+                    const activeRect = active.getBoundingClientRect();
+                    const indicatorRect = indicator.getBoundingClientRect();
+                    const result = {
+                        widthMatch: Math.abs(activeRect.width - indicatorRect.width) < 1,
+                        leftMatch: Math.abs(activeRect.left - indicatorRect.left) < 1,
+                        transition: getComputedStyle(indicator).transitionDuration !== "0s",
+                        segments: [...calendarSegments, ...statsSegments, ...appearanceSegments]
+                    };
+                    setStatsPeriodMode("month");
+                    switchView("calendar");
+                    return result;
+                })()
+            `);
+            if (!navIndicatorAudit.widthMatch || !navIndicatorAudit.leftMatch || !navIndicatorAudit.transition
+                || !["themeChoice", "languageChoice"].every(id => navIndicatorAudit.segments.some(item => item.id === id))
+                || navIndicatorAudit.segments.some(item => !item.hasIndicator || !item.widthMatch || !item.leftMatch || !item.transition)) {
+                throw new Error(`${w}px nav indicator audit failed: ${JSON.stringify(navIndicatorAudit)}`);
+            }
+        }
         const noteMarker = await win.webContents.executeJavaScript(`
             (() => {
                 const iso = \`\${currentYear}-\${String(currentMonth).padStart(2, "0")}-15\`;
@@ -357,6 +491,47 @@ async function run() {
             item.width < 16 || item.height < 16 || !item.href.startsWith("#i-")
         )) {
             throw new Error(`${w}px settings icon layout failed: ${JSON.stringify(settingsItems)}`);
+        }
+        if (w === 360) {
+            await win.webContents.executeJavaScript(`
+                setSettingsPanel("data");
+                document.getElementById("webdavConfigure").click();
+                undefined
+            `);
+            await wait(420);
+            const webdavModalAudit = await win.webContents.executeJavaScript(`
+                (() => {
+                    const backdrop = document.getElementById("webdavConfigModal");
+                    const modal = backdrop.querySelector(".webdav-config-modal");
+                    backdrop.getAnimations().forEach(animation => animation.finish());
+                    modal.getAnimations().forEach(animation => animation.finish());
+                    const rect = modal.getBoundingClientRect();
+                    const modalStyle = getComputedStyle(modal);
+                    return {
+                        className: backdrop.className,
+                        open: backdrop.classList.contains("open"),
+                        dialog: backdrop.getAttribute("role") === "dialog" && backdrop.getAttribute("aria-modal") === "true",
+                        themed: getComputedStyle(modal).backgroundColor !== "rgba(0, 0, 0, 0)",
+                        animation: {name: modalStyle.animationName, state: modalStyle.animationPlayState, transform: modalStyle.transform},
+                        inViewport: rect.left >= -1 && rect.right <= innerWidth + 1 && rect.top >= -1 && rect.bottom <= innerHeight + 1,
+                        rect: {left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height},
+                        viewport: {width: innerWidth, height: innerHeight},
+                        focused: document.activeElement === document.getElementById("webdavUrl"),
+                        outsideSettings: !document.getElementById("settingsModal").contains(backdrop)
+                    };
+                })()
+            `);
+            if (!webdavModalAudit.open || !webdavModalAudit.dialog || !webdavModalAudit.themed
+                || !webdavModalAudit.inViewport || !webdavModalAudit.focused || !webdavModalAudit.outsideSettings) {
+                throw new Error(`WebDAV config modal audit failed: ${JSON.stringify(webdavModalAudit)}`);
+            }
+            await capture(win, "webdav-config-360");
+            await win.webContents.executeJavaScript(`
+                document.getElementById("webdavConfigDone").click();
+                setSettingsPanel("profile");
+                undefined
+            `);
+            await wait(260);
         }
         await capture(win, `settings-${w}`);
         await win.webContents.executeJavaScript("document.getElementById('closeSettings').click(); undefined");

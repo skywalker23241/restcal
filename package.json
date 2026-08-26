@@ -14,6 +14,7 @@
         "verify:structure": "node scripts/verify-structure.js",
         "verify:server": "node scripts/verify-server.js",
         "verify:mobile": "electron scripts/verify-mobile.js",
+        "test": "node scripts/test-ics.js",
         "dist": "electron-builder --win"
     },
     "devDependencies": {

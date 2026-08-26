@@ -49,11 +49,71 @@
         return `${yyyy}${mm}${dd}`;
     }
 
+    function stableHash(value) {
+        let hash = 2166136261;
+        for (const char of String(value)) {
+            hash ^= char.codePointAt(0);
+            hash = Math.imul(hash, 16777619);
+        }
+        return (hash >>> 0).toString(36);
+    }
+
+    function foldIcsLine(line) {
+        const encoder = new TextEncoder();
+        const folded = [];
+        let current = "";
+        let limit = 75;
+        for (const char of String(line)) {
+            if (encoder.encode(current + char).length > limit) {
+                folded.push(current);
+                current = " " + char;
+                limit = 75;
+            } else {
+                current += char;
+            }
+        }
+        folded.push(current);
+        return folded;
+    }
+
+    function formatUtcDateTime(dateValue, time = "09:00", offsetHours = 8) {
+        const date = formatIcsDate(dateValue);
+        const match = /^(\d{2}):(\d{2})$/.exec(time) || [null, "09", "00"];
+        const utc = new Date(Date.UTC(
+            Number(date.slice(0, 4)), Number(date.slice(4, 6)) - 1, Number(date.slice(6, 8)),
+            Number(match[1]) - offsetHours, Number(match[2]), 0
+        ));
+        return utc.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    }
+
+    function addMinutesUtc(value, minutes) {
+        const match = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(value);
+        if (!match) return value;
+        const date = new Date(Date.UTC(+match[1], +match[2] - 1, +match[3], +match[4], +match[5], +match[6]));
+        date.setUTCMinutes(date.getUTCMinutes() + minutes);
+        return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    }
+
+    function pushAllDayEvent(lines, {uid, stamp, date, summary, description = "", transparent = true}) {
+        lines.push(
+            "BEGIN:VEVENT",
+            `UID:${uid}`,
+            `DTSTAMP:${stamp}`,
+            `DTSTART;VALUE=DATE:${formatIcsDate(date)}`,
+            `DTEND;VALUE=DATE:${addOneDayIcs(date)}`,
+            `SUMMARY:${escapeIcsText(summary)}`,
+            `DESCRIPTION:${escapeIcsText(description)}`,
+            `TRANSP:${transparent ? "TRANSPARENT" : "OPAQUE"}`,
+            "END:VEVENT"
+        );
+    }
+
     function generateIcs(options = {}) {
         const records = options.records || options.state?.records || {};
         const holidays = options.holidays || [];
         const makeups = options.makeups || [];
         const ticketReminders = options.ticketReminders || [];
+        const include = Object.assign({leave: true, overtime: true, work: false, notes: false, holidays: true, makeups: true, tickets: true}, options.include || {});
         const statusLabels = Object.assign({
             work: "出勤",
             overtime: "加班",
@@ -76,7 +136,7 @@
             "X-WR-TIMEZONE:Asia/Shanghai"
         ];
 
-        // 1. 用户请假、出勤、加班与备注记录
+        // 1. 用户状态、加班与备注记录（加班是独立事件，不覆盖当天状态）
         const recordDates = Object.keys(records).sort();
         recordDates.forEach(iso => {
             if (targetYear && !iso.startsWith(String(targetYear))) return;
@@ -84,49 +144,31 @@
             if (!rec) return;
 
             const status = rec.status;
-            const dtStart = formatIcsDate(iso);
-            const dtEnd = addOneDayIcs(iso);
-            const uid = `restcal-record-${iso}@restcal.local`;
-
-            let summary = "";
-            if (status === "overtime") {
-                const hours = rec.overtimeHours || 8;
-                summary = `💼 [加班] ${hours}小时 ${rec.reason || ""}`.trim();
-            } else if (status === "work") {
-                summary = `💻 [出勤] ${rec.note || ""}`.trim();
-            } else if (status) {
+            if (status === "work" && include.work) {
+                pushAllDayEvent(lines, {uid: `restcal-work-${iso}@restcal.app`, stamp: nowIso, date: iso,
+                    summary: `💻 [出勤] ${rec.note || ""}`.trim(), description: [rec.note && `备注: ${rec.note}`, rec.updatedAt && `更新时间: ${rec.updatedAt}`].filter(Boolean).join("\n")});
+            } else if (status && status !== "work" && include.leave) {
                 const label = statusLabels[status] || rec.leaveType || "请假";
-                summary = `🏖️ [${label}] ${rec.reason || ""}`.trim();
-            } else if (rec.note) {
-                summary = `📝 [备注] ${rec.note}`;
-            } else {
-                return;
+                pushAllDayEvent(lines, {uid: `restcal-leave-${iso}@restcal.app`, stamp: nowIso, date: iso,
+                    summary: `🏖️ [${label}] ${rec.reason || ""}`.trim(),
+                    description: [rec.leaveType && `类型: ${rec.leaveType}`, rec.reason && `理由: ${rec.reason}`, rec.note && `备注: ${rec.note}`, rec.updatedAt && `更新时间: ${rec.updatedAt}`].filter(Boolean).join("\n"), transparent: false});
+            } else if (!status && rec.note && include.notes) {
+                pushAllDayEvent(lines, {uid: `restcal-note-${iso}@restcal.app`, stamp: nowIso, date: iso,
+                    summary: `📝 [备注] ${rec.note}`, description: rec.updatedAt ? `更新时间: ${rec.updatedAt}` : ""});
             }
 
-            const descParts = [];
-            if (rec.leaveType) descParts.push(`类型: ${rec.leaveType}`);
-            if (rec.reason) descParts.push(`理由: ${rec.reason}`);
-            if (rec.note) descParts.push(`备注: ${rec.note}`);
-            if (rec.overtimeHours) descParts.push(`工时: ${rec.overtimeHours} 小时`);
-            if (rec.overtimeRate && rec.overtimeRate !== 1) descParts.push(`调休倍率: ${rec.overtimeRate}x`);
-            if (rec.updatedAt) descParts.push(`更新时间: ${rec.updatedAt}`);
-
-            lines.push(
-                "BEGIN:VEVENT",
-                `UID:${uid}`,
-                `DTSTAMP:${nowIso}`,
-                `DTSTART;VALUE=DATE:${dtStart}`,
-                `DTEND;VALUE=DATE:${dtEnd}`,
-                `SUMMARY:${escapeIcsText(summary)}`,
-                `DESCRIPTION:${escapeIcsText(descParts.join("\\n"))}`,
-                "TRANSP:TRANSPARENT",
-                "END:VEVENT"
-            );
+            if (rec.overtime && include.overtime) {
+                const hours = Number(rec.overtime.hours) || 0;
+                const rate = Number(rec.overtime.rate) || 1;
+                pushAllDayEvent(lines, {uid: `restcal-overtime-${iso}@restcal.app`, stamp: nowIso, date: iso,
+                    summary: `💼 [加班] ${hours}小时 ${rec.overtime.reason || ""}`.trim(),
+                    description: [`工时: ${hours} 小时`, `调休倍率: ${rate}x`, rec.overtime.reason && `事由: ${rec.overtime.reason}`, rec.note && `备注: ${rec.note}`, rec.overtime.updatedAt && `更新时间: ${rec.overtime.updatedAt}`].filter(Boolean).join("\n")});
+            }
         });
 
         // 2. 法定节假日
         const seenHolidays = new Set();
-        holidays.forEach(h => {
+        if (include.holidays) holidays.forEach(h => {
             const dtStart = formatIcsDate(h.date);
             if (!dtStart) return;
             if (targetYear && !dtStart.startsWith(String(targetYear))) return;
@@ -137,7 +179,7 @@
             const dtEnd = addOneDayIcs(h.date);
             lines.push(
                 "BEGIN:VEVENT",
-                `UID:restcal-holiday-${dtStart}-${escapeIcsText(h.name)}@restcal.local`,
+                `UID:restcal-holiday-${dtStart}-${stableHash(h.name)}@restcal.app`,
                 `DTSTAMP:${nowIso}`,
                 `DTSTART;VALUE=DATE:${dtStart}`,
                 `DTEND;VALUE=DATE:${dtEnd}`,
@@ -150,7 +192,7 @@
 
         // 3. 调休上班（补班日）
         const seenMakeups = new Set();
-        makeups.forEach(m => {
+        if (include.makeups) makeups.forEach(m => {
             const dtStart = formatIcsDate(m.date);
             if (!dtStart) return;
             if (targetYear && !dtStart.startsWith(String(targetYear))) return;
@@ -161,7 +203,7 @@
             const dtEnd = addOneDayIcs(m.date);
             lines.push(
                 "BEGIN:VEVENT",
-                `UID:restcal-makeup-${dtStart}-${escapeIcsText(m.name)}@restcal.local`,
+                `UID:restcal-makeup-${dtStart}-${stableHash(m.name)}@restcal.app`,
                 `DTSTAMP:${nowIso}`,
                 `DTSTART;VALUE=DATE:${dtStart}`,
                 `DTEND;VALUE=DATE:${dtEnd}`,
@@ -174,7 +216,7 @@
 
         // 4. 12306 火车票抢票提醒
         const seenTickets = new Set();
-        ticketReminders.forEach(t => {
+        if (include.tickets) ticketReminders.forEach(t => {
             const dtStart = formatIcsDate(t.saleDate);
             if (!dtStart) return;
             if (targetYear && !dtStart.startsWith(String(targetYear))) return;
@@ -182,17 +224,18 @@
             if (seenTickets.has(key)) return;
             seenTickets.add(key);
 
-            const dtEnd = addOneDayIcs(t.saleDate);
+            const dtStartUtc = formatUtcDateTime(t.saleDate, options.ticketReminderTime || "09:00");
+            const dtEndUtc = addMinutesUtc(dtStartUtc, 30);
             const departureStr = t.departure instanceof Date
                 ? `${t.departure.getFullYear()}年${t.departure.getMonth() + 1}月${t.departure.getDate()}日`
                 : String(t.departure || "");
 
             lines.push(
                 "BEGIN:VEVENT",
-                `UID:restcal-ticket-${dtStart}-${escapeIcsText(t.name)}@restcal.local`,
+                `UID:restcal-ticket-${dtStart}-${stableHash(t.name)}@restcal.app`,
                 `DTSTAMP:${nowIso}`,
-                `DTSTART;VALUE=DATE:${dtStart}`,
-                `DTEND;VALUE=DATE:${dtEnd}`,
+                `DTSTART:${dtStartUtc}`,
+                `DTEND:${dtEndUtc}`,
                 `SUMMARY:🚄 [抢票提醒] ${escapeIcsText(t.name)} 火车票今日开售`,
                 `DESCRIPTION:${escapeIcsText(`假期首日为 ${departureStr}，12306 提前 15 天开售，请记得提前准备抢票。`)}`,
                 "BEGIN:VALARM",
@@ -206,7 +249,7 @@
         });
 
         lines.push("END:VCALENDAR");
-        return lines.join("\r\n");
+        return lines.flatMap(foldIcsLine).join("\r\n");
     }
 
     /**

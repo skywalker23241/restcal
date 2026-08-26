@@ -88,6 +88,7 @@
             --st-sick: #bb2a66;
             --st-annual: #6d4fd2;
             --st-comp: #0e7a70;
+            --st-overtime: #2563eb;
             --st-holiday: #bc3f2b;
             --st-makeup: #9038c8;
             --st-weekend: #8a8273;
@@ -98,8 +99,13 @@
             --tint-sick: color-mix(in srgb, var(--st-sick) 10%, var(--card));
             --tint-personal: color-mix(in srgb, var(--st-personal) 11%, var(--card));
             --tint-work: color-mix(in srgb, var(--st-work) 7%, var(--card));
+            --tint-overtime: color-mix(in srgb, var(--st-overtime) 10%, var(--card));
             --tint-wknd: color-mix(in srgb, var(--st-weekend) 11%, var(--card));
 
+            --seal-soft: color-mix(in srgb, var(--seal) 12%, var(--card));
+            --paper-deep: color-mix(in srgb, var(--ink) 5%, var(--paper));
+
+            --shadow-sm: 0 1px 2px rgba(64, 45, 30, 0.05);
             --shadow: 0 1px 2px rgba(64, 45, 30, 0.05), 0 8px 24px rgba(64, 45, 30, 0.05);
             --shadow-lg: 0 24px 60px -12px rgba(45, 30, 18, 0.22), 0 4px 14px rgba(45, 30, 18, 0.06);
             --radius: 10px;
@@ -107,6 +113,7 @@
             --nav-height: 66px;
 
             --font-display: "Bodoni Moda", "Noto Serif SC", Georgia, serif;
+            --serif: var(--font-display);
             --font-cjk: "Noto Serif SC", "Songti SC", "SimSun", serif;
             --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
             --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
@@ -732,7 +739,7 @@
         .demo-metric strong.accent { color: var(--seal); font-size: 0.9rem; }
 
         .demo-stats-main { display: grid; gap: 12px; min-width: 0; }
-        .demo-summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--card); }
+        .demo-summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--card); }
         .demo-summary-grid div { padding: 10px 12px; border-right: 1px solid var(--line-soft); }
         .demo-summary-grid div:last-child { border-right: 0; }
         .demo-summary-grid small { display: block; color: var(--muted); font-size: 9px; }
@@ -800,7 +807,7 @@
 
         .demo-editor-layout { grid-template-columns: minmax(0, 1fr) 220px; align-items: start; }
         .demo-editor { padding: 16px; }
-        .demo-statuses { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; margin: 12px 0; }
+        .demo-statuses { display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px; margin: 12px 0; }
         .demo-statuses span { padding: 9px 4px; border: 1px solid var(--line); border-radius: 9px; text-align: center; font-size: 10px; font-weight: 800; }
         .demo-statuses .on { border-color: var(--seal); color: var(--seal); background: var(--seal-soft); box-shadow: 0 0 0 2px color-mix(in srgb, var(--seal) 12%, transparent); }
         .demo-textarea { min-height: 64px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); font-size: 10px; }
@@ -1371,7 +1378,7 @@
             .demo-field:nth-child(n + 3) { display: none; }
             .demo-rest-days { gap: 5px; }
             .demo-rest-days span { width: 29px; }
-            .demo-statuses { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+            .demo-statuses { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
             .demo-statuses span { padding: 8px 1px; font-size: 8px; }
             .features-grid { grid-template-columns: 1fr; }
             .cases-grid { grid-template-columns: 1fr; }
@@ -1475,8 +1482,8 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-9M22 20H2"/></svg>
                         </div>
                         <h3 data-i18n="features.statsTitle">Monthly &amp; yearly statistics</h3>
-                        <p data-i18n="features.statsText">Switch between monthly and yearly analysis, with annual and comp-leave allowance
-                            usage always visible alongside the charts.</p>
+                        <p data-i18n="features.statsText">Switch between monthly and yearly analysis, with overtime and leave allowances
+                            visible alongside the charts.</p>
                     </article>
 
                     <article class="feature" data-reveal>
@@ -1510,9 +1517,9 @@
                         <div class="feature-icon" aria-hidden="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m3 16 4 4 4-4M7 20V4"/><path d="m21 8-4-4-4 4M17 4v16"/></svg>
                         </div>
-                        <h3 data-i18n="features.csvTitle">CSV import &amp; export</h3>
-                        <p data-i18n="features.csvText">CSV and optional WebDAV backup live together in Settings, with validated imports and
-                            merge-safe restoration.</p>
+                        <h3 data-i18n="features.csvTitle">CSV &amp; calendar export</h3>
+                        <p data-i18n="features.csvText">Move records with CSV, export an ICS calendar, or use optional WebDAV backup with
+                            validated imports and merge-safe restoration.</p>
                     </article>
 
                     <article class="feature" data-reveal>
@@ -1542,7 +1549,7 @@
                 <div class="section-head" data-reveal>
                     <p class="eyebrow" data-i18n="preview.label">Preview</p>
                     <h2 data-i18n="preview.title">One calendar, three focused workspaces</h2>
-                    <p data-i18n="preview.intro">Five crisp, browser-rendered previews show the daily calendar, statistics,
+                    <p data-i18n="preview.intro">Seven crisp, browser-rendered previews show the daily calendar, statistics,
                         allowances, tools, settings and quick record editor.</p>
                 </div>
 
@@ -1677,6 +1684,7 @@
                                         <div class="demo-summary-grid">
                                             <div><small data-i18n="demo.totalLeave">Total leave</small><strong>13</strong></div>
                                             <div><small data-i18n="demo.attended">Attended</small><strong>10</strong></div>
+                                            <div><small data-i18n="demo.overtimeHours">Overtime</small><strong>8h</strong></div>
                                             <div><small data-i18n="demo.holidays">Holidays</small><strong>33</strong></div>
                                             <div><small data-i18n="demo.weekends">Weekends</small><strong>84</strong></div>
                                         </div>
@@ -1807,7 +1815,7 @@
                                         <strong data-i18n="demo.july23">July 23 · Thursday</strong>
                                         <div class="demo-statuses">
                                             <span class="on" data-i18n="demo.work">Work</span><span data-i18n="demo.personal">Personal</span>
-                                            <span data-i18n="demo.sick">Sick</span><span data-i18n="demo.annual">Annual</span><span data-i18n="demo.comp">Comp</span>
+                                            <span data-i18n="demo.sick">Sick</span><span data-i18n="demo.annual">Annual</span><span data-i18n="demo.comp">Comp</span><span data-i18n="demo.overtime">Overtime</span>
                                         </div>
                                         <div class="demo-textarea" data-i18n="demo.reasonPlaceholder">Reason (optional when working)</div>
                                         <div class="demo-more" data-i18n="demo.moreOptions">More options · note, handoff and custom hours</div>
@@ -1918,6 +1926,7 @@
                         <span data-i18n="oss.chipBuild">No build step</span>
                         <span data-i18n="oss.chipPwa">Offline-first PWA</span>
                         <span data-i18n="oss.chipWindows">Portable Windows .exe</span>
+                        <span data-i18n="oss.chipIcs">RFC 5545 ICS export</span>
                         <span data-i18n="oss.chipData">Holiday data 2004–2026</span>
                     </div>
 
@@ -2046,15 +2055,15 @@
                 "features.calendarTitle": "Day, week, month & year views",
                 "features.calendarText": "Switch from a tear-off day page to weekly, monthly, or yearly views while keeping lunar dates, holidays and makeup workdays visible.",
                 "features.statsTitle": "Monthly & yearly statistics",
-                "features.statsText": "Switch between monthly and yearly analysis, with annual and comp-leave allowance usage always visible alongside the charts.",
+                "features.statsText": "Switch between monthly and yearly analysis, with overtime and leave allowances visible alongside the charts.",
                 "features.workdayTitle": "Real working-day math",
                 "features.workdayText": "Weekends and public holidays are excluded, makeup workdays included — attendance reflects the calendar you actually work.",
                 "features.salaryTitle": "Pay calculation & payslips",
                 "features.salaryText": "Set salary and deduction rules once, then estimate monthly take-home pay and download a clean payslip image.",
                 "features.ticketTitle": "Ticket reminders",
                 "features.ticketText": "A focused tool card shows the next statutory-holiday ticket sale date and expands into the full yearly reminder list.",
-                "features.csvTitle": "CSV import & export",
-                "features.csvText": "CSV and optional WebDAV backup live together in Settings, with validated imports and merge-safe restoration.",
+                "features.csvTitle": "CSV & calendar export",
+                "features.csvText": "Move records with CSV, export an ICS calendar, or use optional WebDAV backup with validated imports and merge-safe restoration.",
                 "features.noteTitle": "Leave note templates",
                 "features.noteText": "Pick dates and a reason, preview the result, and download a clean leave-note image ready to send.",
                 "features.localTitle": "Yours, locally",
@@ -2098,7 +2107,7 @@
                 "demo.attendance": "Attendance", "demo.takeHome": "Estimated take-home", "demo.days": "days",
                 "demo.statistics": "Statistics", "demo.statsTitle": "See the month, then zoom out to the year",
                 "demo.monthly": "Monthly", "demo.yearly": "Yearly",
-                "demo.totalLeave": "Total leave", "demo.attended": "Attended", "demo.holidays": "Holidays", "demo.weekends": "Weekends",
+                "demo.totalLeave": "Total leave", "demo.attended": "Attended", "demo.overtimeHours": "Overtime", "demo.holidays": "Holidays", "demo.weekends": "Weekends",
                 "demo.leaveAllowance": "Leave allowance", "demo.annualLeave": "Annual leave", "demo.compLeave": "Comp leave",
                 "demo.tools": "Tools", "demo.toolsTitle": "Three practical jobs, kept out of the way",
                 "demo.payslip": "Payslip", "demo.payslipText": "Calculate take-home pay and export a clean image.",
@@ -2115,7 +2124,7 @@
                 "demo.payCalculation": "Pay calculation", "demo.monthlySalary": "Monthly salary",
                 "demo.dailyRecord": "Daily record", "demo.editorTitle": "Mark attendance or leave in seconds",
                 "demo.july23": "July 23 · Thursday", "demo.work": "Work", "demo.personal": "Personal",
-                "demo.sick": "Sick", "demo.annual": "Annual", "demo.comp": "Comp",
+                "demo.sick": "Sick", "demo.annual": "Annual", "demo.comp": "Comp", "demo.overtime": "Overtime",
                 "demo.reasonPlaceholder": "Reason (optional when working)",
                 "demo.moreOptions": "More options · note, handoff and custom hours",
                 "demo.cancel": "Cancel", "demo.save": "Save",
@@ -2128,8 +2137,8 @@
                 "demo.restore": "Restore", "demo.backupNow": "Back up now",
                 "demo.localFirst": "100% local by default",
                 "demo.localFirstText": "Data lives in your browser — no account, no analytics.",
-                "demo.csv": "CSV import & export",
-                "demo.csvText": "Take records to Excel, or move between devices with validated imports.",
+                "demo.csv": "CSV & calendar export",
+                "demo.csvText": "Take records to Excel, export an ICS calendar, or move between devices with validated imports.",
                 "demo.offline": "Offline-ready PWA",
                 "demo.offlineText": "Install once — it opens with or without a network, on desktop and phone.",
                 "week.mon": "MON", "week.tue": "TUE", "week.wed": "WED", "week.thu": "THU", "week.fri": "FRI", "week.sat": "SAT", "week.sun": "SUN",
@@ -2148,7 +2157,7 @@
                 "oss.label": "Open source",
                 "oss.title": "Plain web technology, MIT licensed",
                 "oss.intro": "RestCal is built with plain HTML, CSS, and JavaScript — no framework and no analytics. Clone it, run the local server, or package the included Windows app. Read the source in an afternoon, or fork it to match your company's leave rules.",
-                "oss.chipLicense": "MIT License", "oss.chipBuild": "No build step", "oss.chipPwa": "Offline-first PWA", "oss.chipWindows": "Portable Windows .exe", "oss.chipData": "Holiday data 2004–2026",
+                "oss.chipLicense": "MIT License", "oss.chipBuild": "No build step", "oss.chipPwa": "Offline-first PWA", "oss.chipWindows": "Portable Windows .exe", "oss.chipIcs": "RFC 5545 ICS export", "oss.chipData": "Holiday data 2004–2026",
                 "oss.star": "Star on GitHub",
                 "oss.note": "If RestCal saves you a payroll surprise, a star helps other people find it. Issues and pull requests are welcome.",
                 "terminal.running": "RestCal running at http://localhost:8765",
@@ -2186,15 +2195,15 @@
                 "features.calendarTitle": "日、周、月、年四种视图",
                 "features.calendarText": "从撕页日历切换到周、月或年视图，农历、法定节假日和调休补班始终清晰可见。",
                 "features.statsTitle": "月度与年度统计",
-                "features.statsText": "在月度和年度分析之间切换，年假与调休额度使用量始终显示在图表右侧。",
+                "features.statsText": "在月度和年度分析之间切换，加班时长、年假与调休额度都会随图表同步统计。",
                 "features.workdayTitle": "真实工作日核算",
                 "features.workdayText": "自动排除周末和法定假日，并计入调休补班，准确反映你真正需要工作的日期。",
                 "features.salaryTitle": "工资核算与工资条",
                 "features.salaryText": "一次设置工资和扣款规则，即可估算每月实发工资并下载清晰的工资条图片。",
                 "features.ticketTitle": "购票提醒",
                 "features.ticketText": "工具卡会显示下一个法定假期的火车票开售时间，并可展开查看全年提醒。",
-                "features.csvTitle": "CSV 导入与导出",
-                "features.csvText": "CSV 与可选的 WebDAV 备份统一放在设置中，导入自动校验，恢复采用安全合并。",
+                "features.csvTitle": "CSV 与日历导出",
+                "features.csvText": "可通过 CSV 迁移记录、导出 ICS 日历，也可使用 WebDAV 备份；导入自动校验，恢复采用安全合并。",
                 "features.noteTitle": "请假条模板",
                 "features.noteText": "填写日期和理由后即可预览，并下载排版清晰、可直接发送的请假条图片。",
                 "features.localTitle": "数据留在本地",
@@ -2239,7 +2248,7 @@
                 "demo.statistics": "统计",
                 "demo.statsTitle": "先看本月，再展开全年",
                 "demo.monthly": "月度", "demo.yearly": "年度",
-                "demo.totalLeave": "总请假", "demo.attended": "已出勤", "demo.holidays": "节假日", "demo.weekends": "周末",
+                "demo.totalLeave": "总请假", "demo.attended": "已出勤", "demo.overtimeHours": "加班时长", "demo.holidays": "节假日", "demo.weekends": "周末",
                 "demo.leaveAllowance": "假期额度", "demo.annualLeave": "年假", "demo.compLeave": "调休",
                 "demo.tools": "工具", "demo.toolsTitle": "三个实用任务，随用随开",
                 "demo.payslip": "工资核算与工资条", "demo.payslipText": "核算本月到手工资，并导出清晰图片。",
@@ -2256,7 +2265,7 @@
                 "demo.payCalculation": "工资核算方式", "demo.monthlySalary": "月薪制",
                 "demo.dailyRecord": "每日记录", "demo.editorTitle": "几秒钟完成出勤或请假记录",
                 "demo.july23": "7 月 23 日 · 周四", "demo.work": "出勤", "demo.personal": "事假",
-                "demo.sick": "病假", "demo.annual": "年假", "demo.comp": "调休",
+                "demo.sick": "病假", "demo.annual": "年假", "demo.comp": "调休", "demo.overtime": "加班",
                 "demo.reasonPlaceholder": "理由（出勤时可不填）",
                 "demo.moreOptions": "更多选项 · 备注、工作交接和自定义工时",
                 "demo.cancel": "取消", "demo.save": "保存",
@@ -2269,8 +2278,8 @@
                 "demo.restore": "恢复数据", "demo.backupNow": "立即备份",
                 "demo.localFirst": "默认 100% 本地",
                 "demo.localFirstText": "数据保存在你的浏览器里——无账号、无统计追踪。",
-                "demo.csv": "CSV 导入导出",
-                "demo.csvText": "随时把记录带去 Excel，或经校验导入在设备间迁移。",
+                "demo.csv": "CSV 与日历导出",
+                "demo.csvText": "随时把记录带去 Excel、导出 ICS 日历，或经校验导入在设备间迁移。",
                 "demo.offline": "PWA 离线可用",
                 "demo.offlineText": "安装一次，有没有网络都能打开，桌面手机皆可。",
                 "week.mon": "周一", "week.tue": "周二", "week.wed": "周三", "week.thu": "周四", "week.fri": "周五", "week.sat": "周六", "week.sun": "周日",
@@ -2289,7 +2298,7 @@
                 "oss.label": "自由开源",
                 "oss.title": "原生 Web 技术，MIT 开源许可",
                 "oss.intro": "休历使用原生 HTML、CSS 和 JavaScript 构建——无框架、无统计追踪。克隆后可运行本地服务，也可打包自带的 Windows 应用。一个下午便能读完源码，并可按公司的请假规则自由修改。",
-                "oss.chipLicense": "MIT 许可", "oss.chipBuild": "无需构建", "oss.chipPwa": "离线优先 PWA", "oss.chipWindows": "Windows 便携版", "oss.chipData": "2004–2026 节假日数据",
+                "oss.chipLicense": "MIT 许可", "oss.chipBuild": "无需构建", "oss.chipPwa": "离线优先 PWA", "oss.chipWindows": "Windows 便携版", "oss.chipIcs": "RFC 5545 日历导出", "oss.chipData": "2004–2026 节假日数据",
                 "oss.star": "在 GitHub 点赞",
                 "oss.note": "如果休历帮你避免了一次工资意外，欢迎点个 Star，让更多人找到它。也欢迎提交 Issue 和 PR。",
                 "terminal.running": "休历运行于 http://localhost:8765",

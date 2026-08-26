@@ -37,6 +37,8 @@ The application interface can switch between Chinese and English. Language, them
 - Improved the landing-page preview carousel to cover day, week, month, and year views as well as settings and backup features.
 - Fixed extensionless `/app` routing, PWA navigation redirects, and caching of dynamic endpoints.
 - Improved mobile modal scrolling, safe-area spacing, and responsive layouts throughout the app.
+- Overtime is now stored alongside attendance or leave, with custom hours, conversion rates, batch scopes, and comp-time calculation.
+- Added filtered RFC 5545 calendar exports; CSV backups now preserve all overtime fields while remaining backward compatible.
 
 ## ✨ Features
 
@@ -44,7 +46,7 @@ The application interface can switch between Chinese and English. Language, them
 
 - The day view emphasizes the current date, lunar date, solar terms, and record status; week, month, and year views support planning at different levels.
 - Every view combines Gregorian and lunar dates, solar terms, statutory holidays, adjusted working days, and weekends.
-- Mark five statuses with one click: present, personal leave, sick leave, annual leave, and time off in lieu. Leave reasons and notes are supported, and weekends can have standalone notes.
+- Mark attendance and four leave statuses with one click. Overtime is stored alongside the day's status, and weekends support both overtime and standalone notes.
 - Apply a status to a date range while automatically skipping weekends and holidays.
 - Search leave records by keyword, status, or date range.
 
@@ -191,10 +193,10 @@ Export a CSV regularly under Settings → Data & Sync, or configure WebDAV backu
 Exported CSV files use these columns:
 
 ```text
-日期,状态,请假类型,请假理由,是否节假日,是否周末,备注,用户设置(JSON)
+日期,状态,请假类型,请假理由,加班工时,调休倍率,加班事由,是否节假日,是否周末,备注,更新时间,用户设置(JSON)
 ```
 
-The `用户设置(JSON)` column appears once in the first data row and contains the profile, work schedule, salary, leave balances, leave-note defaults, theme, and language. A settings row is retained even when no calendar records exist. Older seven-column CSV files without this field remain supported.
+The `用户设置(JSON)` column appears once in the first data row and contains the profile, work schedule, salary, leave balances, leave-note defaults, theme, and language. A settings row is retained even when no calendar records exist. Older CSV files without overtime fields or this settings column remain supported.
 
 Supported status values:
 

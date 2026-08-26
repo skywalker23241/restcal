@@ -150,20 +150,14 @@
         }
 
         .mark {
-            display: grid;
-            place-items: center;
+            display: block;
             width: 48px;
             height: 48px;
             border-radius: 13px;
-            background: linear-gradient(145deg, #c84839, var(--seal));
-            color: var(--on-seal);
             box-shadow:
                 inset 0 0 0 2px rgba(255, 247, 241, 0.28),
                 0 8px 20px rgba(143, 40, 30, 0.16);
-            font-family: var(--font-cjk);
-            font-size: 28px;
-            font-weight: 700;
-            line-height: 1;
+            object-fit: cover;
         }
 
         .brand-name {
@@ -497,7 +491,7 @@
     <main class="page">
         <header class="topbar">
             <div class="brand">
-                <span class="mark" aria-hidden="true">休</span>
+                <img class="mark" src="../public/assets/icons/icon-192.png" alt="">
                 <span class="brand-name">RestCal</span>
                 <span class="brand-cn">休历</span>
             </div>
