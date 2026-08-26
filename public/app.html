@@ -5599,10 +5599,8 @@
             return "Basic " + btoa(unescape(encodeURIComponent(`${webdavConfig.username}:${webdavConfig.password}`)));
         }
 
-        // 桌面版（有 window.xiuliDav）走主进程；网页/PWA 走同源服务（本地为 server.js，
-        // 线上为 Netlify Function，部署见 README）。两者都在服务端发请求，绕过浏览器
-        // CORS，兼容坚果云等所有服务器。网页端不再静默退回直连，否则代理的 404/CORS
-        // 配置错误会被二次跨域错误掩盖，用户无法判断真正原因。
+        // 桌面版走主进程，Android APK 走原生 OkHttp（支持 PROPFIND、MKCOL 等 WebDAV
+        // 方法且不受浏览器 CORS 限制），网页/PWA 才走同源服务端代理。
         async function webdavRequest(method, {url, headers = {}, body} = {}) {
             const target = url || webdavTargetUrl();
             if (!target) throw new Error("请先填写服务器地址");
@@ -5610,6 +5608,19 @@
             const payload = {method, url: target, headers: reqHeaders, body};
             if (window.xiuliDav?.request) {
                 return await window.xiuliDav.request(payload);
+            }
+            const nativeWebDav = window.Capacitor?.Plugins?.WebDav;
+            if (document.documentElement.classList.contains("android-shell") && nativeWebDav?.request) {
+                try {
+                    const result = await nativeWebDav.request(payload);
+                    if (!result || typeof result.status !== "number") {
+                        throw new Error("原生 WebDAV 响应格式不正确");
+                    }
+                    return result;
+                } catch (error) {
+                    const message = error?.message || String(error || "未知网络错误");
+                    throw new Error(message);
+                }
             }
             // 网页/PWA：通过服务端代理转发，绕过 WebDAV 服务器的跨域限制。
             const proxyUrl = WEBDAV_PROXY_URL;
