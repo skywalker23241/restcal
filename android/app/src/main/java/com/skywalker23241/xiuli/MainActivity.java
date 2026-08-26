@@ -19,7 +19,11 @@ public class MainActivity extends BridgeActivity {
         // Android 15+ draws targetSdk 35+ apps edge-to-edge by default. Apply the
         // real system-bar and display-cutout insets to the WebView so the app UI
         // never sits underneath a status bar, camera cutout, or gesture area.
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        // Keep the normal system-bar fitting behavior on Android 15 devices.
+        // The theme opts out of forced edge-to-edge for this WebView shell; the
+        // listener below remains as a fallback for devices that still dispatch
+        // edge-to-edge insets.
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
         View webView = getBridge().getWebView();
         ViewCompat.setOnApplyWindowInsetsListener(webView, (view, insets) -> {
             Insets systemBars = insets.getInsets(
