@@ -3856,6 +3856,11 @@ html.theme-anim #themeToggle .icon {
 @keyframes onboarding-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes onboarding-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 760px) {
+    /* Android WebView fallback for OEMs that report an incomplete status-bar inset. */
+    html.android-shell .app {
+        padding-top: max(32px, env(safe-area-inset-top));
+    }
+
     .tools-grid {
         grid-template-columns: 1fr;
     }
@@ -5097,6 +5102,10 @@ html.theme-anim #themeToggle .icon {
         border: 0;
         padding-top: env(safe-area-inset-top);
         padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    html.android-shell .settings-backdrop .settings-page {
+        padding-top: max(32px, env(safe-area-inset-top));
     }
 
     .settings-backdrop.open .settings-page {
