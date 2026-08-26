@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">休历</string>
+    <string name="title_activity_main">休历</string>
+    <string name="package_name">com.skywalker23241.xiuli</string>
+    <string name="custom_url_scheme">com.skywalker23241.xiuli</string>
+</resources>

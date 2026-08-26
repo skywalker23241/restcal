@@ -12,7 +12,7 @@
 ![Release](https://img.shields.io/badge/release-v1.6.0-b4382a)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-5A0FC8)
 ![Zero Build](https://img.shields.io/badge/build-zero%20dependency-orange)
-![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Windows-blue)
+![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Windows%20%7C%20Android-blue)
 
 **[🌐 立即使用](https://restcal.abohack.com/app.html)** · [产品主页](https://restcal.abohack.com) · [Telegram 频道](https://t.me/restcalabohack) · **[下载 v1.6.0 离线版](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)** · [问题反馈](https://github.com/skywalker23241/restcal-abohack/issues)
 
@@ -162,6 +162,17 @@ npm run dist
 - 开发调试可以运行 `npm start` 直接启动桌面窗口。
 - 国内网络下 Electron 二进制会自动走 npmmirror 镜像；如果 `npm install` 较慢，可加 `--registry=https://registry.npmmirror.com`。
 - 如果构建报错 `Cannot create symbolic link`（解压 winCodeSign 时缺少权限），可以在 Windows 设置中开启「开发者模式」后重试，或手动把 [winCodeSign-2.6.0.7z](https://npmmirror.com/mirrors/electron-builder-binaries/winCodeSign-2.6.0/winCodeSign-2.6.0.7z) 解压到 `%LOCALAPPDATA%\electron-builder\Cache\winCodeSign\winCodeSign-2.6.0`（两个 macOS 符号链接解压失败可忽略）。
+
+## 📱 Android APK
+
+Android 版本使用 Capacitor 将应用页面和资源打包进 APK，安装后不依赖浏览器的 PWA 安装功能。构建前需要 JDK 17 和 Android SDK（Platform、Build-Tools、Platform-Tools）。
+
+```bash
+npm install
+npm run build:android
+```
+
+Debug APK 输出在 `android/app/build/outputs/apk/debug/app-debug.apk`，可直接传到手机安装测试。`mobile/` 是由 `scripts/build-android-web.cjs` 从 `public/app.html` 和 `public/assets/` 生成的构建目录，不需要手动编辑。
 
 ## 🛠 部署自己的实例
 

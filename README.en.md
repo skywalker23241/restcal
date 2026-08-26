@@ -12,7 +12,7 @@
 ![Release](https://img.shields.io/badge/release-v1.6.0-b4382a)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-5A0FC8)
 ![Zero Build](https://img.shields.io/badge/build-zero%20dependency-orange)
-![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Windows-blue)
+![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Windows%20%7C%20Android-blue)
 
 **[🌐 Open RestCal](https://restcal.abohack.com/app.html)** · [Product site](https://restcal.abohack.com) · [Telegram](https://t.me/restcalabohack) · **[Download v1.6.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)** · [Report an issue](https://github.com/skywalker23241/restcal-abohack/issues)
 
@@ -162,6 +162,17 @@ Notes:
 - Run `npm start` to launch the desktop app in development.
 - Electron downloads use the npmmirror mirror by default. If `npm install` is slow in mainland China, add `--registry=https://registry.npmmirror.com`.
 - If the build fails with `Cannot create symbolic link` while extracting winCodeSign, enable Developer Mode in Windows and retry. Alternatively, extract [winCodeSign-2.6.0.7z](https://npmmirror.com/mirrors/electron-builder-binaries/winCodeSign-2.6.0/winCodeSign-2.6.0.7z) to `%LOCALAPPDATA%\electron-builder\Cache\winCodeSign\winCodeSign-2.6.0`; failures involving the two macOS symlinks can be ignored.
+
+## 📱 Android APK
+
+The Android build uses Capacitor to bundle the app pages and assets into an installable APK. It does not rely on the browser's PWA installation flow. Building requires JDK 17 and the Android SDK (Platform, Build-Tools, and Platform-Tools).
+
+```bash
+npm install
+npm run build:android
+```
+
+The debug APK is written to `android/app/build/outputs/apk/debug/app-debug.apk` and can be installed directly on an Android phone for testing. `mobile/` is generated from `public/app.html` and `public/assets/` by `scripts/build-android-web.cjs`; do not edit it manually.
 
 ## 🛠 Deploy your own instance
 
