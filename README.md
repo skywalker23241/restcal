@@ -174,6 +174,8 @@ npm run build:android
 
 Debug APK 输出在 `android/app/build/outputs/apk/debug/app-debug.apk`，可直接传到手机安装测试。`mobile/` 是由 `scripts/build-android-web.cjs` 从 `public/app.html` 和 `public/assets/` 生成的构建目录，不需要手动编辑。
 
+当前可直接安装的测试包：[RestCal-1.6.0-android-webdav-debug.apk](https://github.com/skywalker23241/restcal-abohack/raw/refs/heads/main/releases/RestCal-1.6.0-android-webdav-debug.apk)。该版本包含 Android 原生 WebDAV 通道，SHA256：`806119659596279414773D6060CA19CCAC3C4DF8D4A223BFEF423D65257414D6`。
+
 ## 🛠 部署自己的实例
 
 ### Netlify 部署与网页版 WebDAV

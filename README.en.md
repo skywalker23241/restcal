@@ -174,6 +174,8 @@ npm run build:android
 
 The debug APK is written to `android/app/build/outputs/apk/debug/app-debug.apk` and can be installed directly on an Android phone for testing. `mobile/` is generated from `public/app.html` and `public/assets/` by `scripts/build-android-web.cjs`; do not edit it manually.
 
+Installable test build: [RestCal-1.6.0-android-webdav-debug.apk](https://github.com/skywalker23241/restcal-abohack/raw/refs/heads/main/releases/RestCal-1.6.0-android-webdav-debug.apk). This build includes the native Android WebDAV transport. SHA256: `806119659596279414773D6060CA19CCAC3C4DF8D4A223BFEF423D65257414D6`.
+
 ## 🛠 Deploy your own instance
 
 ### Netlify and WebDAV
