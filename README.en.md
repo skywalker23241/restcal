@@ -141,14 +141,14 @@ The application shell and bundled holiday, lunar-calendar, and solar-term data f
 
 Latest Android release: [RestCal v2.0.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v2.0.0)
 
-Windows offline release: [RestCal v1.6.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)
+Windows offline release: [RestCal v2.0.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v2.0.0)
 
 | Download | Purpose |
 |---|---|
-| [`RestCal-1.6.0-portable.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/RestCal-1.6.0-portable.exe) | Portable executable; no installation required |
-| [`RestCal-1.6.0-setup.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/RestCal-1.6.0-setup.exe) | Windows installer with a selectable installation directory |
-| [`RestCal-1.6.0-win.zip`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/RestCal-1.6.0-win.zip) | Extract and run `休历.exe` |
-| [`SHA256SUMS-1.6.0.txt`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/SHA256SUMS-1.6.0.txt) | File-integrity checksums |
+| [`休历-2.0.0-portable.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/%E4%BC%91%E5%8E%86-2.0.0-portable.exe) | Portable executable; no installation required |
+| [`休历-2.0.0-setup.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/%E4%BC%91%E5%8E%86-2.0.0-setup.exe) | Windows installer with a selectable installation directory |
+| [`休历-2.0.0-win.zip`](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/%E4%BC%91%E5%8E%86-2.0.0-win.zip) | Extract and run `休历.exe` |
+| [`SHA256SUMS-2.0.0.txt`](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/SHA256SUMS-2.0.0.txt) | File-integrity checksums |
 
 All three packages include the application and Chinese calendar data for 2004–2026. The current builds are not code-signed, so Windows SmartScreen may display a warning on first launch.
 
@@ -180,7 +180,7 @@ npm run build:android
 
 The debug APK is written to `android/app/build/outputs/apk/debug/app-debug.apk` and can be installed directly on an Android phone for testing. `mobile/` is generated from `public/app.html` and `public/assets/` by `scripts/build-android-web.cjs`; do not edit it manually.
 
-Installable APK: [RestCal-2.0.0-android-webdav.apk](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/RestCal-2.0.0-android-webdav.apk). This build includes the native Android WebDAV transport; see the v2.0.0 release notes for SHA256.
+Installable APK: [RestCal-2.0.0-android-webdav.apk](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/RestCal-2.0.0-android-webdav.apk). This build includes the native Android WebDAV transport; see [SHA256SUMS-2.0.0.txt](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/SHA256SUMS-2.0.0.txt) for the checksum.
 
 ## 🛠 Deploy your own instance
 

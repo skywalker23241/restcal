@@ -141,14 +141,14 @@
 
 最新 Android 版：[RestCal v2.0.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v2.0.0)
 
-Windows 离线版：[RestCal v1.6.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)
+Windows 离线版：[RestCal v2.0.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v2.0.0)
 
 | 下载 | 用途 |
 |---|---|
-| [`RestCal-1.6.0-portable.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/RestCal-1.6.0-portable.exe) | 免安装，下载后直接运行 |
-| [`RestCal-1.6.0-setup.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/RestCal-1.6.0-setup.exe) | Windows 安装程序，可选择安装目录 |
-| [`RestCal-1.6.0-win.zip`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/RestCal-1.6.0-win.zip) | 解压后运行 `休历.exe` |
-| [`SHA256SUMS-1.6.0.txt`](https://github.com/skywalker23241/restcal-abohack/releases/download/v1.6.0/SHA256SUMS-1.6.0.txt) | 下载文件完整性校验值 |
+| [`休历-2.0.0-portable.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/%E4%BC%91%E5%8E%86-2.0.0-portable.exe) | 免安装，下载后直接运行 |
+| [`休历-2.0.0-setup.exe`](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/%E4%BC%91%E5%8E%86-2.0.0-setup.exe) | Windows 安装程序，可选择安装目录 |
+| [`休历-2.0.0-win.zip`](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/%E4%BC%91%E5%8E%86-2.0.0-win.zip) | 解压后运行 `休历.exe` |
+| [`SHA256SUMS-2.0.0.txt`](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/SHA256SUMS-2.0.0.txt) | 下载文件完整性校验值 |
 
 三个程序包均包含应用和 2004–2026 年中国日历数据，无网络时也能使用。当前构建尚未进行代码签名，Windows SmartScreen 可能在首次运行时显示提醒。
 
@@ -180,7 +180,7 @@ npm run build:android
 
 Debug APK 输出在 `android/app/build/outputs/apk/debug/app-debug.apk`，可直接传到手机安装测试。`mobile/` 是由 `scripts/build-android-web.cjs` 从 `public/app.html` 和 `public/assets/` 生成的构建目录，不需要手动编辑。
 
-当前可直接安装的 APK：[RestCal-2.0.0-android-webdav.apk](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/RestCal-2.0.0-android-webdav.apk)。该版本包含 Android 原生 WebDAV 通道，SHA256 见 v2.0.0 Release 说明。
+当前可直接安装的 APK：[RestCal-2.0.0-android-webdav.apk](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/RestCal-2.0.0-android-webdav.apk)。该版本包含 Android 原生 WebDAV 通道，SHA256 见 [SHA256SUMS-2.0.0.txt](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/SHA256SUMS-2.0.0.txt)。
 
 ## 🛠 部署自己的实例
 
