@@ -220,13 +220,16 @@
             <div class="home-alerts" id="homeAlerts" hidden></div>
 
             <section class="setup-banner" id="welcomeCard" aria-label="完成初始设置" hidden>
+                <svg class="icon setup-banner-icon" aria-hidden="true">
+                    <use href="#i-settings" />
+                </svg>
                 <div class="setup-banner-copy">
                     <strong id="welcomeTitle">完成初始设置</strong>
                     <span id="welcomeSubtitle">填写工作制度、工资和假期额度，统计会更准确。</span>
                 </div>
                 <div class="setup-banner-actions">
                     <button class="btn primary compact-btn" id="setupBannerStart" type="button">继续设置</button>
-                    <button class="btn ghost compact-btn" id="setupBannerDismiss" type="button">暂不需要</button>
+                    <button class="btn ghost compact-btn" id="setupBannerDismiss" type="button" aria-label="暂不需要" title="暂不需要">暂不需要</button>
                 </div>
             </section>
 
@@ -1092,6 +1095,8 @@
         const enhancedDateInputs = new Map();
         let enhancedSelectEventsBound = false;
         const narrowScreenQuery = window.matchMedia("(max-width: 760px)");
+        // 与 styles.css 里“手机端月历”的 @media (max-width: 768px) 保持同一断点。
+        const compactMonthQuery = window.matchMedia("(max-width: 768px)");
         const openBackdrops = new Set();
         let searchRenderTimer = 0;
         let onboardingStep = 0;
@@ -1351,6 +1356,10 @@
 
         function isNarrowScreen() {
             return narrowScreenQuery.matches;
+        }
+
+        function isCompactMonthView() {
+            return compactMonthQuery.matches;
         }
 
         function getThemePreference() {
@@ -1615,7 +1624,13 @@
             groups.forEach(group => resizeObserver.observe(group));
 
             window.addEventListener("resize", () => syncAllSegmentedIndicators(false));
+            // 跨越紧凑断点时日期格副标题的取值规则会变，需要重绘日历。
+            compactMonthQuery.addEventListener("change", () => renderCalendarView());
             window.addEventListener("restcal:languagechange", () => {
+                // 重渲染写回的是中文原文，而 apply(document) 已在派发事件前跑完，
+                // 这里必须补一次同步翻译，否则要等 MutationObserver 的异步回调。
+                renderMonthSummary(calculateStats(currentYear, currentMonth));
+                window.RestCalI18n?.apply(els.monthSummary);
                 requestAnimationFrame(() => syncAllSegmentedIndicators(false));
             });
         }
@@ -2746,7 +2761,12 @@
             card.type = "button";
             card.setAttribute("aria-label", dayAriaLabel(date, info, record));
 
-            const sub = daySubInfo(date, info, record) || {text: getLunarText(date), kind: "lunar"};
+            // 手机端月视图的出勤状态由日期格底色表达，保留农历文字，避免连续“✓”形成视觉噪音；
+            // 桌面端日期格没有整格底色，仍需要“✓”标记出勤。
+            const fallbackSub = {text: getLunarText(date), kind: "lunar"};
+            const sub = isCompactMonthView() && record?.status === "work" && !record.overtime
+                ? fallbackSub
+                : daySubInfo(date, info, record) || fallbackSub;
             card.innerHTML = `
           <span class="solar">${date.getDate()}</span>
           ${daySubHtml(sub)}
@@ -3085,6 +3105,7 @@
         <div class="overview-item">
           <span class="overview-label">${label}</span>
           <strong class="overview-value">${value}</strong>
+          <span class="overview-compact">${label} · ${value}</span>
         </div>
       `).join("");
             const unavailable = `<div class="empty-state">${escapeHtml(message)}，暂不计算统计。</div>`;
@@ -3154,26 +3175,35 @@
         function renderMonthSummary(monthStats) {
             const salary = calculateSalarySnapshot(monthStats);
             const nextHoliday = findNextHoliday();
+            // compact 只产出中文原文，英文交给 app-i18n 的 translateCore 规则处理，
+            // 与其余带数字的插值文案（如“已出勤 N 天”）保持同一套机制。
             const items = [
                 {
                     label: "请假 / 出勤",
                     value: `${monthStats.totalLeave} / ${monthStats.actualWorkdays} 天`,
+                    compact: `${monthStats.totalLeave} 请假 · ${monthStats.actualWorkdays} 出勤`,
                     meta: "请假天数 / 已出勤天数"
                 },
                 {
                     label: "请假每日扣款",
                     value: salary.salary ? `${formatMoney(salary.daily)} / 天` : "未设置",
+                    compact: salary.salary ? `扣款 ${formatMoney(salary.daily)} / 天` : "扣款未设置",
                     action: salary.salary ? "" : "salary",
                     meta: salary.salary ? "按本月应出勤天数折算，实际按请假类型比例计算" : ""
                 },
                 {
                     label: "距下个节假日",
                     value: nextHoliday ? (nextHoliday.days === 0 ? "今天" : `${nextHoliday.days} 天`) : "暂无数据",
+                    compact: nextHoliday
+                        ? (nextHoliday.days === 0
+                            ? `${nextHoliday.name} · 今天`
+                            : `${nextHoliday.name} · 还有 ${nextHoliday.days} 天`)
+                        : "节假日暂无数据",
                     meta: nextHoliday ? `${nextHoliday.name} · ${formatMonthDay(nextHoliday.date)}` : ""
                 }
             ];
             els.monthSummary.innerHTML = items.map(item => {
-                const inner = `<span class="overview-label">${escapeHtml(item.label)}</span><strong class="overview-value">${escapeHtml(item.value)}</strong>`;
+                const inner = `<span class="overview-label">${escapeHtml(item.label)}</span><strong class="overview-value">${escapeHtml(item.value)}</strong><span class="overview-compact">${escapeHtml(item.compact)}</span>`;
                 const title = item.meta ? ` title="${escapeHtml(item.meta)}"` : "";
                 if (item.action) {
                     return `<button class="overview-item is-action ${item.tone}" data-open-settings-dynamic="${item.action}" type="button"${title}>${inner}</button>`;

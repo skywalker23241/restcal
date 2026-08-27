@@ -20,6 +20,7 @@
         "Chinese Days 发布该年度数据后，联网刷新页面即可自动获取。为避免误导，当前不计算该年度的出勤、工资和购票提醒。": "Once Chinese Days publishes data for this year, refresh while online to retrieve it automatically. To avoid misleading results, attendance, pay and ticket reminders are not calculated yet.",
         "今天": "Today", "上月": "Previous month", "下月": "Next month",
         "请假 / 出勤": "Leave / attendance", "请假每日扣款": "Daily leave deduction", "距下个节假日": "Next holiday in", "请假天数 / 已出勤天数": "Leave days / attended days", "按本月应出勤天数折算，实际按请假类型比例计算": "Based on this month's expected workdays; actual deduction varies by leave type",
+        "扣款未设置": "Deduction not set", "节假日暂无数据": "No holiday data",
         "选择日期": "Pick a date", "清空": "Clear", "上一年": "Previous year", "下一年": "Next year",
         "年份": "Year", "月份": "Month", "年月选择": "Year and month", "月份导航": "Month navigation", "月份切换": "Change month", "工具操作": "Tools",
         "搜索与筛选": "Search and filters", "切换主题": "Switch theme", "设置": "Settings", "使用说明": "Help", "界面引导": "Interface tour", "CSV 备份与导入": "CSV backup and import",
@@ -269,6 +270,17 @@
             if (statusCount) translated = `${EN[statusCount[1]]} ${statusCount[2]}${statusCount[3] ? " days" : ""}`;
             const monthlyLeave = trimmed.match(/^(\d{4}-\d{2}) 请假 (\d+(?:\.\d+)?) 天$/);
             if (monthlyLeave) translated = `${monthlyLeave[1]} Leave ${monthlyLeave[2]} days`;
+            // 手机端月摘要（#monthSummary .overview-compact）的三条插值文案。
+            const leaveAttendance = trimmed.match(/^(\d+(?:\.\d+)?) 请假 · (\d+(?:\.\d+)?) 出勤$/);
+            if (leaveAttendance) translated = `${leaveAttendance[1]} leave · ${leaveAttendance[2]} attended`;
+            const dailyDeduction = trimmed.match(/^扣款 (.+) \/ 天$/);
+            if (dailyDeduction) translated = `Deduction ${dailyDeduction[1]}/day`;
+            const holidayToday = trimmed.match(/^(.+?) · 今天$/);
+            if (holidayToday) translated = `${EN[holidayToday[1]] || holidayToday[1]} · Today`;
+            const holidayCountdown = trimmed.match(/^(.+?) · 还有 (\d+) 天$/);
+            if (holidayCountdown) translated = `${EN[holidayCountdown[1]] || holidayCountdown[1]} · in ${holidayCountdown[2]} days`;
+            const pendingItem = trimmed.match(/^(.+?) · 待发布$/);
+            if (pendingItem) translated = `${EN[pendingItem[1]] || pendingItem[1]} · Pending`;
             const datedStatus = trimmed.match(/^(\d{4}-\d{2}-\d{2}) (工作日|周末|节假日|出勤|事假|病假|年假|调休)$/);
             if (datedStatus) translated = `${datedStatus[1]} ${EN[datedStatus[2]]}`;
         }

@@ -10,6 +10,51 @@ const URL = "http://127.0.0.1:8765/app.html";
 
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+/* 紧凑月视图（styles.css 的 @media (max-width: 768px)）的布局约束。
+ * 尺寸一律用区间而非精确值，给字体回退和 DPR 取整留出余量；
+ * 改动那段 CSS 的尺寸时，同步改这里而不是散落在断言表达式里。 */
+const COMPACT_BREAKPOINT = 768;
+const COMPACT_MONTH_RANGES = {
+    switcherHeight: [48, 52],        // 年月选择器整体触控高度
+    pickerHeight: [48, 52],          // 内嵌的年 / 月下拉与外框等高
+    tabsHeight: [24, 38],            // 日/周/月/年降级为轻量 Tab
+    summaryHeight: [36, 48],         // 三卡合并后的单行摘要条
+    weekdayHeight: [28, 32],         // 星期表头
+    gridHeight: [342, 400],          // 6 行日期格
+    cellHeight: [52, 58],            // 单个日期格行高
+    calendarShare: [0.6, 1],         // 日历面板占「控件+日历」总高的比例
+    bannerHeight: [28, 52],          // 初始设置提示压缩为单行
+    bannerDismissWidth: [36, 64]     // 「×」按钮仍需满足触控区
+};
+const COMPACT_MONTH_EXACT = {
+    cards: 42,
+    indicatorHeight: 2,              // Tab 下的 2px 滑动指示器
+    tabsBackground: "rgba(0, 0, 0, 0)",
+    cellBorder: "none",
+    cellRadius: "0px",
+    cellBackground: "rgba(0, 0, 0, 0)",
+    subNoWrap: true,
+    footerDisplay: "none",
+    bannerSubtitleDisplay: "none"
+};
+const COMPACT_NOTE_MARKER = [3, 6];  // 便签标记降为小圆点
+const WIDE_NOTE_MARKER = [11, 40];   // 宽屏保留图标本体
+
+function collectFailures(audit, ranges, exact) {
+    const failures = Object.entries(ranges).flatMap(([key, [min, max]]) => {
+        const value = audit[key];
+        return typeof value === "number" && value >= min && value <= max
+            ? []
+            : [`${key}=${JSON.stringify(value)} 期望 ${min}~${max}`];
+    });
+    return failures.concat(Object.entries(exact).flatMap(([key, expected]) =>
+        audit[key] === expected ? [] : [`${key}=${JSON.stringify(audit[key])} 期望 ${JSON.stringify(expected)}`]));
+}
+
+function inRange(value, [min, max]) {
+    return typeof value === "number" && value >= min && value <= max;
+}
+
 async function capture(win, name) {
     win.webContents.invalidate();
     await wait(120);
@@ -184,16 +229,41 @@ async function run() {
                 renderCalendarView();
                 const marker = document.querySelector(\`[data-date="\${iso}"] .note-marker\`);
                 if (!marker) return null;
+                const card = marker.closest(".day-card");
                 const rect = marker.getBoundingClientRect();
                 return {
-                    width: Math.round(rect.width),
-                    height: Math.round(rect.height),
-                    href: marker.querySelector("use")?.getAttribute("href")
+                    marker: {
+                        width: Math.round(rect.width),
+                        height: Math.round(rect.height),
+                        href: marker.querySelector("use")?.getAttribute("href"),
+                        iconDisplay: getComputedStyle(marker.querySelector(".icon")).display
+                    },
+                    statusCell: {
+                        subText: card.querySelector(".day-sub")?.textContent.trim(),
+                        background: getComputedStyle(card).backgroundColor,
+                        radius: getComputedStyle(card).borderTopLeftRadius
+                    }
                 };
             })()
         `);
-        if (!noteMarker || noteMarker.width < 11 || noteMarker.height < 11 || noteMarker.href !== "#i-note") {
-            throw new Error(`${w}px note marker layout failed: ${JSON.stringify(noteMarker)}`);
+        const compactViewport = w <= COMPACT_BREAKPOINT;
+        const markerAudit = noteMarker?.marker;
+        const markerRange = compactViewport ? COMPACT_NOTE_MARKER : WIDE_NOTE_MARKER;
+        const markerFailed = !markerAudit || markerAudit.href !== "#i-note"
+            || !inRange(markerAudit.width, markerRange) || !inRange(markerAudit.height, markerRange)
+            // 紧凑月视图把便签标记降为小圆点，图标本体隐藏。
+            || (compactViewport ? markerAudit.iconDisplay !== "none" : markerAudit.iconDisplay === "none");
+        if (markerFailed) {
+            throw new Error(`${w}px note marker layout failed: ${JSON.stringify(markerAudit ?? noteMarker)}`);
+        }
+        // 上面的夹具给这一天写了 status:"work"，因此同一个格子可以顺带校验
+        // 紧凑月视图“出勤用底色表达、不再显示✓”的约定。断言分开抛，避免失败时指错方向。
+        if (compactViewport) {
+            const statusCell = noteMarker.statusCell;
+            if (statusCell.background === "rgba(0, 0, 0, 0)" || statusCell.radius !== "8px"
+                || statusCell.subText === "✓") {
+                throw new Error(`${w}px compact status cell audit failed: ${JSON.stringify(statusCell)}`);
+            }
         }
         const overviewAudit = await win.webContents.executeJavaScript(`
             [...document.querySelectorAll("#monthSummary .overview-item")].map(item => {
@@ -202,16 +272,130 @@ async function run() {
                     label: item.querySelector(".overview-label")?.textContent.trim(),
                     border: style.borderTopStyle,
                     background: style.backgroundColor,
-                    align: style.textAlign
+                    align: style.textAlign,
+                    compact: item.querySelector(".overview-compact")?.textContent.trim(),
+                    compactDisplay: getComputedStyle(item.querySelector(".overview-compact")).display
                 };
             })
         `);
         const expectedOverviewLabels = ["请假 / 出勤", "请假每日扣款", "距下个节假日"];
-        if (overviewAudit.length !== 3 || overviewAudit.some((item, index) =>
-            item.label !== expectedOverviewLabels[index] || item.border === "none"
-            || item.background === "rgba(0, 0, 0, 0)" || item.align !== "center"
-        )) {
+        const overviewFailed = overviewAudit.length !== 3 || overviewAudit.some((item, index) => {
+            if (item.label !== expectedOverviewLabels[index]) return true;
+            if (compactViewport) return item.border !== "none" || item.background !== "rgba(0, 0, 0, 0)"
+                || !item.compact || item.compactDisplay === "none";
+            return item.border === "none" || item.background === "rgba(0, 0, 0, 0)"
+                || item.align !== "center" || item.compactDisplay !== "none";
+        });
+        if (overviewFailed) {
             throw new Error(`${w}px overview card audit failed: ${JSON.stringify(overviewAudit)}`);
+        }
+        if (compactViewport) {
+            const mobileMonthAudit = await win.webContents.executeJavaScript(`
+                (() => {
+                    const switcher = document.querySelector("#viewCalendar .month-switcher");
+                    const picker = switcher.querySelector(".picker-group");
+                    const tabs = document.querySelector("#viewCalendar .view-switcher");
+                    const indicator = tabs.querySelector(".segmented-indicator");
+                    const summary = document.getElementById("monthSummary");
+                    const panel = document.querySelector(".calendar-panel.mode-month");
+                    const weekday = panel.querySelector(".weekday-row");
+                    const grid = document.getElementById("calendarGrid");
+                    const cards = [...grid.querySelectorAll(".day-card")];
+                    const cardStyle = getComputedStyle(cards[0]);
+                    const subStyles = cards.map(card => getComputedStyle(card.querySelector(".day-sub")));
+                    const rect = element => element.getBoundingClientRect();
+                    const controlsAndCalendarHeight = rect(panel).bottom - rect(switcher).top;
+                    const previousOnboarding = state.onboardingCompleted;
+                    const previousDismissed = state.setupBannerDismissed;
+                    let bannerAudit;
+                    try {
+                        state.onboardingCompleted = false;
+                        state.setupBannerDismissed = false;
+                        renderSetupBanner();
+                        const banner = document.getElementById("welcomeCard");
+                        bannerAudit = {
+                            height: Math.round(rect(banner).height),
+                            subtitleDisplay: getComputedStyle(document.getElementById("welcomeSubtitle")).display,
+                            dismissWidth: Math.round(rect(document.getElementById("setupBannerDismiss")).width)
+                        };
+                    } finally {
+                        state.onboardingCompleted = previousOnboarding;
+                        state.setupBannerDismissed = previousDismissed;
+                        renderSetupBanner();
+                    }
+                    return {
+                        switcherHeight: Math.round(rect(switcher).height),
+                        pickerHeight: Math.round(rect(picker).height),
+                        tabsHeight: Math.round(rect(tabs).height),
+                        indicatorHeight: Math.round(rect(indicator).height),
+                        tabsBackground: getComputedStyle(tabs).backgroundColor,
+                        summaryHeight: Math.round(rect(summary).height),
+                        weekdayHeight: Math.round(rect(weekday).height),
+                        gridHeight: Math.round(rect(grid).height),
+                        panelHeight: Math.round(rect(panel).height),
+                        calendarShare: rect(panel).height / controlsAndCalendarHeight,
+                        cards: cards.length,
+                        cellHeight: cards.length > 7 ? Math.round(rect(cards[7]).top - rect(cards[0]).top) : 0,
+                        cellBorder: cardStyle.borderTopStyle,
+                        cellRadius: cardStyle.borderTopLeftRadius,
+                        cellBackground: cardStyle.backgroundColor,
+                        subNoWrap: subStyles.every(style => style.whiteSpace === "nowrap"),
+                        footerDisplay: getComputedStyle(panel.querySelector(".calendar-footer")).display,
+                        banner: bannerAudit
+                    };
+                })()
+            `);
+            const compactMonthFailures = collectFailures({
+                ...mobileMonthAudit,
+                bannerHeight: mobileMonthAudit.banner.height,
+                bannerDismissWidth: mobileMonthAudit.banner.dismissWidth,
+                bannerSubtitleDisplay: mobileMonthAudit.banner.subtitleDisplay
+            }, COMPACT_MONTH_RANGES, COMPACT_MONTH_EXACT);
+            if (compactMonthFailures.length) {
+                throw new Error(`${w}px compact month audit failed: ${compactMonthFailures.join("; ")}`);
+            }
+            const mobileThemeLanguageAudit = await win.webContents.executeJavaScript(`
+                (() => {
+                    const root = document.documentElement;
+                    const previousTheme = root.dataset.theme;
+                    const previousLanguage = window.RestCalI18n.getLanguage();
+                    try {
+                        window.RestCalI18n.setLanguage("en");
+                        root.dataset.theme = "dark";
+                        const grid = document.getElementById("calendarGrid");
+                        const panel = document.querySelector(".calendar-panel.mode-month");
+                        return {
+                            language: root.lang,
+                            horizontalOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+                            summaryText: document.querySelector("#monthSummary .overview-compact")?.textContent.trim(),
+                            summaryNoWrap: [...document.querySelectorAll("#monthSummary .overview-compact")]
+                                .every(item => getComputedStyle(item).whiteSpace === "nowrap"),
+                            overflowing: [...document.querySelectorAll("body *")]
+                                .filter(item => {
+                                    const rect = item.getBoundingClientRect();
+                                    return rect.width && (rect.right > innerWidth + 0.5 || rect.left < -0.5);
+                                })
+                                .slice(0, 8)
+                                .map(item => ({tag: item.tagName, id: item.id, className: String(item.className), right: Math.round(item.getBoundingClientRect().right), width: Math.round(item.getBoundingClientRect().width)})),
+                            gridBackground: getComputedStyle(grid).backgroundColor,
+                            panelBackground: getComputedStyle(panel).backgroundColor,
+                            foreground: getComputedStyle(panel.querySelector(".solar")).color,
+                            pageBackground: getComputedStyle(document.body).backgroundColor
+                        };
+                    } finally {
+                        if (previousTheme === undefined) delete root.dataset.theme;
+                        else root.dataset.theme = previousTheme;
+                        window.RestCalI18n.setLanguage(previousLanguage);
+                    }
+                })()
+            `);
+            if (mobileThemeLanguageAudit.language !== "en" || mobileThemeLanguageAudit.horizontalOverflow !== 0
+                || !mobileThemeLanguageAudit.summaryText?.includes("leave") || !mobileThemeLanguageAudit.summaryNoWrap
+                || mobileThemeLanguageAudit.gridBackground !== "rgba(0, 0, 0, 0)"
+                || mobileThemeLanguageAudit.panelBackground !== "rgba(0, 0, 0, 0)"
+                || mobileThemeLanguageAudit.foreground === mobileThemeLanguageAudit.pageBackground) {
+                throw new Error(`${w}px mobile dark/i18n audit failed: ${JSON.stringify(mobileThemeLanguageAudit)}`);
+            }
         }
         await wait(650);
         const tooltipAudit = await win.webContents.executeJavaScript(`

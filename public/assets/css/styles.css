@@ -492,6 +492,10 @@ h1 {
     text-overflow: ellipsis;
 }
 
+.overview-compact {
+    display: none;
+}
+
 .overview-item.warn .overview-value {
     color: var(--st-sick);
 }
@@ -597,6 +601,10 @@ h1 {
 .setup-banner-actions {
     display: inline-flex;
     gap: 8px;
+}
+
+.setup-banner-icon {
+    display: none;
 }
 
 /* ===== 日历下方次级区域 ===== */
@@ -5470,5 +5478,568 @@ html.theme-anim #themeToggle .icon {
     .rate-grid,
     .range-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* ===== 手机端月历：日历优先、轻量网格 ===== */
+@media (max-width: 768px) {
+    #viewCalendar {
+        gap: 6px;
+        min-width: 0;
+    }
+
+    #viewCalendar .calendar-toolbar {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        gap: 4px;
+    }
+
+    /* 年月在视觉上合并为一个选择器，仍复用原来的两个自定义下拉菜单。 */
+    #viewCalendar .month-switcher {
+        position: relative;
+        display: grid;
+        grid-template-columns: 44px minmax(0, 1fr) 44px 64px;
+        width: min(100%, 430px);
+        min-width: 0;
+        max-width: 100%;
+        gap: 0;
+        min-height: 48px;
+    }
+
+    #viewCalendar .month-switcher::before {
+        content: "";
+        grid-column: 1 / 5;
+        grid-row: 1;
+        z-index: 0;
+        align-self: stretch;
+        min-height: 48px;
+        border: 1px solid color-mix(in srgb, var(--border) 58%, transparent);
+        border-radius: var(--radius-sm);
+        background: color-mix(in srgb, var(--surface-subtle) 72%, var(--card));
+        pointer-events: none;
+    }
+
+    #viewCalendar .month-switcher > * {
+        position: relative;
+        z-index: 1;
+        grid-row: 1;
+    }
+
+    #viewCalendar .month-switcher #prevMonth { grid-column: 1; }
+    #viewCalendar .month-switcher .picker-group { grid-column: 2; }
+    #viewCalendar .month-switcher #nextMonth { grid-column: 3; }
+    #viewCalendar .month-switcher #todayBtn { grid-column: 4; }
+
+    #viewCalendar .month-switcher .btn,
+    #viewCalendar .month-switcher .control {
+        min-height: 48px;
+        font-size: 14px;
+    }
+
+    #viewCalendar .month-switcher .month-nav-btn {
+        width: 44px;
+        min-width: 44px;
+        padding: 0;
+        border-color: transparent;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        box-shadow: none;
+        color: var(--muted);
+    }
+
+    #viewCalendar .month-switcher .month-nav-btn:focus-visible {
+        box-shadow: inset 0 0 0 2px var(--ring-soft);
+    }
+
+    #viewCalendar .month-switcher #todayBtn {
+        width: auto;
+        min-width: 0;
+        margin-left: 0;
+        padding-inline: 9px;
+        border: 0;
+        border-left: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        color: var(--primary);
+        font-weight: 650;
+    }
+
+    #viewCalendar .picker-group {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+        min-width: 0;
+        overflow: visible;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    #viewCalendar .picker-group .selectbox {
+        min-width: 0;
+    }
+
+    #viewCalendar .picker-group .selectbox-year {
+        flex: 1 1 auto;
+    }
+
+    #viewCalendar .picker-group .selectbox-month {
+        flex: 0 1 78px;
+    }
+
+    #viewCalendar .picker-group .select-trigger {
+        min-height: 48px;
+        padding-inline: 3px;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        font-weight: 650;
+    }
+
+    #viewCalendar .picker-group .selectbox-year .select-trigger {
+        justify-content: center;
+    }
+
+    #viewCalendar .picker-group .selectbox-year .select-trigger::after {
+        display: none;
+    }
+
+    #viewCalendar .picker-group .selectbox-month .select-trigger {
+        justify-content: center;
+        gap: 0;
+        padding-inline: 3px;
+    }
+
+    #viewCalendar .picker-group .selectbox-month .select-trigger::after {
+        display: none;
+    }
+
+    #viewCalendar .picker-group .selectbox.open .select-trigger {
+        background: color-mix(in srgb, var(--primary) 6%, transparent);
+        box-shadow: none;
+    }
+
+    #viewCalendar .month-switcher.mode-year .picker-group .selectbox-year .select-trigger {
+        justify-content: center;
+    }
+
+    /* 大胶囊切换器降为轻量 Tab，滑动指示器继续沿用原组件逻辑。 */
+    #viewCalendar .view-switcher {
+        min-width: 0;
+        max-width: 100%;
+        min-height: 36px;
+        padding: 0;
+        border: 0;
+        border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+        border-radius: 0;
+        background: transparent;
+    }
+
+    #viewCalendar .view-switcher .segmented-indicator {
+        top: auto;
+        bottom: -1px;
+        height: 2px;
+        border-radius: 999px;
+        background: var(--primary);
+        box-shadow: none;
+    }
+
+    #viewCalendar .view-switcher .seg-btn {
+        min-height: 35px;
+        padding: 0 8px;
+        border-radius: 0;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 650;
+    }
+
+    #viewCalendar .view-switcher .seg-btn.active {
+        color: var(--primary);
+    }
+
+    /* 三张统计卡合并成单行摘要；未设置项保留入口，但不再形成大卡片。 */
+    #viewCalendar .overview-strip {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        min-height: 40px;
+        gap: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-top: 1px solid color-mix(in srgb, var(--border) 66%, transparent);
+        border-bottom: 1px solid color-mix(in srgb, var(--border) 66%, transparent);
+        border-radius: 0;
+        background: transparent;
+        overscroll-behavior-inline: contain;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    #viewCalendar .overview-strip::-webkit-scrollbar {
+        display: none;
+    }
+
+    #viewCalendar .overview-item,
+    #viewCalendar .overview-item:first-child {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1 0 0;
+        min-width: max-content;
+        min-height: 38px;
+        padding: 0 9px;
+        border: 0;
+        border-right: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        color: var(--muted);
+        text-align: center;
+        scroll-snap-align: center;
+    }
+
+    #viewCalendar .overview-item:first-child {
+        padding-left: 9px;
+    }
+
+    #viewCalendar .overview-item:last-child {
+        border-right: 0;
+        padding-right: 9px;
+    }
+
+    #viewCalendar .overview-label,
+    #viewCalendar .overview-value {
+        display: none;
+    }
+
+    #viewCalendar .overview-compact {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 650;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    #viewCalendar .overview-item.is-action .overview-compact {
+        color: var(--primary);
+    }
+
+    :lang(en) #viewCalendar .overview-compact {
+        font-size: 10px;
+        letter-spacing: -0.01em;
+    }
+
+    /* 初始设置从大横幅压缩为可操作的单行提示。 */
+    #viewCalendar .setup-banner {
+        flex-wrap: nowrap;
+        min-height: 44px;
+        padding: 1px 5px 1px 10px;
+        gap: 8px;
+        border-style: solid;
+        border-color: color-mix(in srgb, var(--primary) 20%, var(--border));
+        border-radius: var(--radius-sm);
+        background: color-mix(in srgb, var(--primary) 3%, var(--card));
+    }
+
+    #viewCalendar .setup-banner-icon {
+        display: block;
+        width: 17px;
+        height: 17px;
+        flex: 0 0 auto;
+        color: var(--primary);
+    }
+
+    #viewCalendar .setup-banner-copy {
+        display: block;
+        flex: 1 1 auto;
+        overflow: hidden;
+    }
+
+    #viewCalendar .setup-banner-copy strong {
+        display: block;
+        overflow: hidden;
+        color: var(--foreground);
+        font-size: 12px;
+        font-weight: 650;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    #viewCalendar .setup-banner-copy span {
+        display: none;
+    }
+
+    #viewCalendar .setup-banner-actions {
+        align-items: center;
+        flex: 0 0 auto;
+        gap: 0;
+    }
+
+    #viewCalendar .setup-banner-actions .btn {
+        min-height: 40px;
+        padding-inline: 7px;
+        border: 0;
+        border-radius: var(--radius-sm);
+        background: transparent;
+        box-shadow: none;
+        color: var(--primary);
+        font-size: 12px;
+    }
+
+    #viewCalendar #setupBannerStart::after {
+        content: "›";
+        margin-left: 4px;
+        font-size: 17px;
+        line-height: 1;
+    }
+
+    #viewCalendar #setupBannerDismiss {
+        width: 36px;
+        min-width: 36px;
+        padding: 0;
+        color: var(--muted);
+        font-size: 0;
+    }
+
+    #viewCalendar #setupBannerDismiss::before {
+        content: "×";
+        font-size: 18px;
+        font-weight: 400;
+    }
+
+    /* 月视图不再嵌套一张大卡片，星期和日期靠排版、留白与轻分隔成网格。 */
+    #viewCalendar .calendar-panel.mode-month {
+        --month-status-fill: 16%;
+        --month-status-line: 24%;
+        min-height: 0;
+        overflow: visible;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    [data-theme="dark"] #viewCalendar .calendar-panel.mode-month {
+        --month-status-fill: 20%;
+        --month-status-line: 32%;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .weekday-row {
+        gap: 0;
+        min-height: 30px;
+        padding: 0;
+        border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+        background: transparent;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .weekday {
+        display: grid;
+        place-items: center;
+        min-height: 30px;
+        padding: 0;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 650;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .weekday:nth-child(6),
+    #viewCalendar .calendar-panel.mode-month .weekday:nth-child(7) {
+        color: color-mix(in srgb, var(--muted) 72%, transparent);
+    }
+
+    #viewCalendar .calendar-panel.mode-month .calendar-grid {
+        flex: 0 0 auto;
+        grid-auto-rows: 57px;
+        align-content: start;
+        gap: 0;
+        min-height: 342px;
+        padding: 3px 0 5px;
+        background: transparent;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card {
+        min-width: 0;
+        min-height: 57px;
+        height: 57px;
+        gap: 1px;
+        justify-content: center;
+        padding: 4px 1px 5px;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        filter: none;
+        overflow: visible;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.clickable:hover {
+        filter: none;
+        transform: none;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card .solar {
+        display: grid;
+        place-items: center;
+        width: 27px;
+        height: 27px;
+        flex: 0 0 27px;
+        border-radius: 50%;
+        color: var(--foreground);
+        font-size: 17px;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-sub {
+        max-width: calc(100% - 2px);
+        min-height: 12px;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 600;
+        line-height: 12px;
+        letter-spacing: -0.02em;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-sub.kind-lunar {
+        color: color-mix(in srgb, var(--muted) 88%, transparent);
+        font-weight: 500;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.is-weekend,
+    #viewCalendar .calendar-panel.mode-month .day-card.is-holiday {
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    /* 记录状态使用轻量色块，不再依赖勾号或小圆点。
+       每种状态只声明 --month-status-color，底色和描边由下面的共用规则统一推导。 */
+    #viewCalendar .calendar-panel.mode-month .day-card.status-work { --month-status-color: var(--st-work); }
+    #viewCalendar .calendar-panel.mode-month .day-card.status-personal { --month-status-color: var(--st-personal); }
+    #viewCalendar .calendar-panel.mode-month .day-card.status-sick { --month-status-color: var(--st-sick); }
+    #viewCalendar .calendar-panel.mode-month .day-card.status-annual { --month-status-color: var(--st-annual); }
+    #viewCalendar .calendar-panel.mode-month .day-card.status-comp { --month-status-color: var(--st-comp); }
+    #viewCalendar .calendar-panel.mode-month .day-card.status-overtime,
+    #viewCalendar .calendar-panel.mode-month .day-card.status-work.has-overtime { --month-status-color: var(--st-overtime); }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.status-work,
+    #viewCalendar .calendar-panel.mode-month .day-card.status-personal,
+    #viewCalendar .calendar-panel.mode-month .day-card.status-sick,
+    #viewCalendar .calendar-panel.mode-month .day-card.status-annual,
+    #viewCalendar .calendar-panel.mode-month .day-card.status-comp,
+    #viewCalendar .calendar-panel.mode-month .day-card.status-overtime {
+        border: 0;
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--month-status-color) var(--month-status-fill), var(--card));
+        clip-path: inset(2px 1px round 8px);
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.is-weekend .solar {
+        color: color-mix(in srgb, var(--muted) 76%, var(--foreground));
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.is-holiday .solar,
+    #viewCalendar .calendar-panel.mode-month .day-card.is-holiday .day-sub {
+        color: var(--st-holiday);
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card .day-sub.kind-term {
+        color: var(--st-comp);
+        font-weight: 750;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card .day-sub.kind-makeup {
+        color: var(--st-makeup);
+        font-weight: 800;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.today,
+    #viewCalendar .calendar-panel.mode-month .day-card.selected {
+        box-shadow: none;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.today .solar {
+        background: var(--primary);
+        color: var(--primary-foreground);
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.selected:not(.today) .solar {
+        color: var(--primary);
+        outline: 1.5px solid var(--primary);
+        outline-offset: -1px;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.selected.today .solar {
+        box-shadow: 0 0 0 2px var(--background), 0 0 0 3px color-mix(in srgb, var(--foreground) 46%, transparent);
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.clickable:focus-visible {
+        box-shadow: none;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.clickable:focus-visible .solar {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.outside {
+        opacity: 0.34;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.has-overtime {
+        box-shadow: none;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.has-overtime::before {
+        content: "";
+        position: absolute;
+        bottom: 3px;
+        left: 50%;
+        width: 12px;
+        height: 2px;
+        border-radius: 999px;
+        background: var(--st-overtime);
+        transform: translateX(-50%);
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card .note-marker {
+        top: 7px;
+        left: calc(50% + 9px);
+        right: auto;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--primary);
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card .note-marker .icon {
+        display: none;
+    }
+
+    #viewCalendar .calendar-panel.mode-month .day-card.today .note-marker {
+        background: var(--primary-foreground);
+    }
+
+    /* 描边必须声明在 .has-overtime / .today / .selected / :focus-visible 的
+       box-shadow: none 之后 —— 它们特异度相同，靠源码顺序压制。 */
+    #viewCalendar .calendar-panel.mode-month .day-card.status-work,
+    #viewCalendar .calendar-panel.mode-month .day-card.status-personal,
+    #viewCalendar .calendar-panel.mode-month .day-card.status-sick,
+    #viewCalendar .calendar-panel.mode-month .day-card.status-annual,
+    #viewCalendar .calendar-panel.mode-month .day-card.status-comp,
+    #viewCalendar .calendar-panel.mode-month .day-card.status-overtime {
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--month-status-color) var(--month-status-line), transparent);
+    }
+
+
+    #viewCalendar .calendar-panel.mode-month .calendar-footer {
+        display: none;
     }
 }
