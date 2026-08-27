@@ -9,12 +9,12 @@
 **请假、出勤、工资核算、购票提醒 —— 一页搞定的中国职场日历**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-![Release](https://img.shields.io/badge/release-v1.6.0-b4382a)
+![Release](https://img.shields.io/badge/release-v2.0.0-b4382a)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-5A0FC8)
 ![Zero Build](https://img.shields.io/badge/build-zero%20dependency-orange)
 ![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Windows%20%7C%20Android-blue)
 
-**[🌐 立即使用](https://restcal.abohack.com/app.html)** · [产品主页](https://restcal.abohack.com) · [Telegram 频道](https://t.me/restcalabohack) · **[下载 v1.6.0 离线版](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)** · [问题反馈](https://github.com/skywalker23241/restcal-abohack/issues)
+**[🌐 立即使用](https://restcal.abohack.com/app.html)** · [产品主页](https://restcal.abohack.com) · [Telegram 频道](https://t.me/restcalabohack) · **[下载 v2.0.0 Android APK](https://github.com/skywalker23241/restcal-abohack/releases/tag/v2.0.0)** · [问题反馈](https://github.com/skywalker23241/restcal-abohack/issues)
 
 <img src="public/assets/images/screenshots/overview-light.png" alt="休历天视图：当日日历卡片、假期额度、出勤和预计实发概览" width="100%">
 
@@ -30,7 +30,11 @@
 
 应用界面支持中文与英文一键切换；语言、主题以及所有业务设置都可以随 CSV 或 WebDAV 完整备份和恢复。
 
-## 🆕 v1.6.0 更新
+## 🆕 v2.0.0 更新
+
+- 发布可直接安装的 Android 2.0.0 APK，适配全面屏和小米 HyperOS 状态栏安全区域。
+- Android 端 WebDAV 改用原生网络通道，支持 `PROPFIND`、`MKCOL`、`PUT` 和 `GET`，不受浏览器跨域限制。
+- 保留 v1.6.0 Windows 离线版，旧版数据可继续通过 CSV 或 WebDAV 迁移。
 
 - 新增统一主题样式的日期选择器，并优化年月选择、日历卡片和周视图信息层级。
 - 每日一言按界面语言切换中文/英文来源，网络不可用时继续使用本地名句。
@@ -135,7 +139,9 @@
 
 ## 💻 桌面版（Windows）
 
-最新离线版：[RestCal v1.6.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)
+最新 Android 版：[RestCal v2.0.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v2.0.0)
+
+Windows 离线版：[RestCal v1.6.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)
 
 | 下载 | 用途 |
 |---|---|
@@ -174,7 +180,7 @@ npm run build:android
 
 Debug APK 输出在 `android/app/build/outputs/apk/debug/app-debug.apk`，可直接传到手机安装测试。`mobile/` 是由 `scripts/build-android-web.cjs` 从 `public/app.html` 和 `public/assets/` 生成的构建目录，不需要手动编辑。
 
-当前可直接安装的测试包：[RestCal-1.6.0-android-webdav-debug.apk](https://github.com/skywalker23241/restcal-abohack/raw/refs/heads/main/releases/RestCal-1.6.0-android-webdav-debug.apk)。该版本包含 Android 原生 WebDAV 通道，SHA256：`806119659596279414773D6060CA19CCAC3C4DF8D4A223BFEF423D65257414D6`。
+当前可直接安装的 APK：[RestCal-2.0.0-android-webdav.apk](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/RestCal-2.0.0-android-webdav.apk)。该版本包含 Android 原生 WebDAV 通道，SHA256 见 v2.0.0 Release 说明。
 
 ## 🛠 部署自己的实例
 

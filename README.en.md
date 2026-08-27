@@ -9,12 +9,12 @@
 **Leave, attendance, payroll estimates, and ticket reminders — one calendar for the Chinese workplace**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-![Release](https://img.shields.io/badge/release-v1.6.0-b4382a)
+![Release](https://img.shields.io/badge/release-v2.0.0-b4382a)
 ![PWA](https://img.shields.io/badge/PWA-offline--ready-5A0FC8)
 ![Zero Build](https://img.shields.io/badge/build-zero%20dependency-orange)
 ![Platform](https://img.shields.io/badge/platform-Web%20%7C%20Windows%20%7C%20Android-blue)
 
-**[🌐 Open RestCal](https://restcal.abohack.com/app.html)** · [Product site](https://restcal.abohack.com) · [Telegram](https://t.me/restcalabohack) · **[Download v1.6.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)** · [Report an issue](https://github.com/skywalker23241/restcal-abohack/issues)
+**[🌐 Open RestCal](https://restcal.abohack.com/app.html)** · [Product site](https://restcal.abohack.com) · [Telegram](https://t.me/restcalabohack) · **[Download v2.0.0 Android APK](https://github.com/skywalker23241/restcal-abohack/releases/tag/v2.0.0)** · [Report an issue](https://github.com/skywalker23241/restcal-abohack/issues)
 
 <img src="public/assets/images/screenshots/overview-light.png" alt="RestCal day view with the daily calendar card, leave balance, attendance, and estimated take-home pay" width="100%">
 
@@ -30,7 +30,11 @@ It is a **zero-build, dependency-free frontend** written in native HTML, CSS, an
 
 The application interface can switch between Chinese and English. Language, theme, and all business settings are included in complete CSV and WebDAV backups.
 
-## 🆕 What's new in v1.6.0
+## 🆕 What's new in v2.0.0
+
+- Published an installable Android 2.0.0 APK with full-screen and Xiaomi HyperOS system-bar safe-area handling.
+- Android WebDAV now uses a native transport supporting `PROPFIND`, `MKCOL`, `PUT`, and `GET` without browser CORS restrictions.
+- The v1.6.0 Windows offline build remains available; existing data can be migrated through CSV or WebDAV.
 
 - Added a theme-aware date picker and improved year/month selection, calendar cards, and the week-view hierarchy.
 - Daily quotes now follow the interface language, with local fallback quotes when the network is unavailable.
@@ -135,7 +139,9 @@ The application shell and bundled holiday, lunar-calendar, and solar-term data f
 
 ## 💻 Windows desktop app
 
-Latest offline release: [RestCal v1.6.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)
+Latest Android release: [RestCal v2.0.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v2.0.0)
+
+Windows offline release: [RestCal v1.6.0](https://github.com/skywalker23241/restcal-abohack/releases/tag/v1.6.0)
 
 | Download | Purpose |
 |---|---|
@@ -174,7 +180,7 @@ npm run build:android
 
 The debug APK is written to `android/app/build/outputs/apk/debug/app-debug.apk` and can be installed directly on an Android phone for testing. `mobile/` is generated from `public/app.html` and `public/assets/` by `scripts/build-android-web.cjs`; do not edit it manually.
 
-Installable test build: [RestCal-1.6.0-android-webdav-debug.apk](https://github.com/skywalker23241/restcal-abohack/raw/refs/heads/main/releases/RestCal-1.6.0-android-webdav-debug.apk). This build includes the native Android WebDAV transport. SHA256: `806119659596279414773D6060CA19CCAC3C4DF8D4A223BFEF423D65257414D6`.
+Installable APK: [RestCal-2.0.0-android-webdav.apk](https://github.com/skywalker23241/restcal-abohack/releases/download/v2.0.0/RestCal-2.0.0-android-webdav.apk). This build includes the native Android WebDAV transport; see the v2.0.0 release notes for SHA256.
 
 ## 🛠 Deploy your own instance
 
